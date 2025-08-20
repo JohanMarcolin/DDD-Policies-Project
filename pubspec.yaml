@@ -3,7 +3,7 @@ version: 1.0.0
 description: A simple Dart server using shelf
 
 environment:
-  sdk: '>=2.12.0 <4.0.0'
+  sdk: '>=2.17.0 <4.0.0'
 
 dependencies:
   shelf: ^1.4.2

@@ -137,10 +137,10 @@
       "name": "dart_server",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.17"
     }
   ],
-  "generated": "2025-08-20T10:43:47.943899Z",
+  "generated": "2025-08-20T16:12:53.985065Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/J_TH/flutter",
