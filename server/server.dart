@@ -1,7 +1,7 @@
-import 'package:dart_server/router.dart';
+import 'router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'middlewares/jwt.dart';
+import 'infrastructure/middlewares/jwt.dart';
 
 void main() async {
   var handler = const Pipeline()

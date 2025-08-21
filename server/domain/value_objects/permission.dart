@@ -1,5 +1,5 @@
-import 'package:dart_server/domain/value_objects/action.dart';
-import 'package:dart_server/domain/value_objects/resource.dart';
+import 'action.dart';
+import 'resource.dart';
 
 class Permission {
   final List<Action> actions;
