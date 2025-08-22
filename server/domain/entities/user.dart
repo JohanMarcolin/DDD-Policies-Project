@@ -25,10 +25,4 @@ class User {
     Permission([Action.read], [Resource.self, Resource.user, Resource.admin]),
     Permission([Action.write, Action.delete], [Resource.self]),
   ];
-
-  bool get isRegularUser => role is User;
-
-  bool get isAdmin => role is Admin;
-
-  bool get isSuperAdmin => role is SuperAdmin;
 }

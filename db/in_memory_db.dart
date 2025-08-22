@@ -1,4 +1,4 @@
-mixin InMemoryDb<T> {
+class InMemoryDb<T> {
   final Map<String, T> _items = {};
 
   T? get(String id) => _items[id];

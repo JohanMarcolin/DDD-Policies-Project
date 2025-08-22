@@ -7,6 +7,8 @@ import '../value_objects/password.dart';
 import '../value_objects/role.dart';
 
 abstract class UserRepository {
+  User? getById(Id id);
+  User? getByEmail(Email email);
   List<User> get users;
   List<Admin> get admins;
   List<SuperAdmin> get superAdmins;
