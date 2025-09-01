@@ -1,12 +1,13 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/user.dart';
 typedef JwtToken = String;
 
 class TokenService {
-  TokenService(this._key);
+  TokenService();
 
-  final SecretKey _key;
+  static final SecretKey _key = SecretKey(Uuid().v4());
   final Duration _tokenExpiration = Duration(minutes: 5);
 
   JwtToken generate(User user) {
@@ -18,11 +19,11 @@ class TokenService {
     return jwt.sign(_key, expiresIn: _tokenExpiration);
   }
 
-  JWT? verify(JwtToken token) {
+  JWT verify(JwtToken token) {
     try {
       return JWT.verify(token, _key);
-    } catch (_) {
-      return null;
+    } catch (err) {
+      throw err;
     }
   }
 }

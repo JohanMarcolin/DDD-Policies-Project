@@ -8,42 +8,43 @@ class SecurityFilterChain {
 
   static final _protectedPaths = {'user', 'admin', 'data'};
 
-  Middleware get middleware => (Handler innerHandler) {
-        return (Request request) async {
-          final path = request.url.path;
+  Middleware get middleware => (Handler protectedHandler) {
+        return (Request req) async {
+          final path = req.url.path;
 
-          if (_isProtectedPath(path)) _authorize(request);
+          if (_isProtectedPath(path)) {
+            try {
+              _authorize(req);
+            } catch (err) {
+              return Response.forbidden(err.toString());
+            }
+          }
 
-          return await innerHandler(request);
+          return await protectedHandler(req);
         };
       };
 
   bool _isProtectedPath(String path) => _protectedPaths.contains(path);
 
-  Response? _authorize(Request request) {
-    final authHeader = request.headers['authorization'];
+  void _authorize(Request req) {
+    final token = extractToken(req);
+
+    final jwt = _tokenService.verify(token);
+
+    final path = req.url.path;
+
+    if (path == 'admin' && jwt.payload['role'] != 'admin') {
+      throw Exception('Admin access required');
+    }
+  }
+
+  String extractToken(Request req) {
+    final authHeader = req.headers['authorization'];
 
     if (authHeader == null || !authHeader.startsWith('Bearer ')) {
-      return Response.forbidden('Missing or malformed authorization header');
+      throw Exception('Missing or malformed authorization header');
     }
 
-    final token = authHeader.substring(7);
-    try {
-      final jwt = _tokenService.verify(token);
-
-      if (jwt == null) {
-        return Response.forbidden('Invalid or expired token');
-      }
-
-      final path = request.url.path;
-
-      if (path == 'admin' && jwt.payload['role'] != 'admin') {
-        return Response.forbidden('Admin access required');
-      }
-    } catch (e) {
-      return Response.forbidden('Invalid token: $e');
-    }
-
-    return null;
+    return authHeader.substring(7);
   }
 }

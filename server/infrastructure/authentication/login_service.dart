@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:shelf/shelf.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import '../../domain/value_objects/email.dart';
 import '../repositories/in_memory_user_repository.dart';
+import '../security/token_service.dart';
 
 class LoginService {
-  LoginService(InMemoryUserRepository repository) : _repository = repository;
+  LoginService(InMemoryUserRepository repository, TokenService tokenService)
+      : _repository = repository,
+        _tokenService = tokenService;
 
   final InMemoryUserRepository _repository;
+  final TokenService _tokenService;
 
   Future<Response> handler(Request req) async {
     try {
@@ -36,14 +39,7 @@ class LoginService {
             headers: {'content-type': 'application/json'});
       }
 
-      final jwt = JWT({
-        'id': user.id.value,
-        'username': user.email.value,
-        'role': user.role.name,
-      });
-      final token =
-          jwt.sign(SecretKey('my-secret-key'), expiresIn: Duration(hours: 1));
-      return Response.ok(jsonEncode({'token': token}),
+      return Response.ok(jsonEncode({'token': _tokenService.generate(user)}),
           headers: {'content-type': 'application/json'});
     } catch (e) {
       return Response(500,

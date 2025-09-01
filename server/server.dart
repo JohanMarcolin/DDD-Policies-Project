@@ -1,4 +1,3 @@
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:get_it/get_it.dart';
 
 import '../db/in_memory_db.dart';
@@ -15,9 +14,9 @@ void main() async {
 final getIt = GetIt.instance;
 
 getIt.registerSingleton<InMemoryUserRepository>(InMemoryUserRepository(InMemoryDb<User>()));
-getIt.registerSingleton<TokenService>(TokenService(SecretKey('your-secret-key')));
+getIt.registerSingleton<TokenService>(TokenService());
 getIt.registerSingleton<SecurityFilterChain>(SecurityFilterChain(getIt<TokenService>()));
-getIt.registerSingleton<LoginService>(LoginService(getIt<InMemoryUserRepository>()));
+getIt.registerSingleton<LoginService>(LoginService(getIt<InMemoryUserRepository>(), getIt<TokenService>()));
 getIt.registerSingleton<RouterProvider>(RouterProvider(getIt<LoginService>()));
 
   final pipeline = const Pipeline()
