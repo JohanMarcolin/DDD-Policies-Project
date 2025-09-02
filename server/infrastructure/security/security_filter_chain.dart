@@ -29,7 +29,7 @@ class SecurityFilterChain {
   void _authorize(Request req) {
     final token = extractToken(req);
 
-    final jwt = _tokenService.verify(token);
+    final jwt = _tokenService.verifyAccessToken(token);
 
     final path = req.url.path;
 

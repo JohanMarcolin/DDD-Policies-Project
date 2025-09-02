@@ -39,7 +39,11 @@ class LoginService {
             headers: {'content-type': 'application/json'});
       }
 
-      return Response.ok(jsonEncode({'token': _tokenService.generate(user)}),
+      return Response.ok(
+          jsonEncode({
+            'accessToken': _tokenService.generateAccessToken(user),
+            'refreshToken': _tokenService.generateRefreshToken(user)
+          }),
           headers: {'content-type': 'application/json'});
     } catch (e) {
       return Response(500,

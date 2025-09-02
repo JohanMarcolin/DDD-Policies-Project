@@ -1,4 +1,4 @@
-import '../../../db/in_memory_db.dart';
+import '../databases/database.dart';
 import '../../domain/entities/admin.dart';
 import '../../domain/entities/super_admin.dart';
 import '../../domain/entities/user.dart';
@@ -9,11 +9,11 @@ import '../../domain/value_objects/password.dart';
 import '../../domain/value_objects/role.dart';
 
 class InMemoryUserRepository implements UserRepository {
-  InMemoryUserRepository(InMemoryDb<User> db) : _db = db {
+  InMemoryUserRepository(Database<User> db) : _db = db {
     _setupMockUsers();
   }
 
-  final InMemoryDb<User> _db;
+  final Database<User> _db;
 
   void _setupMockUsers() {
     final user1 = User(
@@ -33,20 +33,20 @@ class InMemoryUserRepository implements UserRepository {
       password: Password('superadmin'),
     );
 
-    _db.put(user1.id.value, user1);
-    _db.put(admin1.id.value, admin1);
-    _db.put(superAdmin1.id.value, superAdmin1);
+    _db.put(user1.id, user1);
+    _db.put(admin1.id, admin1);
+    _db.put(superAdmin1.id, superAdmin1);
   }
 
   @override
   User? getById(Id id) {
-    return _db.get(id.value);
+    return _db.get(id);
   }
 
   @override
   User? getByEmail(Email email) {
     final users = _db.getAll();
-    
+
     return users.firstWhere((user) => user.email.value == email.value);
   }
 
@@ -62,7 +62,7 @@ class InMemoryUserRepository implements UserRepository {
     final id = Id.generate();
     final user = User(id: id, email: email, password: password, role: role);
 
-    return _db.put(id.value, user);
+    return _db.put(id, user);
   }
 
   @override
@@ -77,7 +77,7 @@ class InMemoryUserRepository implements UserRepository {
 
   @override
   void updateEmail(Id id, Email newEmail) {
-    final user = _db.get(id.value);
+    final user = _db.get(id);
     if (user != null) {
       final updated = User(
         id: user.id,
@@ -85,13 +85,13 @@ class InMemoryUserRepository implements UserRepository {
         role: user.role,
         password: user.password,
       );
-      _db.put(id.value, updated);
+      _db.put(id, updated);
     }
   }
 
   @override
   void updatePassword(Id id, Password newPassword) {
-    final user = _db.get(id.value);
+    final user = _db.get(id);
     if (user != null) {
       final updated = User(
         id: user.id,
@@ -99,7 +99,7 @@ class InMemoryUserRepository implements UserRepository {
         role: user.role,
         password: newPassword,
       );
-      _db.put(id.value, updated);
+      _db.put(id, updated);
     }
   }
 
@@ -108,6 +108,6 @@ class InMemoryUserRepository implements UserRepository {
 
   @override
   void delete(Id id) {
-    _db.delete(id.value);
+    _db.delete(id);
   }
 }
