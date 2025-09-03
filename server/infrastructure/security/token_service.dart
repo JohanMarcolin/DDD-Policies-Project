@@ -2,6 +2,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/user.dart';
+import '../../domain/value_objects/id.dart';
 import '../databases/refresh_token_database.dart';
 
 typedef AccessToken = String;
@@ -42,6 +43,15 @@ class TokenService {
     return _verifyToken(token);
   }
 
+  RefreshToken rotateRefreshToken(User user) {
+    final oldToken = _refreshTokenDatabase.get(user.id);
+    if (oldToken != null) {
+      _refreshTokenDatabase.delete(user.id);
+      return generateRefreshToken(user);
+    }
+    throw Exception('No existing refresh token');
+  }
+
   void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.id);
 
   String _signToken(JWT token, Duration expiration) =>
@@ -53,5 +63,15 @@ class TokenService {
     } catch (err) {
       throw err;
     }
+  }
+
+  Id extractUserId(String token) {
+    final claims = _extractTokenClaims(token);
+    return Id(claims['id']);
+  }
+
+  Map<String, dynamic> _extractTokenClaims(String token) {
+    final jwt = _verifyToken(token);
+    return jwt.payload;
   }
 }

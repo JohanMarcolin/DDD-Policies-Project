@@ -1,12 +1,12 @@
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import 'infrastructure/authentication/login_service.dart';
+import 'infrastructure/authentication/auth_service.dart';
 
 class RouterProvider {
-  RouterProvider(LoginService loginService) : _loginService = loginService;
+  RouterProvider(AuthService authService) : _authService = authService;
 
-  final LoginService _loginService;
+  final AuthService _authService;
 
   Router get handler => Router()
     ..get('/public', (Request req) => Response.ok('Public endpoint'))
@@ -17,5 +17,6 @@ class RouterProvider {
     ..get('/mock1', (Request req) => Response.ok('Mock endpoint 1'))
     ..get('/mock2', (Request req) => Response.ok('Mock endpoint 2'))
     ..get('/mock3', (Request req) => Response.ok('Mock endpoint 3'))
-    ..post('/login', _loginService.handler);
+    ..post('/auth/login', _authService.handleLogin)
+    ..post('/auth/refresh', _authService.handleRefresh);
 }

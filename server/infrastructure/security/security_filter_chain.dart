@@ -27,9 +27,9 @@ class SecurityFilterChain {
   bool _isProtectedPath(String path) => _protectedPaths.contains(path);
 
   void _authorize(Request req) {
-    final token = extractToken(req);
+    final accessToken = extractAccessToken(req);
 
-    final jwt = _tokenService.verifyAccessToken(token);
+    final jwt = _tokenService.verifyAccessToken(accessToken);
 
     final path = req.url.path;
 
@@ -38,7 +38,7 @@ class SecurityFilterChain {
     }
   }
 
-  String extractToken(Request req) {
+  String extractAccessToken(Request req) {
     final authHeader = req.headers['authorization'];
 
     if (authHeader == null || !authHeader.startsWith('Bearer ')) {

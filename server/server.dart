@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 
-import 'infrastructure/authentication/login_service.dart';
+import 'infrastructure/authentication/auth_service.dart';
 import 'infrastructure/databases/refresh_token_database.dart';
 import 'infrastructure/databases/user_database.dart';
 import 'infrastructure/repositories/in_memory_user_repository.dart';
@@ -21,10 +21,9 @@ void main() async {
       TokenService(getIt<RefreshTokenDatabase>()));
   getIt.registerSingleton<SecurityFilterChain>(
       SecurityFilterChain(getIt<TokenService>()));
-  getIt.registerSingleton<LoginService>(
-      LoginService(getIt<InMemoryUserRepository>(), getIt<TokenService>()));
-  getIt
-      .registerSingleton<RouterProvider>(RouterProvider(getIt<LoginService>()));
+  getIt.registerSingleton<AuthService>(
+      AuthService(getIt<InMemoryUserRepository>(), getIt<TokenService>()));
+  getIt.registerSingleton<RouterProvider>(RouterProvider(getIt<AuthService>()));
 
   final pipeline = const Pipeline()
       .addMiddleware(logRequests())
