@@ -1,4 +1,4 @@
-import '../databases/database.dart';
+import '../../application/databases/database.dart';
 import '../../domain/entities/admin.dart';
 import '../../domain/entities/super_admin.dart';
 import '../../domain/entities/user.dart';
