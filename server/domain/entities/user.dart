@@ -13,7 +13,7 @@ class User extends Equatable {
     required this.id,
     required this.email,
     required this.password,
-    required this.role,
+    this.role = Role.user,
   });
 
   final Id id;
@@ -23,6 +23,10 @@ class User extends Equatable {
 
   @override
   List<Object?> get props => [id];
+
+  bool isSameAs(User other) => id == other.id;
+
+  bool isSuperAdmin() => role == Role.superAdmin;
 
   static final List<Permission> permissions = [
     Permission([Action.read], [Resource.self, Resource.user, Resource.admin]),
