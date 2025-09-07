@@ -1,4 +1,4 @@
-import '../../domain/value_objects/id.dart';
+import '../../../domain/value_objects/id.dart';
 import 'database.dart';
 
 typedef RefreshToken = String;

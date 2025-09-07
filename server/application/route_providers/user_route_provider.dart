@@ -1,7 +1,7 @@
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import '../../domain/services/user_administration/user_administration_service.dart';
+import '../../../domain/services/user_administration/user_administration_service.dart';
 
 class UserRouteProvider {
   UserRouteProvider(UserAdministrationService userAdministrationService)

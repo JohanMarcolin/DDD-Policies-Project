@@ -1,12 +1,9 @@
-import '../../domain/entities/user.dart';
-import '../../domain/value_objects/id.dart';
-import '../factories/mock_user_factory.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/value_objects/id.dart';
 import 'database.dart';
 
 class UserDatabase implements Database<User> {
-  UserDatabase() {
-    _setupMockUsers();
-  }
+  UserDatabase() {}
 
   final Map<Id, User> _users = {};
 
@@ -24,11 +21,5 @@ class UserDatabase implements Database<User> {
   @override
   void delete(Id id) {
     _users.remove(id);
-  }
-
-  void _setupMockUsers() {
-    for (final user in MockUserFactory.createDefaultUsers()) {
-      put(user.id, user);
-    }
   }
 }

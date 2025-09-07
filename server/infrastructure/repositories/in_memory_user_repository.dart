@@ -1,58 +1,61 @@
-import '../databases/database.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/repositories/user_repository.dart';
-import '../../domain/value_objects/email.dart';
-import '../../domain/value_objects/id.dart';
-import '../../domain/value_objects/password.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/value_objects/email.dart';
+import '../../../domain/value_objects/id.dart';
+import '../../../domain/value_objects/password.dart';
+import '../databases/user_database.dart';
+import '../databases/user_password_database.dart';
 
 class InMemoryUserRepository implements UserRepository {
-  InMemoryUserRepository(Database<User> db) : _db = db {}
+  InMemoryUserRepository(
+      UserDatabase userDb, UserPasswordDatabase userPasswordDb)
+      : _userdb = userDb,
+        _userPasswordDb = userPasswordDb;
 
-  final Database<User> _db;
+  final UserDatabase _userdb;
+  final UserPasswordDatabase _userPasswordDb;
+
+  @override
+  List<User> get users => _userdb.getAll();
 
   @override
   User? get({required Id id}) {
-    return _db.get(id);
+    return _userdb.get(id);
   }
 
   @override
   User? getByEmail({required Email email}) {
-    final users = _db.getAll();
+    final users = _userdb.getAll();
 
     return users.firstWhere((user) => user.email.value == email.value);
   }
 
   @override
   void updateEmail({required Id id, required Email newEmail}) {
-    final user = _db.get(id);
+    final user = _userdb.get(id);
     if (user != null) {
       final updated = User(
         id: user.id,
         email: newEmail,
         role: user.role,
       );
-      _db.put(id, updated);
+      _userdb.put(id, updated);
     }
   }
 
   @override
   void updatePassword({required Id id, required Password newPassword}) {
-    final user = _db.get(id);
-    if (user != null) {
-      final updated = User(
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      );
-      _db.put(id, updated);
+    final userPassword = _userPasswordDb.get(id);
+    if (userPassword != null) {
+      _userPasswordDb.put(id, newPassword);
     }
   }
 
   @override
-  List<User> get users => _db.getAll();
-
-  @override
   void delete({required Id id}) {
-    _db.delete(id);
+    _userdb.delete(id);
   }
+
+  bool isPasswordVerified({required Id id, required Password password}) =>
+      _userPasswordDb.isPasswordVerified(id, password);
 }

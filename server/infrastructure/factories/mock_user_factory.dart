@@ -1,38 +1,25 @@
-import '../../domain/entities/admin.dart';
-import '../../domain/entities/analyst.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/value_objects/id.dart';
-import '../../domain/value_objects/email.dart';
-import '../../domain/value_objects/role.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/value_objects/id.dart';
+import '../../../domain/value_objects/email.dart';
+import '../../../domain/value_objects/password.dart';
+import '../../../domain/value_objects/role.dart';
 
 class MockUserFactory {
-  static User createUser({String email = 'user', String password = 'user'}) {
-    return User(
-      id: Id.generate(),
-      email: Email(email),
-      role: Role.user,
-    );
-  }
-
-  static Admin createAdmin(
-      {String email = 'admin', String password = 'admin'}) {
-    return Admin(
-      id: Id.generate(),
-      email: Email(email),    );
-  }
-
-  static Analyst createAnalyst(
-      {String email = 'analyst', String password = 'analyst'}) {
-    return Analyst(
-      id: Id.generate(),
-      email: Email(email),    );
-  }
-
-  static List<User> createDefaultUsers() {
+  static List<Map<User, Password>> createDefaultUsersWithPasswords() {
     return [
-      createUser(),
-      createAdmin(),
-      createAnalyst(),
+      _createUserWithPassword(role: Role.user),
+      _createUserWithPassword(role: Role.admin),
+      _createUserWithPassword(role: Role.analyst),
     ];
+  }
+
+  static Map<User, Password> _createUserWithPassword({required Role role}) {
+    return {
+      User(
+        id: Id.generate(),
+        email: Email(role.name),
+        role: role,
+      ): Password(role.name),
+    };
   }
 }

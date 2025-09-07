@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:shelf/shelf.dart';
 
-import '../../domain/value_objects/email.dart';
-import '../../infrastructure/repositories/in_memory_user_repository.dart';
+import '../../../domain/value_objects/email.dart';
+import '../../../domain/value_objects/password.dart';
+import '../repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 
 class AuthService {
@@ -32,7 +33,12 @@ class AuthService {
 
       if (user == null) {
         return Response(401,
-            body: jsonEncode({'error': 'Invalid credentials'}));
+            body: jsonEncode({'error': 'Invalid email'}));
+      }
+
+      if (!_userRepository.isPasswordVerified(id: user.id, password: Password(password))) {
+        return Response(401,
+            body: jsonEncode({'error': 'Invalid password'}));
       }
 
       return Response.ok(jsonEncode({
@@ -72,8 +78,7 @@ class AuthService {
       }
 
       return Response.ok(jsonEncode({
-        'accessToken': _tokenService.generateAccessToken(user),
-        'refreshToken': _tokenService.generateRefreshToken(user)
+        'accessToken': _tokenService.generateAccessToken(user)
       }));
     } catch (e) {
       return Response(500,
