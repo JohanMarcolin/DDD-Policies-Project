@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 
+import '../infrastructure/repositories/in_memory_user_repository.dart';
 import 'authentication/auth_service.dart';
-import 'databases/refresh_token_database.dart';
-import 'databases/user_database.dart';
-import 'repositories/in_memory_user_repository.dart';
+import '../infrastructure/databases/refresh_token_database.dart';
+import '../infrastructure/databases/user_database.dart';
 import 'security/token_service.dart';
 import 'router.dart';
 import 'package:shelf/shelf.dart';

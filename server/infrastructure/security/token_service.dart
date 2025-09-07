@@ -1,7 +1,7 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../application/databases/refresh_token_database.dart';
+import '../databases/refresh_token_database.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/value_objects/id.dart';
 

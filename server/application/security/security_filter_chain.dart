@@ -1,4 +1,7 @@
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
+import '../../domain/entities/user.dart';
+import '../../domain/value_objects/role.dart';
 import 'token_service.dart';
 
 class SecurityFilterChain {
@@ -14,7 +17,10 @@ class SecurityFilterChain {
 
           if (_isProtectedPath(path)) {
             try {
-              _authorize(req);
+              final verifiedAccessToken = _getVerifiedAccessToken(req);
+              final currentUser = _extractCurrentUser(verifiedAccessToken);
+              _authorizePath(currentUser, path);
+              _appendCurrentUser(req, currentUser);
             } catch (err) {
               return Response.forbidden(err.toString());
             }
@@ -26,19 +32,36 @@ class SecurityFilterChain {
 
   bool _isProtectedPath(String path) => _protectedPaths.contains(path);
 
-  void _authorize(Request req) {
-    final accessToken = extractAccessToken(req);
+  JWT _getVerifiedAccessToken(Request req) {
+    final accessToken = _extractAccessToken(req);
 
     final jwt = _tokenService.verifyAccessToken(accessToken);
 
-    final path = req.url.path;
+    if (jwt == null) {
+      throw Exception('Invalid or expired access token');
+    }
 
-    if (path == 'admin' && jwt.payload['role'] != 'admin') {
+    return jwt;
+  }
+
+  void _authorizePath(User currentUser, String path) {
+    if (path == 'admin' && currentUser.role != Role.admin) {
       throw Exception('Admin access required');
     }
   }
 
-  String extractAccessToken(Request req) {
+  void _appendCurrentUser(Request req, User user) {
+    req.context['currentUser'] = user;
+  }
+
+  User _extractCurrentUser(JWT token) {
+    return User(
+        id: _tokenService.extractUserId(token),
+        email: _tokenService.extractUserEmail(token),
+        role: _tokenService.extractUserRole(token));
+  }
+
+  String _extractAccessToken(Request req) {
     final authHeader = req.headers['authorization'];
 
     if (authHeader == null || !authHeader.startsWith('Bearer ')) {

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 
 import '../../domain/value_objects/email.dart';
-import '../repositories/in_memory_user_repository.dart';
+import '../../infrastructure/repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 
 class AuthService {
@@ -28,9 +28,9 @@ class AuthService {
             body: jsonEncode({'error': 'Missing email or password'}));
       }
 
-      final user = _userRepository.getByEmail(Email(email));
+      final user = _userRepository.getByEmail(email: Email(email));
 
-      if (user == null || user.password.value != password) {
+      if (user == null) {
         return Response(401,
             body: jsonEncode({'error': 'Invalid credentials'}));
       }
@@ -46,7 +46,7 @@ class AuthService {
     }
   }
 
-  Future<Response> handleRefresh(Request req) async {
+  Future<Response> handleRefreshAccessToken(Request req) async {
     try {
       final payload = await req.readAsString();
       if (payload.isEmpty) {
@@ -60,8 +60,11 @@ class AuthService {
             body: jsonEncode({'error': 'Missing refresh token'}));
       }
 
-      final userId = _tokenService.extractUserId(refreshToken);
-      final user = _userRepository.getById(userId);
+      final verifiedRefreshToken =
+          _tokenService.verifyRefreshToken(refreshToken);
+
+      final userId = _tokenService.extractUserId(verifiedRefreshToken);
+      final user = _userRepository.get(id: userId);
 
       if (user == null) {
         return Response(401,

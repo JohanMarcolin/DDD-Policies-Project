@@ -20,11 +20,24 @@ class UserAdministrationService {
         repository: _userRepository);
   }
 
-  User? getUser(
+  User? get(
       {required User subject,
-      required Id object,
+      required Id id,
       required ViewUserPolicy policy}) {
-    final user = _userRepository.getById(object);
+    final user = _userRepository.get(id: id);
+
+    if (user != null && policy.isCompliant(subject: subject, object: user)) {
+      return user;
+    } else {
+      return null;
+    }
+  }
+
+  User? getByEmail(
+      {required User subject,
+      required Email email,
+      required ViewUserPolicy policy}) {
+    final user = _userRepository.getByEmail(email: email);
 
     if (user != null && policy.isCompliant(subject: subject, object: user)) {
       return user;
@@ -38,7 +51,7 @@ class UserAdministrationService {
       required User object,
       required DeleteUserPolicy policy}) {
     if (policy.isCompliant(subject: subject, object: object)) {
-      _userRepository.delete(object.id);
+      _userRepository.delete(id: object.id);
     }
   }
 
@@ -48,7 +61,7 @@ class UserAdministrationService {
       required Email newEmail,
       required UpdateUserEmailPolicy policy}) {
     if (policy.isCompliant(subject: subject, object: object)) {
-      _userRepository.updateEmail(object.id, newEmail);
+      _userRepository.updateEmail(id: object.id, newEmail: newEmail);
     }
   }
 
@@ -58,7 +71,7 @@ class UserAdministrationService {
       required Password newPassword,
       required UpdateUserPasswordPolicy policy}) {
     if (policy.isCompliant(subject: subject, object: object)) {
-      _userRepository.updatePassword(object.id, newPassword);
+      _userRepository.updatePassword(id: object.id, newPassword: newPassword);
     }
   }
 }

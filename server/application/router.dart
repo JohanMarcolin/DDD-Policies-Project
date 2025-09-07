@@ -10,7 +10,7 @@ class RouterProvider {
 
   Router get handler => Router()
     ..post('/auth/login', _authService.handleLogin)
-    ..post('/auth/refresh', _authService.handleRefresh)
+    ..post('/auth/refresh', _authService.handleRefreshAccessToken)
     ..get('/user/<id>', (Request req) {
       final id = req.params['id'];
       return Response.ok('User: $id');

@@ -2,12 +2,12 @@ import '../entities/user.dart';
 import '../value_objects/email.dart';
 import '../value_objects/id.dart';
 import '../value_objects/password.dart';
-
+import '../value_objects/role.dart';
 abstract class UserRepository {
   List<User> get users;
-  User? getById(Id id);
-  User? getByEmail(Email email);
-  void delete(Id id);
-  void updateEmail(Id id, Email newEmail);
-  void updatePassword(Id id, Password newPassword);
+  User? get({required Id id});
+  User? getByEmail({required Email email});
+  void delete({required Id id});
+  void updateEmail({required Id id, required Email newEmail});
+  void updatePassword({required Id id, required Password newPassword});
 }
