@@ -1,16 +1,15 @@
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import 'authentication/auth_service.dart';
+import '../../domain/services/user_administration/user_administration_service.dart';
 
-class RouterProvider {
-  RouterProvider(AuthService authService) : _authService = authService;
+class UserRouteProvider {
+  UserRouteProvider(UserAdministrationService userAdministrationService)
+      : _userAdministrationService = userAdministrationService;
 
-  final AuthService _authService;
+  final UserAdministrationService _userAdministrationService;
 
-  Router get handler => Router()
-    ..post('/auth/login', _authService.handleLogin)
-    ..post('/auth/refresh', _authService.handleRefreshAccessToken)
+  void appendRoutes(Router router) => router
     ..get('/user/<id>', (Request req) {
       final id = req.params['id'];
       return Response.ok('User: $id');

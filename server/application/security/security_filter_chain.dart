@@ -1,15 +1,18 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 import '../../domain/entities/user.dart';
-import '../../domain/value_objects/role.dart';
 import 'token_service.dart';
+
+extension CurrentUserRequestExtension on Request {
+  User? get currentUser => context['currentUser'] as User?;
+}
 
 class SecurityFilterChain {
   SecurityFilterChain(TokenService tokenService) : _tokenService = tokenService;
 
   final TokenService _tokenService;
 
-  static final _protectedPaths = {'user', 'admin', 'data'};
+  static final _protectedPaths = {'user'};
 
   Middleware get middleware => (Handler protectedHandler) {
         return (Request req) async {
@@ -17,10 +20,7 @@ class SecurityFilterChain {
 
           if (_isProtectedPath(path)) {
             try {
-              final verifiedAccessToken = _getVerifiedAccessToken(req);
-              final currentUser = _extractCurrentUser(verifiedAccessToken);
-              _authorizePath(currentUser, path);
-              _appendCurrentUser(req, currentUser);
+              _authorize(req);
             } catch (err) {
               return Response.forbidden(err.toString());
             }
@@ -32,22 +32,18 @@ class SecurityFilterChain {
 
   bool _isProtectedPath(String path) => _protectedPaths.contains(path);
 
+  void _authorize(Request req) {
+    final verifiedAccessToken = _getVerifiedAccessToken(req);
+    final currentUser = _extractCurrentUser(verifiedAccessToken);
+    _appendCurrentUser(req, currentUser);
+  }
+
   JWT _getVerifiedAccessToken(Request req) {
     final accessToken = _extractAccessToken(req);
 
     final jwt = _tokenService.verifyAccessToken(accessToken);
 
-    if (jwt == null) {
-      throw Exception('Invalid or expired access token');
-    }
-
     return jwt;
-  }
-
-  void _authorizePath(User currentUser, String path) {
-    if (path == 'admin' && currentUser.role != Role.admin) {
-      throw Exception('Admin access required');
-    }
   }
 
   void _appendCurrentUser(Request req, User user) {

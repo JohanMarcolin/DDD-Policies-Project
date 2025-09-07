@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:uuid/uuid.dart';
 
@@ -81,23 +79,37 @@ class TokenService {
 
   Id extractUserId(JWT token) {
     final claims = _extractTokenClaims(token);
-    return Id(claims['id']);
+    final id = claims['id'];
+    if (id == null) {
+      throw Exception('Token does not contain a valid user id');
+    }
+    return Id(id);
   }
 
   Email extractUserEmail(JWT token) {
     final claims = _extractTokenClaims(token);
-    return Email(claims['username']);
+    final email = claims['username'];
+    if (email == null) {
+      throw Exception('Token does not contain a valid user email');
+    }
+    return Email(email);
   }
 
   Role extractUserRole(JWT token) {
     final claims = _extractTokenClaims(token);
-    switch (claims['role']) {
+    final role = claims['role'];
+    if (role == null) {
+      throw Exception('Token does not contain a valid user role');
+    }
+    switch (role) {
       case 'analyst':
         return Role.analyst;
       case 'admin':
         return Role.admin;
-      default:
+      case 'user':
         return Role.user;
+      default:
+        throw Exception('Unknown user role: $role');
     }
   }
 
