@@ -9,14 +9,26 @@ class RouterProvider {
   final AuthService _authService;
 
   Router get handler => Router()
-    ..get('/public', (Request req) => Response.ok('Public endpoint'))
-    ..get('/user', (Request req) => Response.ok('User endpoint: Authenticated'))
-    ..get(
-        '/admin', (Request req) => Response.ok('Admin endpoint: Authenticated'))
-    ..get('/data', (Request req) => Response.ok('Data endpoint: Authenticated'))
-    ..get('/mock1', (Request req) => Response.ok('Mock endpoint 1'))
-    ..get('/mock2', (Request req) => Response.ok('Mock endpoint 2'))
-    ..get('/mock3', (Request req) => Response.ok('Mock endpoint 3'))
     ..post('/auth/login', _authService.handleLogin)
-    ..post('/auth/refresh', _authService.handleRefresh);
+    ..post('/auth/refresh', _authService.handleRefresh)
+    ..get('/user/<id>', (Request req) {
+      final id = req.params['id'];
+      return Response.ok('User: $id');
+    })
+    ..delete('/user/<id>', (Request req) {
+      final id = req.params['id'];
+      return Response.ok('Deleted user: $id');
+    })
+    ..post('/user/email', (Request req) {
+      return req.readAsString().then((body) {
+        final newEmail = body;
+        return Response.ok('Received new email: $newEmail');
+      });
+    })
+    ..post('/user/password', (Request req) {
+      return req.readAsString().then((body) {
+        final newPassword = body;
+        return Response.ok('Received new password: $newPassword');
+      });
+    });
 }

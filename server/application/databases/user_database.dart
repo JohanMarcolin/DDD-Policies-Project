@@ -24,15 +24,15 @@ class UserDatabase implements Database<User> {
       email: Email('admin'),
       password: Password('admin'),
     );
-    final superAdmin1 = SuperAdmin(
+    final analyst1 = Analyst(
       id: Id.generate(),
-      email: Email('superadmin'),
-      password: Password('superadmin'),
+      email: Email('analyst'),
+      password: Password('analyst'),
     );
 
     put(user1.id, user1);
     put(admin1.id, admin1);
-    put(superAdmin1.id, superAdmin1);
+    put(analyst1.id, analyst1);
   }
 
   final Map<Id, User> _users = {};

@@ -1,28 +1,27 @@
-import '../../entities/user.dart';
-import '../../value_objects/role.dart';
-import 'user_policy_outcome.dart';
+part of '../policy.dart';
 
-class DeleteUserPolicy {
-  const DeleteUserPolicy();
+class DeleteUserPolicy extends Policy<User, User> {
+  const DeleteUserPolicy(super.subject, super.object);
 
-  UserPolicyOutcome canDeleteUser(
+  @override
+  PolicyComplianceResult checkCompliance(
       {required User subject, required User object}) {
     switch (subject.role) {
-      case Role.superAdmin:
+      case Role.analyst:
         if (!subject.isSameAs(object))
-          return Granted();
+          return Compliant();
         else
-          return Denied(reason: CanNotDeleteSelf());
+          return NonCompliant(reason: CanNotDeleteSelf());
       case Role.admin:
-        if (!object.isSuperAdmin())
-          return Granted();
+        if (!object.isAnalyst())
+          return Compliant();
         else
-          return Denied(reason: CanNotDeleteSuperAdmin());
+          return NonCompliant(reason: CanNotDeleteAnalyst());
       case Role.user:
         if (subject.isSameAs(object))
-          return Granted();
+          return Compliant();
         else
-          return Denied(reason: CanOnlyDeleteSelf());
+          return NonCompliant(reason: CanOnlyDeleteSelf());
     }
   }
 }

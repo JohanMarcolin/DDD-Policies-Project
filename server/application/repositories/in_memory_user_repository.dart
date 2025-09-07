@@ -27,15 +27,15 @@ class InMemoryUserRepository implements UserRepository {
       email: Email('admin'),
       password: Password('admin'),
     );
-    final superAdmin1 = SuperAdmin(
+    final analyst1 = Analyst(
       id: Id.generate(),
-      email: Email('superadmin'),
-      password: Password('superadmin'),
+      email: Email('analyst'),
+      password: Password('analyst'),
     );
 
     _db.put(user1.id, user1);
     _db.put(admin1.id, admin1);
-    _db.put(superAdmin1.id, superAdmin1);
+    _db.put(analyst1.id, analyst1);
   }
 
   @override
@@ -66,13 +66,10 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  List<SuperAdmin> get superAdmins {
+  List<Analyst> get analysts {
     final users = _db.getAll();
 
-    return users
-        .where((user) => user.role is SuperAdmin)
-        .cast<SuperAdmin>()
-        .toList();
+    return users.where((user) => user.role is Analyst).cast<Analyst>().toList();
   }
 
   @override

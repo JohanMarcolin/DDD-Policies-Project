@@ -1,5 +1,1 @@
-enum Role {
-  user,
-  admin,
-  superAdmin
-}
+enum Role { user, admin, analyst }

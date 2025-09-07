@@ -1,24 +1,24 @@
-import '../../entities/user.dart';
-import '../../value_objects/role.dart';
-import 'user_policy_outcome.dart';
+part of '../policy.dart';
 
-class ViewUserPolicy {
-  const ViewUserPolicy();
+class ViewUserPolicy extends Policy<User, User> {
+  const ViewUserPolicy(super.subject, super.object);
 
-  UserPolicyOutcome canViewUser({required User subject, required User object}) {
+  @override
+  PolicyComplianceResult checkCompliance(
+      {required User subject, required User object}) {
     switch (subject.role) {
-      case Role.superAdmin:
-        return Granted();
+      case Role.analyst:
+        return Compliant();
       case Role.admin:
-        if (!object.isSuperAdmin())
-          return Granted();
+        if (!object.isAnalyst())
+          return Compliant();
         else
-          return Denied(reason: CanNotViewSuperAdmin());
+          return NonCompliant(reason: CanNotViewAnalyst());
       case Role.user:
         if (subject.isSameAs(object))
-          return Granted();
+          return Compliant();
         else
-          return Denied(reason: CanOnlyViewSelf());
+          return NonCompliant(reason: CanOnlyViewSelf());
     }
   }
 }

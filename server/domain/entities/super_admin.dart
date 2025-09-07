@@ -7,12 +7,12 @@ import '../value_objects/permission.dart';
 import '../value_objects/resource.dart';
 import '../value_objects/role.dart';
 
-class SuperAdmin extends User {
-  SuperAdmin({
+class Analyst extends User {
+  Analyst({
     required Id id,
     required Email email,
     required Password password,
-  }) : super(id: id, email: email, password: password, role: Role.superAdmin);
+  }) : super(id: id, email: email, password: password, role: Role.analyst);
 
   static final List<Permission> permissions = [
     Permission(Action.values, Resource.values),

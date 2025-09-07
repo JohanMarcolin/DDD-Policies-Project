@@ -1,25 +1,24 @@
-import '../../entities/user.dart';
-import '../../value_objects/role.dart';
-import 'user_policy_outcome.dart';
+part of '../policy.dart';
 
-class UpdateUserPasswordPolicy {
-  const UpdateUserPasswordPolicy();
+class UpdateUserPasswordPolicy extends Policy<User, User> {
+  const UpdateUserPasswordPolicy(super.subject, super.object);
 
-  UserPolicyOutcome canModifyUserPassword(
+  @override
+  PolicyComplianceResult checkCompliance(
       {required User subject, required User object}) {
     switch (subject.role) {
-      case Role.superAdmin:
-        return Granted();
+      case Role.analyst:
+        return Compliant();
       case Role.admin:
-        if (!object.isSuperAdmin())
-          return Granted();
+        if (!object.isAnalyst())
+          return Compliant();
         else
-          return Denied(reason: CanNotModifySuperAdmin());
+          return NonCompliant(reason: CanNotModifyAnalyst());
       case Role.user:
         if (subject.isSameAs(object))
-          return Granted();
+          return Compliant();
         else
-          return Denied(reason: CanOnlyModifySelf());
+          return NonCompliant(reason: CanOnlyModifySelf());
     }
   }
 }

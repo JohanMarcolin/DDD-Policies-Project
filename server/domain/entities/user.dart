@@ -26,7 +26,7 @@ class User extends Equatable {
 
   bool isSameAs(User other) => id == other.id;
 
-  bool isSuperAdmin() => role == Role.superAdmin;
+  bool isAnalyst() => role == Role.analyst;
 
   static final List<Permission> permissions = [
     Permission([Action.read], [Resource.self, Resource.user, Resource.admin]),

@@ -1,14 +1,10 @@
 import '../../entities/user.dart';
-import '../../policies/user_administration/delete_user_policy.dart';
-import '../../policies/user_administration/update_user_email_policy.dart';
-import '../../policies/user_administration/update_user_password_policy.dart';
-import '../../policies/user_administration/user_policy_outcome.dart';
-import '../../policies/user_administration/view_user_policy.dart';
+import '../../operations/operation.dart';
+import '../../policies/policy.dart';
 import '../../repositories/user_repository.dart';
 import '../../value_objects/email.dart';
 import '../../value_objects/id.dart';
 import '../../value_objects/password.dart';
-import 'user_administration_outcome.dart';
 
 class UserAdministrationService {
   UserAdministrationService(UserRepository userRepository)
@@ -16,50 +12,53 @@ class UserAdministrationService {
 
   final UserRepository _userRepository;
 
-  UserAdministrationOutcome viewUser(
-      User subject, Id object, ViewUserPolicy policy) {
+  List<User> getUsers(
+      {required User subject, required ViewUsersOperation operation}) {
+    return operation.execute(
+        subject: subject,
+        policy: operation.policy,
+        repository: _userRepository);
+  }
+
+  User? getUser(
+      {required User subject,
+      required Id object,
+      required ViewUserPolicy policy}) {
     final user = _userRepository.getById(object);
 
-    if (user == null) return UserNotFound(id: object);
-
-    switch (policy.canViewUser(subject: subject, object: user)) {
-      case Granted():
-        return ViewUserSuccess(user: user);
-      case Denied(reason: final reason):
-        return ViewUserDenied(reason: reason);
+    if (user != null && policy.isCompliant(subject: subject, object: user)) {
+      return user;
+    } else {
+      return null;
     }
   }
 
-  UserAdministrationOutcome deleteUser(
-      User subject, User object, DeleteUserPolicy policy) {
-    switch (policy.canDeleteUser(subject: subject, object: object)) {
-      case Granted():
-        _userRepository.delete(object.id);
-        return DeleteUserSuccess();
-      case Denied(reason: final reason):
-        return DeleteUserDenied(reason: reason);
+  void deleteUser(
+      {required User subject,
+      required User object,
+      required DeleteUserPolicy policy}) {
+    if (policy.isCompliant(subject: subject, object: object)) {
+      _userRepository.delete(object.id);
     }
   }
 
-  UserAdministrationOutcome updateUserEmail(
-      User subject, User object, Email newEmail, UpdateUserEmailPolicy policy) {
-    switch (policy.canUpdateUserEmail(subject: subject, object: object)) {
-      case Granted():
-        _userRepository.updateEmail(object.id, newEmail);
-        return UpdateUserEmailSuccess();
-      case Denied(reason: final reason):
-        return UpdateUserEmailDenied(reason: reason);
+  void updateUserEmail(
+      {required User subject,
+      required User object,
+      required Email newEmail,
+      required UpdateUserEmailPolicy policy}) {
+    if (policy.isCompliant(subject: subject, object: object)) {
+      _userRepository.updateEmail(object.id, newEmail);
     }
   }
 
-  UserAdministrationOutcome updateUserPassword(
-      User subject, User object, Password newPassword, UpdateUserPasswordPolicy policy) {
-    switch (policy.canModifyUserPassword(subject: subject, object: object)) {
-      case Granted():
-        _userRepository.updatePassword(object.id, newPassword);
-        return UpdateUserPasswordSuccess();
-      case Denied(reason: final reason):
-        return UpdateUserPasswordDenied(reason: reason);
+  void updateUserPassword(
+      {required User subject,
+      required User object,
+      required Password newPassword,
+      required UpdateUserPasswordPolicy policy}) {
+    if (policy.isCompliant(subject: subject, object: object)) {
+      _userRepository.updatePassword(object.id, newPassword);
     }
   }
 }
