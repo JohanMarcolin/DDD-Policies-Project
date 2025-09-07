@@ -59,9 +59,8 @@ void _setupMockUsers() {
   for (final entry in MockUserFactory.createDefaultUsersWithPasswords()) {
     final user = entry.keys.first;
     final password = entry.values.first;
-    final hashedPassword = getIt<PasswordHasher>().hash(password);
 
     getIt<UserDatabase>().put(user.id, user);
-    getIt<UserPasswordDatabase>().put(user.id, hashedPassword);
+    getIt<UserPasswordDatabase>().put(user.id, password);
   }
 }

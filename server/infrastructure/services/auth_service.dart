@@ -32,13 +32,12 @@ class AuthService {
       final user = _userRepository.getByEmail(email: Email(email));
 
       if (user == null) {
-        return Response(401,
-            body: jsonEncode({'error': 'Invalid email'}));
+        return Response(401, body: jsonEncode({'error': 'Invalid email'}));
       }
 
-      if (!_userRepository.isPasswordVerified(id: user.id, password: Password(password))) {
-        return Response(401,
-            body: jsonEncode({'error': 'Invalid password'}));
+      if (!_userRepository.isPasswordVerified(
+          id: user.id, password: Password(password))) {
+        return Response(401, body: jsonEncode({'error': 'Invalid password'}));
       }
 
       return Response.ok(jsonEncode({
@@ -77,9 +76,8 @@ class AuthService {
             body: jsonEncode({'error': 'Invalid refresh token'}));
       }
 
-      return Response.ok(jsonEncode({
-        'accessToken': _tokenService.generateAccessToken(user)
-      }));
+      return Response.ok(
+          jsonEncode({'accessToken': _tokenService.generateAccessToken(user)}));
     } catch (e) {
       return Response(500,
           body: jsonEncode(
