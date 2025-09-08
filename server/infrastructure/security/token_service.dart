@@ -16,7 +16,7 @@ class TokenService {
   final RefreshTokenDatabase _refreshTokenDatabase;
 
   static final SecretKey _key = SecretKey(Uuid().v4());
-  final Duration _accessTokenExpiration = Duration(minutes: 5);
+  final Duration _accessTokenExpiration = Duration(days: 1);
   final Duration _refreshTokenExpiration = Duration(days: 7);
 
   AccessToken generateAccessToken(User user) {

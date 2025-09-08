@@ -28,7 +28,7 @@ class SecurityFilterChain {
           if (_isProtectedPath(path)) {
             print('Protected path accessed: $path');
             try {
-              _authorize(req);
+              req = _authorize(req);
             } catch (err) {
               return Response.forbidden(err.toString());
             }
@@ -41,10 +41,10 @@ class SecurityFilterChain {
   bool _isProtectedPath(String path) =>
       _protectedPaths.any((protected) => path.startsWith(protected));
 
-  void _authorize(Request req) {
+  Request _authorize(Request req) {
     final verifiedAccessToken = _getVerifiedAccessToken(req);
     final currentUser = _extractCurrentUser(verifiedAccessToken);
-    _appendCurrentUser(req, currentUser);
+    return _appendCurrentUser(req, currentUser);
   }
 
   JWT _getVerifiedAccessToken(Request req) {
@@ -55,10 +55,8 @@ class SecurityFilterChain {
     return jwt;
   }
 
-  void _appendCurrentUser(Request req, User user) {
-    print(
-        'Authenticated user: ${user.email.value} with role: ${user.role.name}');
-    req.change(context: {'currentUser': user});
+  Request _appendCurrentUser(Request req, User user) {
+    return req.change(context: {'currentUser': user});
   }
 
   User _extractCurrentUser(JWT token) {

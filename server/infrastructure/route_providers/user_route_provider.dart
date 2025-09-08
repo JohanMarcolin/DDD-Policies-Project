@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import '../../../domain/policies/policy_violation_exception.dart';
 import '../../../domain/services/user_administration/user_administration_service.dart';
 import '../../../domain/value_objects/id.dart';
+import '../mappers/user_mapper.dart';
 import '../security/security_filter_chain.dart';
 
 class UserRouteProvider {
@@ -19,7 +22,8 @@ class UserRouteProvider {
       try {
         final users =
             _userAdministrationService.getUsers(requester: req.currentUser);
-        return Response.ok(users);
+        print(UserMapper.toJsonList(users));
+        return Response.ok(jsonEncode(UserMapper.toJsonList(users)));
       } catch (e) {
         return Response.internalServerError();
       }
