@@ -1,9 +1,9 @@
 import 'package:shelf_router/shelf_router.dart';
 
-import '../../infrastructure/services/auth_service.dart';
+import '../services/auth_service.dart';
 
 class AuthRouteProvider {
-  AuthRouteProvider(AuthService authService)
+  AuthRouteProvider({required AuthService authService})
       : _authService = authService;
 
   final AuthService _authService;

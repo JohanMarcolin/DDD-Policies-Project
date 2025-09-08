@@ -7,7 +7,9 @@ import '../repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 
 class AuthService {
-  AuthService(InMemoryUserRepository userRepository, TokenService tokenService)
+  AuthService(
+      {required InMemoryUserRepository userRepository,
+      required TokenService tokenService})
       : _userRepository = userRepository,
         _tokenService = tokenService;
 

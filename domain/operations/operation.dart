@@ -4,16 +4,12 @@ import '../repositories/user_repository.dart';
 
 part 'user_administration/view_users_operation.dart';
 
-sealed class Operation<TSubject, TPolicy extends Policy, TRepository, TResult> {
-  const Operation(
-      {required this.subject, required this.policy, required this.repository});
-
-  final TSubject subject;
-  final TPolicy policy;
-  final TRepository repository;
+sealed class Operation<TRequester, TPolicy extends Policy, TRepository,
+    TResult> {
+  const Operation();
 
   TResult execute(
-      {required TSubject subject,
+      {required TRequester requester,
       required TPolicy policy,
       required TRepository repository});
 }

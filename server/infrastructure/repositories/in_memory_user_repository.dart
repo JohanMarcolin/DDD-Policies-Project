@@ -8,54 +8,55 @@ import '../databases/user_password_database.dart';
 
 class InMemoryUserRepository implements UserRepository {
   InMemoryUserRepository(
-      UserDatabase userDb, UserPasswordDatabase userPasswordDb)
-      : _userdb = userDb,
-        _userPasswordDb = userPasswordDb;
+      {required UserDatabase userDatabase,
+      required UserPasswordDatabase userPasswordDatabase})
+      : _userdatabase = userDatabase,
+        _userPasswordDatabase = userPasswordDatabase;
 
-  final UserDatabase _userdb;
-  final UserPasswordDatabase _userPasswordDb;
+  final UserDatabase _userdatabase;
+  final UserPasswordDatabase _userPasswordDatabase;
 
   @override
-  List<User> get users => _userdb.getAll();
+  List<User> get users => _userdatabase.getAll();
 
   @override
   User? get({required Id id}) {
-    return _userdb.get(id);
+    return _userdatabase.get(id);
   }
 
   @override
   User? getByEmail({required Email email}) {
-    final users = _userdb.getAll();
+    final users = _userdatabase.getAll();
 
     return users.firstWhere((user) => user.email.value == email.value);
   }
 
   @override
   void updateEmail({required Id id, required Email newEmail}) {
-    final user = _userdb.get(id);
+    final user = _userdatabase.get(id);
     if (user != null) {
       final updated = User(
         id: user.id,
         email: newEmail,
         role: user.role,
       );
-      _userdb.put(id, updated);
+      _userdatabase.put(id, updated);
     }
   }
 
   @override
   void updatePassword({required Id id, required Password newPassword}) {
-    final userPassword = _userPasswordDb.get(id);
+    final userPassword = _userPasswordDatabase.get(id);
     if (userPassword != null) {
-      _userPasswordDb.put(id, newPassword);
+      _userPasswordDatabase.put(id, newPassword);
     }
   }
 
   @override
   void delete({required Id id}) {
-    _userdb.delete(id);
+    _userdatabase.delete(id);
   }
 
   bool isPasswordVerified({required Id id, required Password password}) =>
-      _userPasswordDb.isPasswordVerified(id, password);
+      _userPasswordDatabase.isPasswordVerified(id, password);
 }

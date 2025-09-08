@@ -2,21 +2,18 @@ import '../entities/user.dart';
 import '../value_objects/role.dart';
 
 part 'policy_compliance_result.dart';
-part 'policy_non_compliant_reason.dart';
+part 'policy_violation_reason.dart';
 part 'user_administration/delete_user_policy.dart';
 part 'user_administration/update_user_email_policy.dart';
 part 'user_administration/update_user_password_policy.dart';
 part 'user_administration/view_user_policy.dart';
 
-sealed class Policy<TSubject, TObject> {
-  const Policy(this.subject, this.object);
+sealed class Policy<TRequester, TTarget> {
+  const Policy();
 
-  final TSubject subject;
-  final TObject object;
-
-  bool isCompliant({required TSubject subject, required TObject object}) =>
-      checkCompliance(subject: subject, object: object) is Compliant;
+  bool isCompliant({required TRequester requester, required TTarget target}) =>
+      checkCompliance(requester: requester, target: target) is Compliant;
 
   PolicyComplianceResult checkCompliance(
-      {required TSubject subject, required TObject object});
+      {required TRequester requester, required TTarget target});
 }

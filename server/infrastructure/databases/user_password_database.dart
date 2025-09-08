@@ -4,7 +4,7 @@ import '../security/password_hasher.dart';
 import 'database.dart';
 
 class UserPasswordDatabase implements Database<Password> {
-  UserPasswordDatabase(PasswordHasher passwordHasher)
+  UserPasswordDatabase({required PasswordHasher passwordHasher})
       : _passwordHasher = passwordHasher;
 
   final PasswordHasher _passwordHasher;

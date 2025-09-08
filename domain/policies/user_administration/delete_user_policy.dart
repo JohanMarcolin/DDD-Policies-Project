@@ -1,27 +1,27 @@
 part of '../policy.dart';
 
 class DeleteUserPolicy extends Policy<User, User> {
-  const DeleteUserPolicy(super.subject, super.object);
+  const DeleteUserPolicy();
 
   @override
   PolicyComplianceResult checkCompliance(
-      {required User subject, required User object}) {
-    switch (subject.role) {
+      {required User requester, required User target}) {
+    switch (requester.role) {
       case Role.analyst:
-        if (!subject.isSameAs(object))
+        if (!requester.isSameAs(target))
           return Compliant();
         else
-          return NonCompliant(reason: CanNotDeleteSelf());
+          return Violation(reason: CanNotDeleteSelf());
       case Role.admin:
-        if (!object.isAnalyst())
+        if (!target.isAnalyst())
           return Compliant();
         else
-          return NonCompliant(reason: CanNotDeleteAnalyst());
+          return Violation(reason: CanNotDeleteAnalyst());
       case Role.user:
-        if (subject.isSameAs(object))
+        if (requester.isSameAs(target))
           return Compliant();
         else
-          return NonCompliant(reason: CanOnlyDeleteSelf());
+          return Violation(reason: CanOnlyDeleteSelf());
     }
   }
 }

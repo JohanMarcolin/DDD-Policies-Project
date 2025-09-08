@@ -1,24 +1,24 @@
 part of '../policy.dart';
 
 class UpdateUserEmailPolicy extends Policy<User, User> {
-  const UpdateUserEmailPolicy(super.subject, super.object);
+  const UpdateUserEmailPolicy();
 
   @override
   PolicyComplianceResult checkCompliance(
-      {required User subject, required User object}) {
-    switch (subject.role) {
+      {required User requester, required User target}) {
+    switch (requester.role) {
       case Role.analyst:
         return Compliant();
       case Role.admin:
-        if (!object.isAnalyst())
+        if (!target.isAnalyst())
           return Compliant();
         else
-          return NonCompliant(reason: CanNotModifyAnalyst());
+          return Violation(reason: CanNotModifyAnalyst());
       case Role.user:
-        if (subject.isSameAs(object))
+        if (requester.isSameAs(target))
           return Compliant();
         else
-          return NonCompliant(reason: CanOnlyModifySelf());
+          return Violation(reason: CanOnlyModifySelf());
     }
   }
 }

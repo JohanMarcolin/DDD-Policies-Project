@@ -10,7 +10,7 @@ import '../databases/refresh_token_database.dart';
 typedef AccessToken = String;
 
 class TokenService {
-  TokenService(RefreshTokenDatabase refreshTokenDatabase)
+  TokenService({required RefreshTokenDatabase refreshTokenDatabase})
       : _refreshTokenDatabase = refreshTokenDatabase;
 
   final RefreshTokenDatabase _refreshTokenDatabase;

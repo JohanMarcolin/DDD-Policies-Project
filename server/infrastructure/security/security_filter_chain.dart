@@ -4,11 +4,18 @@ import '../../../domain/entities/user.dart';
 import 'token_service.dart';
 
 extension CurrentUserRequestExtension on Request {
-  User? get currentUser => context['currentUser'] as User?;
+  User get currentUser {
+    final user = context['currentUser'] as User?;
+    if (user == null) {
+      throw StateError('No authenticated user found in request context');
+    }
+    return user;
+  }
 }
 
 class SecurityFilterChain {
-  SecurityFilterChain(TokenService tokenService) : _tokenService = tokenService;
+  SecurityFilterChain({required TokenService tokenService})
+      : _tokenService = tokenService;
 
   final TokenService _tokenService;
 
@@ -17,8 +24,9 @@ class SecurityFilterChain {
   Middleware get middleware => (Handler protectedHandler) {
         return (Request req) async {
           final path = req.url.path;
-
+          print('Request path: $path');
           if (_isProtectedPath(path)) {
+            print('Protected path accessed: $path');
             try {
               _authorize(req);
             } catch (err) {
@@ -30,7 +38,8 @@ class SecurityFilterChain {
         };
       };
 
-  bool _isProtectedPath(String path) => _protectedPaths.contains(path);
+  bool _isProtectedPath(String path) =>
+      _protectedPaths.any((protected) => path.startsWith(protected));
 
   void _authorize(Request req) {
     final verifiedAccessToken = _getVerifiedAccessToken(req);
@@ -47,7 +56,9 @@ class SecurityFilterChain {
   }
 
   void _appendCurrentUser(Request req, User user) {
-    req.context['currentUser'] = user;
+    print(
+        'Authenticated user: ${user.email.value} with role: ${user.role.name}');
+    req.change(context: {'currentUser': user});
   }
 
   User _extractCurrentUser(JWT token) {

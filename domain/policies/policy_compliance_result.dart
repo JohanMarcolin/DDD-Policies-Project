@@ -6,8 +6,8 @@ sealed class PolicyComplianceResult {
 
 class Compliant extends PolicyComplianceResult {}
 
-class NonCompliant extends PolicyComplianceResult {
-  NonCompliant({required this.reason});
+class Violation extends PolicyComplianceResult {
+  Violation({required this.reason});
 
-  final PolicyNonCompliantReason reason;
+  final PolicyViolationReason reason;
 }

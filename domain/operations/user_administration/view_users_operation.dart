@@ -2,25 +2,21 @@ part of '../operation.dart';
 
 class ViewUsersOperation
     extends Operation<User, ViewUserPolicy, UserRepository, List<User>> {
-  const ViewUsersOperation(
-      {required User subject,
-      required ViewUserPolicy policy,
-      required UserRepository repository})
-      : super(subject: subject, policy: policy, repository: repository);
+  const ViewUsersOperation();
 
   @override
   List<User> execute(
-      {required User subject,
+      {required User requester,
       required ViewUserPolicy policy,
       required UserRepository repository}) {
-    var filteredUsers = <User>[];
+    var visibleUsers = <User>[];
 
     for (final user in repository.users) {
-      if (policy.isCompliant(subject: subject, object: user)) {
-        filteredUsers.add(user);
+      if (policy.isCompliant(requester: requester, target: user)) {
+        visibleUsers.add(user);
       }
     }
 
-    return filteredUsers;
+    return visibleUsers;
   }
 }
