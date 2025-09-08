@@ -24,9 +24,7 @@ class SecurityFilterChain {
   Middleware get middleware => (Handler protectedHandler) {
         return (Request req) async {
           final path = req.url.path;
-          print('Request path: $path');
           if (_isProtectedPath(path)) {
-            print('Protected path accessed: $path');
             try {
               req = _authorize(req);
             } catch (err) {
