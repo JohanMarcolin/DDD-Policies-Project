@@ -8,12 +8,12 @@ import '../infrastructure/databases/user_password_database.dart';
 import '../infrastructure/factories/mock_user_factory.dart';
 import '../infrastructure/repositories/in_memory_user_repository.dart';
 import '../infrastructure/security/password_hasher.dart';
-import '../infrastructure/route_providers/auth_route_provider.dart';
+import '../infrastructure/controllers/auth_controller.dart';
 import '../infrastructure/services/auth_service.dart';
 import '../infrastructure/databases/refresh_token_database.dart';
 import '../infrastructure/databases/user_database.dart';
 import '../infrastructure/security/token_service.dart';
-import '../infrastructure/route_providers/user_route_provider.dart';
+import '../infrastructure/controllers/user_controller.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import '../infrastructure/security/security_filter_chain.dart';
@@ -69,20 +69,20 @@ void main() async {
           updateUserPasswordPolicy: updateUserPasswordPolicy,
           deleteUserPolicy: deleteUserPolicy));
 
-  final authRouteProvider = getIt.registerSingleton<AuthRouteProvider>(
-      AuthRouteProvider(authService: authService));
-  final userRouteProvider = getIt.registerSingleton<UserRouteProvider>(
-      UserRouteProvider(userAdministrationService: userAdministrationService));
+  final authController = getIt.registerSingleton<AuthController>(
+      AuthController(authService: authService));
+  final userController = getIt.registerSingleton<UserController>(
+      UserController(userAdministrationService: userAdministrationService));
 
-  authRouteProvider.appendRoutes(router);
-  userRouteProvider.appendRoutes(router);
+  router.mount('/auth/', authController.handler);
+  router.mount('/user/', userController.handler);
 
   final pipeline = const Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(securityFilterChain.middleware)
       .addHandler(router);
 
-  _setupMockUsers(
+  MockUserFactory.setupDefaultUsers(
     userDatabase: userDatabase,
     userPasswordDatabase: userPasswordDatabase,
   );
@@ -90,17 +90,4 @@ void main() async {
   final server = await shelf_io.serve(pipeline, 'localhost', 8080);
   server.autoCompress = true;
   print('Serving at http://${server.address.host}:${server.port}');
-}
-
-void _setupMockUsers({
-  required UserDatabase userDatabase,
-  required UserPasswordDatabase userPasswordDatabase,
-}) {
-  for (final entry in MockUserFactory.createDefaultUsersWithPasswords()) {
-    final user = entry.keys.first;
-    final password = entry.values.first;
-
-    userDatabase.put(user.id, user);
-    userPasswordDatabase.put(user.id, password);
-  }
 }
