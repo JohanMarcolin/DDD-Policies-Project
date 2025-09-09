@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import '../../domain/operations/operation.dart';
 import '../../domain/policies/policy.dart';
 import '../../domain/services/user_administration/user_administration_service.dart';
 import '../infrastructure/databases/user_password_database.dart';
@@ -49,9 +48,6 @@ void main() async {
   final authService = getIt.registerSingleton<AuthService>(AuthService(
       userRepository: inMemoryUserRepository, tokenService: tokenService));
 
-  final viewUsersOperation =
-      getIt.registerSingleton<ViewUsersOperation>(ViewUsersOperation());
-
   final viewUserPolicy =
       getIt.registerSingleton<ViewUserPolicy>(ViewUserPolicy());
   final updateUserEmailPolicy =
@@ -64,7 +60,6 @@ void main() async {
   final userAdministrationService = getIt
       .registerSingleton<UserAdministrationService>(UserAdministrationService(
           userRepository: inMemoryUserRepository,
-          viewUsersOperation: viewUsersOperation,
           viewUserPolicy: viewUserPolicy,
           updateUserEmailPolicy: updateUserEmailPolicy,
           updateUserPasswordPolicy: updateUserPasswordPolicy,

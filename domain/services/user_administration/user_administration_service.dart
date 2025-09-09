@@ -1,5 +1,4 @@
 import '../../entities/user.dart';
-import '../../operations/operation.dart';
 import '../../policies/policy.dart';
 import '../../policies/policy_violation_exception.dart';
 import '../../repositories/user_repository.dart';
@@ -10,16 +9,13 @@ import '../../value_objects/password.dart';
 class UserAdministrationService {
   UserAdministrationService({
     required UserRepository userRepository,
-    required ViewUsersOperation viewUsersOperation,
     required this.viewUserPolicy,
     required this.updateUserEmailPolicy,
     required this.updateUserPasswordPolicy,
     required this.deleteUserPolicy,
-  })  : _userRepository = userRepository,
-        _viewUsersOperation = viewUsersOperation;
+  }) : _userRepository = userRepository;
 
   final UserRepository _userRepository;
-  final ViewUsersOperation _viewUsersOperation;
 
   final ViewUserPolicy viewUserPolicy;
   final UpdateUserEmailPolicy updateUserEmailPolicy;
@@ -27,10 +23,13 @@ class UserAdministrationService {
   final DeleteUserPolicy deleteUserPolicy;
 
   List<User> getUsers({required User requester}) {
-    return _viewUsersOperation.execute(
-        requester: requester,
-        policy: viewUserPolicy,
-        repository: _userRepository);
+    var visibleUsers = <User>[];
+    for (final user in _userRepository.users) {
+      if (viewUserPolicy.isCompliant(requester: requester, target: user)) {
+        visibleUsers.add(user);
+      }
+    }
+    return visibleUsers;
   }
 
   User? get({required User requester, required Id id}) {
