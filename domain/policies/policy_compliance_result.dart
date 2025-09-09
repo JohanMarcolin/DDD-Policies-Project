@@ -10,4 +10,7 @@ class Violation extends PolicyComplianceResult {
   Violation({required this.reason});
 
   final PolicyViolationReason reason;
+
+  @override
+  String toString() => 'Policy Violation: ${reason.toString()}';
 }

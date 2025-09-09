@@ -6,13 +6,18 @@ part 'json_response_entity.dart';
 
 Response ok([Object? body]) => JsonResponseOk.asShelfResponse(body);
 
-Response notFound([Object? body]) => JsonResponseNotFound.asShelfResponse(body);
+Response created([Object? body]) => JsonResponseCreated.asShelfResponse(body);
 
-Response forbidden([Object? body]) =>
-    JsonResponseForbidden.asShelfResponse(body);
+Response deleted([Object? body]) => JsonResponseDeleted.asShelfResponse(body);
 
-Response badRequest([Object? body]) =>
-    JsonResponseBadRequest.asShelfResponse(body);
+Response notFound([String? message]) =>
+    JsonResponseNotFound.asShelfResponse(message);
 
-Response serverError([Object? body]) =>
-    JsonResponseServerError.asShelfResponse(body);
+Response forbidden([Object? object]) =>
+    JsonResponseForbidden.asShelfResponse(object);
+
+Response badRequest([String? message]) =>
+    JsonResponseBadRequest.asShelfResponse(message);
+
+Response serverError([String? message]) =>
+    JsonResponseServerError.asShelfResponse(message);

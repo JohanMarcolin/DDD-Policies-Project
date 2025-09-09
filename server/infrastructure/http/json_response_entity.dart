@@ -6,37 +6,52 @@ sealed class JsonResponseEntity {
 
 class JsonResponseOk extends JsonResponseEntity {
   static Response asShelfResponse([Object? body]) => Response.ok(
-        jsonEncode(body ?? {'success': true}),
+        jsonEncode({'success': true, 'result': body}),
+        headers: JsonResponseEntity.jsonHeaders,
+      );
+}
+
+class JsonResponseCreated extends JsonResponseEntity {
+  static Response asShelfResponse([Object? body]) => Response(201,
+        body: jsonEncode({'success': true, 'result': body}),
+        headers: JsonResponseEntity.jsonHeaders,
+      );
+}
+
+class JsonResponseDeleted extends JsonResponseEntity {
+  static Response asShelfResponse([Object? message]) => Response.ok(
+        jsonEncode({'success': true, 'details': message ?? 'Deleted'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseNotFound extends JsonResponseEntity {
-  static Response asShelfResponse([Object? body]) => Response.notFound(
-        jsonEncode(body ?? {'success': false, 'message': 'Not Found'}),
+  static Response asShelfResponse([String? message]) => Response.notFound(
+        jsonEncode({'success': false, 'details': message ?? 'Not Found'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse([Object? body]) => Response.forbidden(
-        jsonEncode(body ?? {'success': false, 'message': 'Forbidden'}),
+  static Response asShelfResponse([Object? object]) => Response.forbidden(
+        jsonEncode({'success': false, 'details': object ?? 'Forbidden'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseBadRequest extends JsonResponseEntity {
-  static Response asShelfResponse([Object? body]) => Response.badRequest(
-        body: jsonEncode(body ?? {'success': false, 'message': 'Bad Request'}),
+  static Response asShelfResponse([String? message]) => Response.badRequest(
+        body:
+            jsonEncode({'success': false, 'details': message ?? 'Bad Request'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseServerError extends JsonResponseEntity {
-  static Response asShelfResponse([Object? body]) =>
+  static Response asShelfResponse([String? message]) =>
       Response.internalServerError(
         body: jsonEncode(
-            body ?? {'success': false, 'message': 'Internal Server Error'}),
+            {'success': false, 'details': message ?? 'Internal Server Error'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

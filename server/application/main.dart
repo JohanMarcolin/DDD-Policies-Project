@@ -6,6 +6,7 @@ import '../../domain/policies/policy.dart';
 import '../../domain/services/user_administration/user_administration_service.dart';
 import '../infrastructure/databases/user_password_database.dart';
 import '../infrastructure/factories/mock_user_factory.dart';
+import '../infrastructure/http/global_exception_handler.dart';
 import '../infrastructure/repositories/in_memory_user_repository.dart';
 import '../infrastructure/security/password_hasher.dart';
 import '../infrastructure/controllers/auth_controller.dart';
@@ -78,6 +79,7 @@ void main() async {
   router.mount('/user/', userController.handler);
 
   final pipeline = const Pipeline()
+      .addMiddleware(globalExceptionHandler())
       .addMiddleware(logRequests())
       .addMiddleware(securityFilterChain.middleware)
       .addHandler(router);
