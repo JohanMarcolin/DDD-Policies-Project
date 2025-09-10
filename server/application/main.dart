@@ -4,7 +4,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../../domain/policies/policy.dart';
 import '../../domain/services/user_administration/user_administration_service.dart';
 import '../infrastructure/databases/user_password_database.dart';
-import '../infrastructure/factories/mock_user_factory.dart';
+import '../test/api/factories/test_user_factory.dart';
 import '../infrastructure/http/global_exception_handler.dart';
 import '../infrastructure/repositories/in_memory_user_repository.dart';
 import '../infrastructure/security/password_hasher.dart';
@@ -18,9 +18,15 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import '../infrastructure/security/security_filter_chain.dart';
 
+const defaultPort = 8080;
+const defaultHost = 'localhost';
+
 final getIt = GetIt.instance;
 
-void main() async {
+void main(List<String> args) async {
+  final int port = args.isNotEmpty ? int.parse(args[0]) : defaultPort;
+  final String domain = args.length > 1 ? args[1] : defaultHost;
+
   final router = getIt.registerSingleton<Router>(Router());
 
   final userDatabase = getIt.registerSingleton<UserDatabase>(UserDatabase());
@@ -79,12 +85,12 @@ void main() async {
       .addMiddleware(securityFilterChain.middleware)
       .addHandler(router);
 
-  MockUserFactory.setupDefaultUsers(
+  TestUserFactory.setupDefaultUsers(
     userDatabase: userDatabase,
     userPasswordDatabase: userPasswordDatabase,
   );
 
-  final server = await shelf_io.serve(pipeline, 'localhost', 8080);
+  final server = await shelf_io.serve(pipeline, domain, port);
   server.autoCompress = true;
   print('Serving at http://${server.address.host}:${server.port}');
 }

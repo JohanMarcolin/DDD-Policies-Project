@@ -28,6 +28,15 @@ class TokenService {
     return _signToken(jwt, _accessTokenExpiration);
   }
 
+  bool isVerifiedAccessToken(AccessToken token) {
+    try {
+      verifyAccessToken(token);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   JWT verifyAccessToken(AccessToken token) {
     final verifiedAccessToken = _verifyToken(token);
     if (verifiedAccessToken == null) {
