@@ -11,8 +11,14 @@ Middleware globalExceptionHandler() {
       } catch (e) {
         return switch (e) {
           BadRequestException(:final message) => badRequest(message),
+          MalformedAuthorizationHeaderException(:final message) =>
+            badRequest(message),
           NotFoundException(:final message) => notFound(message),
           ForbiddenException(:final message) => forbidden(message),
+          InvalidAccessTokenException(:final message) => forbidden(message),
+          InvalidRefreshTokenException(:final message) => forbidden(message),
+          AuthenticatedUserNotFoundException(:final message) =>
+            forbidden(message),
           ServerErrorException(:final message) => serverError(message),
           PolicyViolationException(:final reason) => forbidden(reason),
           _ => serverError('An unexpected error occurred'),

@@ -6,6 +6,26 @@ sealed class RequestException implements Exception {
   String toString() => message;
 }
 
+class AuthenticatedUserNotFoundException extends RequestException {
+  const AuthenticatedUserNotFoundException(String message) : super(message);
+}
+
+class MalformedAuthorizationHeaderException extends RequestException {
+  const MalformedAuthorizationHeaderException(String message) : super(message);
+}
+
+class InvalidAccessTokenException extends RequestException {
+  const InvalidAccessTokenException(String message) : super(message);
+}
+
+class InvalidRefreshTokenException extends RequestException {
+  const InvalidRefreshTokenException(String message) : super(message);
+}
+
+class InvalidUserClaimsException extends RequestException {
+  const InvalidUserClaimsException(String message) : super(message);
+}
+
 class BadRequestException extends RequestException {
   const BadRequestException(String message) : super(message);
 }

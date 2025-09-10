@@ -6,6 +6,7 @@ import '../../../domain/value_objects/email.dart';
 import '../../../domain/value_objects/id.dart';
 import '../../../domain/value_objects/role.dart';
 import '../databases/refresh_token_database.dart';
+import '../http/exceptions/request_exceptions.dart';
 
 typedef AccessToken = String;
 
@@ -40,7 +41,7 @@ class TokenService {
   JWT verifyAccessToken(AccessToken token) {
     final verifiedAccessToken = _verifyToken(token);
     if (verifiedAccessToken == null) {
-      throw Exception('Invalid or expired access token');
+      throw InvalidAccessTokenException('Invalid access token');
     }
     return verifiedAccessToken;
   }
@@ -65,7 +66,7 @@ class TokenService {
     final verifiedRefreshToken = _verifyToken(token);
 
     if (verifiedRefreshToken == null) {
-      throw Exception('Invalid or expired refresh token');
+      throw InvalidRefreshTokenException('Invalid or expired refresh token');
     }
 
     final tokenId = extractUserId(verifiedRefreshToken);
@@ -73,7 +74,7 @@ class TokenService {
     final storedToken = _refreshTokenDatabase.get(tokenId);
 
     if (storedToken == null || storedToken != token) {
-      throw Exception('Invalid refresh token');
+      throw InvalidRefreshTokenException('Could not find stored refresh token');
     }
 
     return verifiedRefreshToken;
@@ -90,7 +91,7 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final id = claims['id'];
     if (id == null) {
-      throw Exception('Token does not contain a valid user id');
+      throw InvalidUserClaimsException('Token does not contain a valid user id');
     }
     return Id(id);
   }
@@ -99,7 +100,7 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final email = claims['username'];
     if (email == null) {
-      throw Exception('Token does not contain a valid user email');
+      throw InvalidUserClaimsException('Token does not contain a valid user email');
     }
     return Email(email);
   }
@@ -108,7 +109,7 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final role = claims['role'];
     if (role == null) {
-      throw Exception('Token does not contain a valid user role');
+      throw InvalidUserClaimsException('Token does not contain a valid user role');
     }
     switch (role) {
       case 'analyst':
@@ -118,7 +119,7 @@ class TokenService {
       case 'user':
         return Role.user;
       default:
-        throw Exception('Unknown user role: $role');
+        throw InvalidUserClaimsException('Unknown user role: $role');
     }
   }
 

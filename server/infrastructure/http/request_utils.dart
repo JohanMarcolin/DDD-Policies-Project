@@ -20,14 +20,12 @@ User getTargetUser(
 
 Future<Map<String, dynamic>> readJsonBody(Request req) async {
   final body = await req.readAsString();
+
   if (body.isEmpty) {
     throw BadRequestException('Request body cannot be empty');
   }
-  try {
-    return jsonDecode(body) as Map<String, dynamic>;
-  } catch (_) {
-    throw BadRequestException('Invalid JSON');
-  }
+
+  return jsonDecode(body) as Map<String, dynamic>;
 }
 
 Id extractIdFromParams(Request req) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../http/request_utils.dart';
 import 'package:shelf/shelf.dart';
 
 import '../../../domain/value_objects/email.dart';
@@ -19,12 +20,7 @@ class AuthService {
   final TokenService _tokenService;
 
   Future<Response> handleLogin(Request req) async {
-    final payload = await req.readAsString();
-    if (payload.isEmpty) {
-      throw BadRequestException('Empty request body');
-    }
-
-    final data = jsonDecode(payload);
+    final data = await readJsonBody(req);
     final email = data['email'] as String?;
 
     if (email == null || email.isEmpty) {
@@ -55,11 +51,7 @@ class AuthService {
   }
 
   Future<Response> handleRefreshAccessToken(Request req) async {
-    final payload = await req.readAsString();
-    if (payload.isEmpty) {
-      throw BadRequestException('Empty request body');
-    }
-    final data = jsonDecode(payload);
+    final data = await readJsonBody(req);
     final refreshToken = data['refreshToken'] as String?;
 
     if (refreshToken == null || refreshToken.isEmpty) {
