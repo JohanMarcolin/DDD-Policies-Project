@@ -1,39 +1,25 @@
 import 'dart:io';
 
-class TestServerFactory {
-  static int port = 8081;
-  static String host = 'localhost';
-  static Process? _process;
+import '../../../infrastructure/factories/server_factory.dart';
 
-  static String get baseUrl => 'http://$host:$port';
+class TestServerFactory {
+  static ServerFactory? _serverFactory;
+  static HttpServer? _server;
 
   static Future<void> start() async {
-    _process = await Process.start(
-      'dart',
-      ['run', 'server/application/main.dart', '$port', host],
-      mode: ProcessStartMode.detached,
-    );
-    await _waitForPortOpen();
+    final randomPort = 0;
+    _serverFactory = ServerFactory(port: randomPort, isTest: true);
+    _server = await _serverFactory!.start();
   }
 
   static Future<void> stop() async {
-    _process?.kill();
+    await _serverFactory?.stop();
+    _server = null;
+    _serverFactory = null;
   }
 
-  /// Waits until the server port is open and accepting connections.
-  /// Throws if the server is not ready after [maxAttempts] tries.
-  static Future<void> _waitForPortOpen(
-      {int maxAttempts = 10,
-      Duration delay = const Duration(milliseconds: 100)}) async {
-    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        final socket = await Socket.connect(host, port, timeout: delay);
-        socket.destroy();
-        return;
-      } catch (_) {}
-      await Future.delayed(delay);
-    }
-    throw Exception(
-        'Test server did not open port $port on $host after $maxAttempts attempts');
+  static String get baseUrl {
+    if (_server == null) throw StateError('Test server not started');
+    return 'http://localhost:${_server!.port}';
   }
 }

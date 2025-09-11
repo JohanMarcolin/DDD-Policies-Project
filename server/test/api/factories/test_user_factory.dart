@@ -17,8 +17,7 @@ class TestUserEntry {
 }
 
 class TestUserFactory {
-  static List<TestUserEntry> get defaultUserEntries =>
-      _createDefaultUserEntries();
+  static List<TestUserEntry> get defaultUserEntries => _getDefaultUserEntries();
 
   static void setupDefaultUsers({
     required UserDatabase userDatabase,
@@ -30,18 +29,18 @@ class TestUserFactory {
     }
   }
 
-  static List<TestUserEntry> _createDefaultUserEntries() {
+  static List<TestUserEntry> _getDefaultUserEntries() {
     return [
-      _createUserEntryWithPassword(role: Role.user),
-      _createUserEntryWithPassword(role: Role.admin),
-      _createUserEntryWithPassword(role: Role.analyst),
+      _getDefaultUserEntryWithPassword(role: Role.user),
+      _getDefaultUserEntryWithPassword(role: Role.admin),
+      _getDefaultUserEntryWithPassword(role: Role.analyst),
     ];
   }
 
-  static TestUserEntry _createUserEntryWithPassword({required Role role}) {
+  static TestUserEntry _getDefaultUserEntryWithPassword({required Role role}) {
     return TestUserEntry(
       user: User(
-        id: Id.generate(),
+        id: Id(role.name),
         email: Email(role.name),
         role: role,
       ),
