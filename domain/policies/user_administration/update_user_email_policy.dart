@@ -4,21 +4,22 @@ class UpdateUserEmailPolicy extends Policy<User, User> {
   const UpdateUserEmailPolicy();
 
   @override
-  PolicyComplianceResult checkCompliance(
-      {required User requester, required User target}) {
-    switch (requester.role) {
+  PolicyPermission evaluatePermission(User initiator, User target) {
+    final isModifyingSelf = initiator.isSameAs(target);
+
+    switch (initiator.role) {
       case Role.analyst:
-        return Compliant();
+        return PermissionGranted();
       case Role.admin:
         if (!target.isAnalyst())
-          return Compliant();
+          return PermissionGranted();
         else
-          return Violation(reason: CanNotModifyAnalyst());
+          return PermissionDenied(reason: CannotModifyAnalyst());
       case Role.user:
-        if (requester.isSameAs(target))
-          return Compliant();
+        if (isModifyingSelf)
+          return PermissionGranted();
         else
-          return Violation(reason: CanOnlyModifySelf());
+          return PermissionDenied(reason: CanOnlyModifySelf());
     }
   }
 }

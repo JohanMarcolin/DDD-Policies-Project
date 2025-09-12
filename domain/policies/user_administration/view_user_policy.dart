@@ -4,21 +4,22 @@ class ViewUserPolicy extends Policy<User, User> {
   const ViewUserPolicy();
 
   @override
-  PolicyComplianceResult checkCompliance(
-      {required User requester, required User target}) {
-    switch (requester.role) {
+  PolicyPermission evaluatePermission(User initiator, User target) {
+    final isViewingSelf = initiator.isSameAs(target);
+
+    switch (initiator.role) {
       case Role.analyst:
-        return Compliant();
+        return PermissionGranted();
       case Role.admin:
         if (!target.isAnalyst())
-          return Compliant();
+          return PermissionGranted();
         else
-          return Violation(reason: CanNotViewAnalyst());
+          return PermissionDenied(reason: CannotViewAnalyst());
       case Role.user:
-        if (requester.isSameAs(target))
-          return Compliant();
+        if (isViewingSelf)
+          return PermissionGranted();
         else
-          return Violation(reason: CanOnlyViewSelf());
+          return PermissionDenied(reason: CanOnlyViewSelf());
     }
   }
 }

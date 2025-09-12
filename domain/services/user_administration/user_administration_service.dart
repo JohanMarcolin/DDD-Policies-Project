@@ -1,6 +1,5 @@
 import '../../entities/user.dart';
 import '../../policies/policy.dart';
-import '../../policies/policy_violation_exception.dart';
 import '../../repositories/user_repository.dart';
 import '../../value_objects/email.dart';
 import '../../value_objects/id.dart';
@@ -22,87 +21,51 @@ class UserAdministrationService {
   final UpdateUserPasswordPolicy updateUserPasswordPolicy;
   final DeleteUserPolicy deleteUserPolicy;
 
-  List<User> getUsers({required User requester}) {
-    var visibleUsers = <User>[];
-    for (final user in _userRepository.users) {
-      if (viewUserPolicy.isCompliant(requester: requester, target: user)) {
-        visibleUsers.add(user);
-      }
-    }
-    return visibleUsers;
+  List<User> getUsers({required User initiator}) {
+    return _userRepository.users
+        .where(
+            (targetUser) => viewUserPolicy.isPermitted(initiator, targetUser))
+        .toList();
   }
 
-  User? get({required User requester, required Id id}) {
+  User? get({required User initiator, required Id id}) {
     final user = _userRepository.get(id: id);
 
     if (user == null) return null;
 
-    final result =
-        viewUserPolicy.checkCompliance(requester: requester, target: user);
-
-    switch (result) {
-      case Compliant():
-        return user;
-      case Violation(:final reason):
-        throw PolicyViolationException(reason);
-    }
+    return viewUserPolicy.enforce(initiator, user,
+        onPermissionGranted: () => user);
   }
 
-  User? getByEmail({required User requester, required Email email}) {
+  User? getByEmail({required User initiator, required Email email}) {
     final user = _userRepository.getByEmail(email: email);
 
     if (user == null) return null;
 
-    final result =
-        viewUserPolicy.checkCompliance(requester: requester, target: user);
-
-    switch (result) {
-      case Compliant():
-        return user;
-      case Violation(:final reason):
-        throw PolicyViolationException(reason);
-    }
+    return viewUserPolicy.enforce(initiator, user,
+        onPermissionGranted: () => user);
   }
 
-  void deleteUser({required User requester, required User target}) {
-    final result =
-        deleteUserPolicy.checkCompliance(requester: requester, target: target);
-
-    switch (result) {
-      case Compliant():
-        _userRepository.delete(id: target.id);
-      case Violation(:final reason):
-        throw PolicyViolationException(reason);
-    }
+  void deleteUser({required User initiator, required User target}) {
+    return deleteUserPolicy.enforce(initiator, target,
+        onPermissionGranted: () => _userRepository.delete(id: target.id));
   }
 
   void updateUserEmail(
-      {required User requester,
+      {required User initiator,
       required User target,
       required Email newEmail}) {
-    final result = updateUserEmailPolicy.checkCompliance(
-        requester: requester, target: target);
-
-    switch (result) {
-      case Compliant():
-        _userRepository.updateEmail(id: target.id, newEmail: newEmail);
-      case Violation(:final reason):
-        throw PolicyViolationException(reason);
-    }
+    return updateUserEmailPolicy.enforce(initiator, target,
+        onPermissionGranted: () =>
+            _userRepository.updateEmail(id: target.id, newEmail: newEmail));
   }
 
   void updateUserPassword(
-      {required User requester,
+      {required User initiator,
       required User target,
       required Password newPassword}) {
-    final result = updateUserPasswordPolicy.checkCompliance(
-        requester: requester, target: target);
-
-    switch (result) {
-      case Compliant():
-        _userRepository.updatePassword(id: target.id, newPassword: newPassword);
-      case Violation(:final reason):
-        throw PolicyViolationException(reason);
-    }
+    return updateUserPasswordPolicy.enforce(initiator, target,
+        onPermissionGranted: () => _userRepository.updatePassword(
+            id: target.id, newPassword: newPassword));
   }
 }

@@ -25,8 +25,7 @@ class UserController {
   Handler get handler => _userRouter;
 
   Future<Response> _getAllUsers(Request req) async {
-    final users =
-        _userAdministrationService.getUsers(requester: req.currentUser);
+    final users = _userAdministrationService.getUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
   }
 
@@ -39,7 +38,7 @@ class UserController {
     final user = getTargetUser(req, _userAdministrationService);
 
     _userAdministrationService.deleteUser(
-        requester: req.currentUser, target: user);
+        initiator: req.currentUser, target: user);
 
     return ok('Deleted user: ${user.id.value}');
   }
@@ -57,11 +56,11 @@ class UserController {
     final email = Email(newEmail);
 
     final user =
-        _userAdministrationService.get(requester: req.currentUser, id: id);
+        _userAdministrationService.get(initiator: req.currentUser, id: id);
     if (user == null) throw NotFoundException('User not found');
 
     _userAdministrationService.updateUserEmail(
-        requester: req.currentUser, target: user, newEmail: email);
+        initiator: req.currentUser, target: user, newEmail: email);
     return ok({
       'message':
           'Updated email for user: ${id.value} from ${user.email.value} to ${email.value}'
@@ -80,7 +79,7 @@ class UserController {
     }
 
     final user =
-        _userAdministrationService.get(requester: req.currentUser, id: id);
+        _userAdministrationService.get(initiator: req.currentUser, id: id);
     if (user == null) throw NotFoundException('User not found');
 
     return ok('Updated password for user: ${id.value}');

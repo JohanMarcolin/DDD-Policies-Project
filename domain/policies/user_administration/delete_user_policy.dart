@@ -4,24 +4,25 @@ class DeleteUserPolicy extends Policy<User, User> {
   const DeleteUserPolicy();
 
   @override
-  PolicyComplianceResult checkCompliance(
-      {required User requester, required User target}) {
-    switch (requester.role) {
+  PolicyPermission evaluatePermission(User initiator, User target) {
+    final isDeletingSelf = initiator.isSameAs(target);
+
+    switch (initiator.role) {
       case Role.analyst:
-        if (!requester.isSameAs(target))
-          return Compliant();
+        if (!isDeletingSelf)
+          return PermissionGranted();
         else
-          return Violation(reason: CanNotDeleteSelf());
+          return PermissionDenied(reason: CannotDeleteSelf());
       case Role.admin:
         if (!target.isAnalyst())
-          return Compliant();
+          return PermissionGranted();
         else
-          return Violation(reason: CanNotDeleteAnalyst());
+          return PermissionDenied(reason: CannotDeleteAnalyst());
       case Role.user:
-        if (requester.isSameAs(target))
-          return Compliant();
+        if (isDeletingSelf)
+          return PermissionGranted();
         else
-          return Violation(reason: CanOnlyDeleteSelf());
+          return PermissionDenied(reason: CanOnlyDeleteSelf());
     }
   }
 }

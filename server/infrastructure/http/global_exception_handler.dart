@@ -1,5 +1,5 @@
 import 'package:shelf/shelf.dart';
-import '../../../domain/policies/policy_violation_exception.dart';
+import '../../../domain/policies/policy.dart';
 import '../http/response_utils.dart';
 import '../http/exceptions/request_exceptions.dart';
 
@@ -20,7 +20,7 @@ Middleware globalExceptionHandler() {
           AuthenticatedUserNotFoundException(:final message) =>
             forbidden(message),
           ServerErrorException(:final message) => serverError(message),
-          PolicyViolationException(:final reason) => forbidden(reason),
+          PolicyPermissionDeniedException(:final reason) => forbidden(reason),
           _ => serverError('An unexpected error occurred'),
         };
       }

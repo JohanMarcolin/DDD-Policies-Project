@@ -12,8 +12,7 @@ import 'exceptions/request_exceptions.dart';
 User getTargetUser(
     Request req, UserAdministrationService userAdministrationService) {
   final id = extractIdFromParams(req);
-  final user =
-      userAdministrationService.get(requester: req.currentUser, id: id);
+  final user = userAdministrationService.get(initiator: req.currentUser, id: id);
   if (user == null) throw const NotFoundException('User not found');
   return user;
 }
