@@ -52,7 +52,7 @@ void main() {
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newEmail': 'new@example.com'}),
         );
-        expect(response.statusCode, anyOf(200, 404));
+        expect(response.statusCode, equals(200));
       });
 
       test('Update password returns success', () async {
@@ -60,7 +60,7 @@ void main() {
           Uri.parse(
               '${TestServerFactory.baseUrl}/user/${tester.id.value}/password'),
           headers: getAuthHeader(accessToken),
-          body: jsonEncode({'newPassword': 'newpassword123'}),
+          body: jsonEncode({'newPassword': 'hello'}),
         );
         expect(response.statusCode, equals(200));
       });
@@ -98,7 +98,7 @@ void main() {
           Uri.parse(
               '${TestServerFactory.baseUrl}/user/${tester.id.value}/email'),
           headers: getAuthHeader(accessToken),
-          body: jsonEncode({'newEmail': 'new@example.com'}),
+          body: jsonEncode({'newEmail': 'example.com'}),
         );
         expect(response.statusCode, equals(404));
       });

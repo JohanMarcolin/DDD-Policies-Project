@@ -1,5 +1,7 @@
 import 'package:shelf/shelf.dart';
 import '../../../domain/policies/policy.dart';
+import '../../../domain/value_objects/email.dart';
+import '../../../domain/value_objects/password.dart';
 import '../http/response_utils.dart';
 import '../http/exceptions/request_exceptions.dart';
 
@@ -21,6 +23,8 @@ Middleware globalExceptionHandler() {
             forbidden(message),
           ServerErrorException(:final message) => serverError(message),
           PolicyPermissionDeniedException(:final reason) => forbidden(reason),
+          EmailValidationErrorException(:final reason) => forbidden(reason),
+          PasswordValidationErrorException(:final reason) => forbidden(reason),
           _ => serverError('An unexpected error occurred'),
         };
       }

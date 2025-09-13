@@ -55,6 +55,8 @@ class UserAdministrationService {
       {required User initiator,
       required User target,
       required Email newEmail}) {
+    newEmail.enforceValidation();
+
     return updateUserEmailPolicy.enforce(initiator, target,
         onPermissionGranted: () =>
             _userRepository.updateEmail(id: target.id, newEmail: newEmail));
@@ -64,6 +66,8 @@ class UserAdministrationService {
       {required User initiator,
       required User target,
       required Password newPassword}) {
+    newPassword.enforceValidation();
+
     return updateUserPasswordPolicy.enforce(initiator, target,
         onPermissionGranted: () => _userRepository.updatePassword(
             id: target.id, newPassword: newPassword));
