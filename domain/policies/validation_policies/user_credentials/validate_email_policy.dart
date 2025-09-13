@@ -1,4 +1,4 @@
-part of 'validation_policy.dart';
+part of '../validation_policy.dart';
 
 class ValidateEmailPolicy extends ValidationPolicy<Email> {
   const ValidateEmailPolicy();

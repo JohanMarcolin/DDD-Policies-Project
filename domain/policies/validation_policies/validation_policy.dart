@@ -6,8 +6,8 @@ import '../../value_objects/validation_result.dart';
 import '../policy_exception.dart';
 import 'validation_policy_result.dart';
 
-part 'validate_email_policy.dart';
-part 'validate_password_policy.dart';
+part 'user_credentials/validate_email_policy.dart';
+part 'user_credentials/validate_password_policy.dart';
 
 sealed class ValidationPolicy<TValue> {
   const ValidationPolicy();

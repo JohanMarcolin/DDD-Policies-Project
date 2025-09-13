@@ -3,10 +3,10 @@ import '../../value_objects/role.dart';
 import '../policy_exception.dart';
 import 'action_policy_permission.dart';
 
-part 'delete_user_policy.dart';
-part 'update_user_email_policy.dart';
-part 'update_user_password_policy.dart';
-part 'view_user_policy.dart';
+part 'user_administration/delete_user_policy.dart';
+part 'user_administration/update_user_email_policy.dart';
+part 'user_administration/update_user_password_policy.dart';
+part 'user_administration/view_user_policy.dart';
 
 sealed class ActionPolicy<TInitiator, TTarget> {
   const ActionPolicy();

@@ -1,4 +1,4 @@
-part of 'validation_policy.dart';
+part of '../validation_policy.dart';
 
 class ValidatePasswordPolicy extends ValidationPolicy<Password> {
   static const minLength = 8;

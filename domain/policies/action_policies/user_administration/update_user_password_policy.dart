@@ -1,4 +1,4 @@
-part of 'action_policy.dart';
+part of '../action_policy.dart';
 
 enum UpdateUserPasswordPolicyDenialReason {
   cannotModifyAnalyst,
@@ -19,12 +19,24 @@ class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
         if (!target.isAnalyst())
           return Granted();
         else
-          return Denied(reason: UpdateUserPasswordPolicyDenialReason.cannotModifyAnalyst);
+          return Denied(reason: CannotUpdatePasswordOnAnalyst());
       case Role.user:
         if (isModifyingSelf)
           return Granted();
         else
-          return Denied(reason: UpdateUserPasswordPolicyDenialReason.canOnlyModifySelf);
+          return Denied(reason: CanOnlyUpdatePasswordOnSelf());
     }
   }
+}
+
+sealed class UpdateUserPasswordDeniedReason {}
+
+class CannotUpdatePasswordOnAnalyst implements UpdateUserPasswordDeniedReason {
+  @override
+  String toString() => 'Cannot update password on analyst.';
+}
+
+class CanOnlyUpdatePasswordOnSelf implements UpdateUserPasswordDeniedReason {
+  @override
+  String toString() => 'Can only update password on self.';
 }

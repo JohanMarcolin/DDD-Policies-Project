@@ -1,4 +1,4 @@
-part of 'action_policy.dart';
+part of '../action_policy.dart';
 
 enum UpdateUserEmailPolicyDenialReason {
   cannotModifyAnalyst,
@@ -19,12 +19,24 @@ class UpdateUserEmailPolicy extends ActionPolicy<User, User> {
         if (!target.isAnalyst())
           return Granted();
         else
-          return Denied(reason: UpdateUserEmailPolicyDenialReason.cannotModifyAnalyst);
+          return Denied(reason: CannotUpdateEmailOnAnalyst());
       case Role.user:
         if (isModifyingSelf)
           return Granted();
         else
-          return Denied(reason: UpdateUserEmailPolicyDenialReason.canOnlyModifySelf);
+          return Denied(reason: CanOnlyUpdateEmailOnSelf());
     }
   }
+}
+
+sealed class UpdateUserEmailDeniedReason {}
+
+class CannotUpdateEmailOnAnalyst implements UpdateUserEmailDeniedReason {
+  @override
+  String toString() => 'Cannot update email on analyst.';
+}
+
+class CanOnlyUpdateEmailOnSelf implements UpdateUserEmailDeniedReason {
+  @override
+  String toString() => 'Can only update email on self.';
 }
