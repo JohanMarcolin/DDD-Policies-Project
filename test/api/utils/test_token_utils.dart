@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../factories/test_user_factory.dart';
-import '../factories/test_server_factory.dart';
+import '../../test_data_factories/test_user_entry_factory.dart';
+import '../../test_data_factories/test_server_factory.dart';
 
 Future<String> getAccessToken({required TestUserEntry testUserEntry}) async {
   final response = await http.post(

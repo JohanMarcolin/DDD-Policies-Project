@@ -8,7 +8,7 @@ part 'user_administration/update_user_email_policy.dart';
 part 'user_administration/update_user_password_policy.dart';
 part 'user_administration/view_user_policy.dart';
 
-sealed class ActionPolicy<TInitiator, TTarget> {
+abstract class ActionPolicy<TInitiator, TTarget> {
   const ActionPolicy();
 
   bool isPermitted(TInitiator initiator, TTarget target) =>

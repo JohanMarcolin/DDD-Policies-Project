@@ -1,7 +1,7 @@
 part of '../validation_policy.dart';
 
-class ValidateEmailPolicy extends ValidationPolicy<Email> {
-  const ValidateEmailPolicy();
+class EmailValidationPolicy extends ValidationPolicy<Email> {
+  const EmailValidationPolicy();
 
   static final RegExp _emailRegex =
       RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
-import 'factories/test_server_factory.dart';
-import 'factories/test_user_factory.dart';
+import '../test_data_factories/test_server_factory.dart';
+import '../test_data_factories/test_user_entry_factory.dart';
 
 void main() {
-  final testEntries = TestUserFactory.defaultUserEntries;
+  final testEntries = TestUserEntryFactory.defaultUserEntries;
 
   setUpAll(() async {
     await TestServerFactory.start();

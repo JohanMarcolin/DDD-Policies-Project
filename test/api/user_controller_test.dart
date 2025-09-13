@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
-import 'factories/test_server_factory.dart';
-import 'factories/test_user_factory.dart';
+import '../test_data_factories/test_server_factory.dart';
+import '../test_data_factories/test_user_entry_factory.dart';
 import 'utils/test_token_utils.dart';
 
 void main() {
-  final tester = TestUserFactory.defaultUserEntries.first;
+  final tester = TestUserEntryFactory.defaultUserEntries.first;
   group('User Controller', () {
     late String accessToken;
     setUpAll(() async {

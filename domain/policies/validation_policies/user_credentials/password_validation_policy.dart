@@ -1,6 +1,6 @@
 part of '../validation_policy.dart';
 
-class ValidatePasswordPolicy extends ValidationPolicy<Password> {
+class PasswordValidationPolicy extends ValidationPolicy<Password> {
   static const minLength = 8;
   static const maxLength = 64;
   static const includeUppercase = true;
@@ -57,7 +57,7 @@ class ValidatePasswordPolicy extends ValidationPolicy<Password> {
         List.generate(length, (_) => chars[random.nextInt(chars.length)])
             .join(),
       );
-      if (ValidatePasswordPolicy().evaluateValidity(candidate) is Valid) {
+      if (PasswordValidationPolicy().evaluateValidity(candidate) is Valid) {
         return candidate;
       }
     }

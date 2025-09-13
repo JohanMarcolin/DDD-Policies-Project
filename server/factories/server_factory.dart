@@ -16,7 +16,7 @@ import '../infrastructure/databases/user_database.dart';
 import '../infrastructure/security/token_service.dart';
 import '../infrastructure/controllers/user_controller.dart';
 import '../infrastructure/security/security_filter_chain.dart';
-import '../test/api/factories/test_user_factory.dart';
+import '../../test/test_data_factories/test_user_entry_factory.dart';
 
 class ServerFactory {
   ServerFactory(
@@ -50,8 +50,8 @@ class ServerFactory {
     final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
     final deleteUserPolicy = DeleteUserPolicy();
 
-    final validateEmailPolicy = ValidateEmailPolicy();
-    final validatePasswordPolicy = ValidatePasswordPolicy();
+    final emailValidationPolicy = EmailValidationPolicy();
+    final passwordValidationPolicy = PasswordValidationPolicy();
 
     final userAdministrationService = UserAdministrationService(
       userRepository: inMemoryUserRepository,
@@ -59,8 +59,8 @@ class ServerFactory {
       updateUserEmailPolicy: updateUserEmailPolicy,
       updateUserPasswordPolicy: updateUserPasswordPolicy,
       deleteUserPolicy: deleteUserPolicy,
-      validateEmailPolicy: validateEmailPolicy,
-      validatePasswordPolicy: validatePasswordPolicy,
+      emailValidationPolicy: emailValidationPolicy,
+      passwordValidationPolicy: passwordValidationPolicy,
     );
     final authController = AuthController(authService: authService);
     final userController =
@@ -70,7 +70,7 @@ class ServerFactory {
     router.mount('/user/', userController.handler);
 
     if (isTest) {
-      TestUserFactory.setupDefaultUsers(
+      TestUserEntryFactory.setupDefaultUsers(
         userDatabase: userDatabase,
         userPasswordDatabase: userPasswordDatabase,
       );

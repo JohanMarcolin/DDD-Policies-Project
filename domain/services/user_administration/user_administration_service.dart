@@ -13,8 +13,8 @@ class UserAdministrationService {
     required this.updateUserEmailPolicy,
     required this.updateUserPasswordPolicy,
     required this.deleteUserPolicy,
-    required this.validateEmailPolicy,
-    required this.validatePasswordPolicy,
+    required this.emailValidationPolicy,
+    required this.passwordValidationPolicy,
   }) : _userRepository = userRepository;
 
   final UserRepository _userRepository;
@@ -24,8 +24,8 @@ class UserAdministrationService {
   final UpdateUserPasswordPolicy updateUserPasswordPolicy;
   final DeleteUserPolicy deleteUserPolicy;
 
-  final ValidateEmailPolicy validateEmailPolicy;
-  final ValidatePasswordPolicy validatePasswordPolicy;
+  final EmailValidationPolicy emailValidationPolicy;
+  final PasswordValidationPolicy passwordValidationPolicy;
 
   List<User> getUsers({required User initiator}) {
     return _userRepository.users
@@ -59,7 +59,7 @@ class UserAdministrationService {
       {required User initiator,
       required User target,
       required Email newEmail}) {
-    validateEmailPolicy.enforce(newEmail);
+    emailValidationPolicy.enforce(newEmail);
 
     return updateUserEmailPolicy.enforce(initiator, target,
         onGranted: () =>
@@ -70,7 +70,7 @@ class UserAdministrationService {
       {required User initiator,
       required User target,
       required Password newPassword}) {
-    validatePasswordPolicy.enforce(newPassword);
+    passwordValidationPolicy.enforce(newPassword);
 
     return updateUserPasswordPolicy.enforce(initiator, target,
         onGranted: () => _userRepository.updatePassword(
