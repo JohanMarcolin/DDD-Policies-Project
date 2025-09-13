@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import '../../../infrastructure/factories/server_factory.dart';
+import '../../../factories/server_factory.dart';
 
 class TestServerFactory {
   static ServerFactory? _serverFactory;

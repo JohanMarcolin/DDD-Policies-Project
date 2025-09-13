@@ -1,5 +1,6 @@
 import '../../entities/user.dart';
-import '../../policies/policy.dart';
+import '../../policies/action_policies/action_policy.dart';
+import '../../policies/validation_policies/validation_policy.dart';
 import '../../repositories/user_repository.dart';
 import '../../value_objects/email.dart';
 import '../../value_objects/id.dart';
@@ -12,6 +13,8 @@ class UserAdministrationService {
     required this.updateUserEmailPolicy,
     required this.updateUserPasswordPolicy,
     required this.deleteUserPolicy,
+    required this.validateEmailPolicy,
+    required this.validatePasswordPolicy,
   }) : _userRepository = userRepository;
 
   final UserRepository _userRepository;
@@ -20,6 +23,9 @@ class UserAdministrationService {
   final UpdateUserEmailPolicy updateUserEmailPolicy;
   final UpdateUserPasswordPolicy updateUserPasswordPolicy;
   final DeleteUserPolicy deleteUserPolicy;
+
+  final ValidateEmailPolicy validateEmailPolicy;
+  final ValidatePasswordPolicy validatePasswordPolicy;
 
   List<User> getUsers({required User initiator}) {
     return _userRepository.users
@@ -33,8 +39,7 @@ class UserAdministrationService {
 
     if (user == null) return null;
 
-    return viewUserPolicy.enforce(initiator, user,
-        onPermissionGranted: () => user);
+    return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
   }
 
   User? getByEmail({required User initiator, required Email email}) {
@@ -42,23 +47,22 @@ class UserAdministrationService {
 
     if (user == null) return null;
 
-    return viewUserPolicy.enforce(initiator, user,
-        onPermissionGranted: () => user);
+    return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
   }
 
   void deleteUser({required User initiator, required User target}) {
     return deleteUserPolicy.enforce(initiator, target,
-        onPermissionGranted: () => _userRepository.delete(id: target.id));
+        onGranted: () => _userRepository.delete(id: target.id));
   }
 
   void updateUserEmail(
       {required User initiator,
       required User target,
       required Email newEmail}) {
-    newEmail.enforceValidation();
+    validateEmailPolicy.enforce(newEmail);
 
     return updateUserEmailPolicy.enforce(initiator, target,
-        onPermissionGranted: () =>
+        onGranted: () =>
             _userRepository.updateEmail(id: target.id, newEmail: newEmail));
   }
 
@@ -66,10 +70,10 @@ class UserAdministrationService {
       {required User initiator,
       required User target,
       required Password newPassword}) {
-    newPassword.enforceValidation();
+    validatePasswordPolicy.enforce(newPassword);
 
     return updateUserPasswordPolicy.enforce(initiator, target,
-        onPermissionGranted: () => _userRepository.updatePassword(
+        onGranted: () => _userRepository.updatePassword(
             id: target.id, newPassword: newPassword));
   }
 }
