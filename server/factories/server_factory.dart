@@ -16,7 +16,7 @@ import '../infrastructure/databases/user_database.dart';
 import '../infrastructure/security/token_service.dart';
 import '../infrastructure/controllers/user_controller.dart';
 import '../infrastructure/security/security_filter_chain.dart';
-import '../../test/test_data_factories/test_user_entry_factory.dart';
+import '../../test/utils/factories/test_user_entry_factory.dart';
 
 class ServerFactory {
   ServerFactory(

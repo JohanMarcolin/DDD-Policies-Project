@@ -1,37 +1,24 @@
 import 'package:test/test.dart';
 import '../../../../domain/policies/validation_policies/validation_policy.dart';
-import '../../../../domain/policies/validation_policies/validation_policy_result.dart';
 import '../../../../domain/policies/policy_exception.dart';
-
-class AlwaysValidPolicy extends ValidationPolicy<String> {
-  const AlwaysValidPolicy();
-  @override
-  ValidationPolicyResult evaluateValidity(String value) => Valid();
-}
-
-class AlwaysInvalidPolicy extends ValidationPolicy<String> {
-  const AlwaysInvalidPolicy();
-  @override
-  ValidationPolicyResult evaluateValidity(String value) =>
-      Invalid(reason: 'fail');
-}
+import '../../../utils/policies/validation_policies/dummy_validation_policy.dart';
 
 void main() {
   group('ValidationPolicy', () {
     test('isValid returns true for valid', () {
-      final policy = AlwaysValidPolicy();
+      final policy = DummyAlwaysValidValidationPolicy<String>();
       expect(policy.isValid('anything'), isTrue);
     });
     test('isValid returns false for invalid', () {
-      final policy = AlwaysInvalidPolicy();
+      final policy = DummyAlwaysInvalidValidationPolicy<String>();
       expect(policy.isValid('anything'), isFalse);
     });
     test('enforce does nothing for valid', () {
-      final policy = AlwaysValidPolicy();
+      final policy = DummyAlwaysValidValidationPolicy<String>();
       expect(() => policy.enforce('anything'), returnsNormally);
     });
     test('enforce throws for invalid', () {
-      final policy = AlwaysInvalidPolicy();
+      final policy = DummyAlwaysInvalidValidationPolicy<String>();
       expect(() => policy.enforce('anything'),
           throwsA(isA<ValidationPolicyException>()));
     });

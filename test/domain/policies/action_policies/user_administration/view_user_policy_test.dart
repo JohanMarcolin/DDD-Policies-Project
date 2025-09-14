@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../../../../../domain/policies/action_policies/action_policy.dart';
-import '../../../../test_data_factories/test_user_factory.dart';
+import '../../../../utils/factories/test_user_factory.dart';
 
 void main() {
   group('ViewUserPolicy', () {

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
-import '../test_data_factories/test_server_factory.dart';
-import '../test_data_factories/test_user_entry_factory.dart';
+import '../utils/factories/test_server_factory.dart';
+import '../utils/factories/test_user_entry_factory.dart';
 
 void main() {
   final testEntries = TestUserEntryFactory.defaultUserEntries;

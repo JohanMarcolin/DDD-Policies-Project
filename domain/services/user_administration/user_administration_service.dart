@@ -19,13 +19,13 @@ class UserAdministrationService {
 
   final UserRepository _userRepository;
 
-  final ViewUserPolicy viewUserPolicy;
-  final UpdateUserEmailPolicy updateUserEmailPolicy;
-  final UpdateUserPasswordPolicy updateUserPasswordPolicy;
-  final DeleteUserPolicy deleteUserPolicy;
+  final ActionPolicy viewUserPolicy;
+  final ActionPolicy updateUserEmailPolicy;
+  final ActionPolicy updateUserPasswordPolicy;
+  final ActionPolicy deleteUserPolicy;
 
-  final EmailValidationPolicy emailValidationPolicy;
-  final PasswordValidationPolicy passwordValidationPolicy;
+  final ValidationPolicy emailValidationPolicy;
+  final ValidationPolicy passwordValidationPolicy;
 
   List<User> getUsers({required User initiator}) {
     return _userRepository.users

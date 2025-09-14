@@ -1,10 +1,10 @@
-import '../../domain/entities/user.dart';
-import '../../domain/value_objects/email.dart';
-import '../../domain/value_objects/id.dart';
-import '../../domain/value_objects/password.dart';
-import '../../domain/value_objects/role.dart';
-import '../../server/infrastructure/databases/user_database.dart';
-import '../../server/infrastructure/databases/user_password_database.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/value_objects/email.dart';
+import '../../../domain/value_objects/id.dart';
+import '../../../domain/value_objects/password.dart';
+import '../../../domain/value_objects/role.dart';
+import '../../../server/infrastructure/databases/user_database.dart';
+import '../../../server/infrastructure/databases/user_password_database.dart';
 
 class TestUserEntry {
   const TestUserEntry({required this.user, required this.password});
