@@ -2,21 +2,21 @@ import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
-import '../../domain/policies/action_policies/action_policy.dart';
-import '../../domain/policies/validation_policies/validation_policy.dart';
-import '../../domain/services/user_administration/user_administration_service.dart';
-import '../infrastructure/databases/user_password_database.dart';
-import '../infrastructure/http/global_exception_handler.dart';
-import '../infrastructure/repositories/in_memory_user_repository.dart';
-import '../infrastructure/security/password_hasher.dart';
-import '../infrastructure/controllers/auth_controller.dart';
-import '../infrastructure/services/auth_service.dart';
-import '../infrastructure/databases/refresh_token_database.dart';
-import '../infrastructure/databases/user_database.dart';
-import '../infrastructure/security/token_service.dart';
-import '../infrastructure/controllers/user_controller.dart';
-import '../infrastructure/security/security_filter_chain.dart';
-import '../../test/utils/factories/test_user_entry_factory.dart';
+import '../../../domain/policies/action_policies/action_policy.dart';
+import '../../../domain/policies/validation_policies/validation_policy.dart';
+import '../../../domain/services/user_administration/user_administration_service.dart';
+import '../databases/user_password_database.dart';
+import '../http/global_exception_handler.dart';
+import '../repositories/in_memory_user_repository.dart';
+import '../security/password_hasher.dart';
+import '../controllers/auth_controller.dart';
+import '../services/auth_service.dart';
+import '../databases/refresh_token_database.dart';
+import '../databases/user_database.dart';
+import '../security/token_service.dart';
+import '../controllers/user_controller.dart';
+import '../security/security_filter_chain.dart';
+import '../../../test/utils/factories/test_user_entry_factory.dart';
 
 class ServerFactory {
   ServerFactory(
