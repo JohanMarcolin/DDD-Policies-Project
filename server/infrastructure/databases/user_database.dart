@@ -3,7 +3,7 @@ import '../../../domain/value_objects/id.dart';
 import 'database.dart';
 
 class UserDatabase implements Database<User> {
-  UserDatabase() {}
+  UserDatabase();
 
   final Map<Id, User> _users = {};
 

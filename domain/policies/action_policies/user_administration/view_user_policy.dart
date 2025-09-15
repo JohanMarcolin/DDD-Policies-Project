@@ -16,15 +16,17 @@ class ViewUserPolicy extends ActionPolicy<User, User> {
       case Role.analyst:
         return Granted();
       case Role.admin:
-        if (!target.isAnalyst())
+        if (!target.isAnalyst()) {
           return Granted();
-        else
+        } else {
           return Denied(reason: CannotViewAnalyst());
+        }
       case Role.user:
-        if (isViewingSelf)
+        if (isViewingSelf) {
           return Granted();
-        else
+        } else {
           return Denied(reason: CanOnlyViewSelf());
+        }
     }
   }
 }

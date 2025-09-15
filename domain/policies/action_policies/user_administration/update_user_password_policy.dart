@@ -16,15 +16,17 @@ class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
       case Role.analyst:
         return Granted();
       case Role.admin:
-        if (!target.isAnalyst())
+        if (!target.isAnalyst()) {
           return Granted();
-        else
+        } else {
           return Denied(reason: CannotUpdatePasswordOnAnalyst());
+        }
       case Role.user:
-        if (isModifyingSelf)
+        if (isModifyingSelf) {
           return Granted();
-        else
+        } else {
           return Denied(reason: CanOnlyUpdatePasswordOnSelf());
+        }
     }
   }
 }

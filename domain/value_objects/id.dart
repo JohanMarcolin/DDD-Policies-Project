@@ -11,7 +11,7 @@ abstract class Id extends Equatable {
 }
 
 class UserId extends Id {
-  UserId(String value) : super(value);
+  UserId(super.value);
 
   factory UserId.generate() => UserId(Uuid().v4());
 }

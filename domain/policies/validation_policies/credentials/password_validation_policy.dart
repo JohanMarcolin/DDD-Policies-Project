@@ -8,6 +8,7 @@ class PasswordValidationPolicy extends ValidationPolicy<Password> {
   static const includeNumbers = true;
   static const includeSpecialCharacters = true;
 
+  @override
   ValidationPolicyResult evaluateValidity(Password password) {
     final value = password.value;
 

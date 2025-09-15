@@ -22,7 +22,7 @@ class UserController {
   final UserAdministrationService _userAdministrationService;
   final Router _userRouter = Router();
 
-  Handler get handler => _userRouter;
+  Handler get handler => _userRouter.call;
 
   Future<Response> _getAllUsers(Request req) async {
     final users = _userAdministrationService.getUsers(initiator: req.currentUser);

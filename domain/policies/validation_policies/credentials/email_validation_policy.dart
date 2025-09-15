@@ -6,7 +6,6 @@ class EmailValidationPolicy extends ValidationPolicy<Email> {
   static final RegExp _emailRegex =
       RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-  bool isValid(Email email) => evaluateValidity(email) is Valid;
   bool _hasValidFormat(Email email) => _emailRegex.hasMatch(email.value);
 
   @override

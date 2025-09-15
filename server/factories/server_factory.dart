@@ -80,7 +80,7 @@ class ServerFactory {
         .addMiddleware(globalExceptionHandler())
         .addMiddleware(logRequests())
         .addMiddleware(securityFilterChain.middleware)
-        .addHandler(router);
+        .addHandler(router.call);
 
     final server = await shelf_io.serve(pipeline, host, port);
     server.autoCompress = true;

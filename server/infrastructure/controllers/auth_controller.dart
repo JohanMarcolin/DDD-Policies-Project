@@ -14,7 +14,7 @@ class AuthController {
   final AuthService _authService;
   final Router _authRouter;
 
-  Handler get handler => _authRouter;
+  Handler get handler => _authRouter.call;
 
   Future<Response> _handleLogin(Request request) {
     return _authService.handleLogin(request);
