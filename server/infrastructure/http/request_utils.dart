@@ -11,8 +11,8 @@ import 'exceptions/request_exceptions.dart';
 
 User getTargetUser(
     Request req, UserAdministrationService userAdministrationService) {
-  final id = extractIdFromParams(req);
-  final user = userAdministrationService.get(initiator: req.currentUser, id: id);
+  final userId = extractUserIdFromParams(req);
+  final user = userAdministrationService.get(initiator: req.currentUser, userId: userId);
   if (user == null) throw const NotFoundException('User not found');
   return user;
 }
@@ -27,12 +27,12 @@ Future<Map<String, dynamic>> readJsonBody(Request req) async {
   return jsonDecode(body) as Map<String, dynamic>;
 }
 
-Id extractIdFromParams(Request req) {
-  final idParam = req.params['id'];
+UserId extractUserIdFromParams(Request req) {
+  final userIdParam = req.params['userId'];
 
-  if (idParam == null || idParam.isEmpty) {
+  if (userIdParam == null || userIdParam.isEmpty) {
     throw BadRequestException('Missing or empty user ID');
   }
 
-  return Id(idParam);
+  return UserId(userIdParam);
 }

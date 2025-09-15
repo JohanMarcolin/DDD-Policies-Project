@@ -5,9 +5,9 @@ import '../value_objects/password.dart';
 
 abstract class UserRepository {
   List<User> get users;
-  User? get({required Id id});
+  User? get({required UserId userId});
   User? getByEmail({required Email email});
-  void delete({required Id id});
-  void updateEmail({required Id id, required Email newEmail});
-  void updatePassword({required Id id, required Password newPassword});
+  void delete({required UserId userId});
+  void updateEmail({required UserId userId, required Email newEmail});
+  void updatePassword({required UserId userId, required Password newPassword});
 }

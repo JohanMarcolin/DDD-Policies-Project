@@ -6,19 +6,19 @@ import '../value_objects/role.dart';
 
 class User extends Equatable {
   User({
-    required this.id,
+    required this.userId,
     required this.email,
     this.role = Role.user,
   });
 
-  final Id id;
+  final UserId userId;
   final Email email;
   final Role role;
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [userId];
 
-  bool isSameAs(User other) => id == other.id;
+  bool isSameAs(User other) => userId == other.userId;
 
   bool isAdmin() => role == Role.admin;
 

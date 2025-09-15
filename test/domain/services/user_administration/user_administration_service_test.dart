@@ -31,7 +31,7 @@ void main() {
     });
     test('get returns user by id', () {
       final user =
-          userAdministrationService.get(initiator: user1, id: user2.id);
+          userAdministrationService.get(initiator: user1, userId: user2.userId);
       expect(user, equals(user2));
     });
     test('getByEmail returns user by email', () {
@@ -49,7 +49,7 @@ void main() {
       userAdministrationService.updateUserEmail(
           initiator: user1, target: user1, newEmail: newEmail);
       final users = userAdministrationService.getUsers(initiator: user1);
-      final updatedUser = users.firstWhere((u) => u.id == user1.id);
+      final updatedUser = users.firstWhere((u) => u.userId == user1.userId);
       expect(updatedUser.email, equals(newEmail));
     });
   });

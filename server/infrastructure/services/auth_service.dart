@@ -39,7 +39,7 @@ class AuthService {
     }
 
     if (!_userRepository.isPasswordVerified(
-        id: user.id, password: Password(password))) {
+        userId: user.userId, password: Password(password))) {
       throw ForbiddenException('Invalid password');
     }
 
@@ -60,7 +60,7 @@ class AuthService {
     final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
 
     final userId = _tokenService.extractUserId(verifiedRefreshToken);
-    final user = _userRepository.get(id: userId);
+    final user = _userRepository.get(userId: userId);
 
     if (user == null) {
       throw NotFoundException('User not found');

@@ -5,7 +5,7 @@ import 'user.dart';
 
 class Analyst extends User {
   Analyst({
-    required Id id,
+    required UserId userId,
     required Email email,
-  }) : super(id: id, email: email, role: Role.analyst);
+  }) : super(userId: userId, email: email, role: Role.analyst);
 }

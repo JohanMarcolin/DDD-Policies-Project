@@ -13,10 +13,10 @@ class UserController {
   UserController({required UserAdministrationService userAdministrationService})
       : _userAdministrationService = userAdministrationService {
     _userRouter.get('/all', _getAllUsers);
-    _userRouter.get('/<id>', _getUserById);
-    _userRouter.delete('/<id>', _deleteUser);
-    _userRouter.post('/<id>/email', _updateEmail);
-    _userRouter.post('/<id>/password', _updatePassword);
+    _userRouter.get('/<userId>', _getUserById);
+    _userRouter.delete('/<userId>', _deleteUser);
+    _userRouter.post('/<userId>/email', _updateEmail);
+    _userRouter.post('/<userId>/password', _updatePassword);
   }
 
   final UserAdministrationService _userAdministrationService;
@@ -40,11 +40,11 @@ class UserController {
     _userAdministrationService.deleteUser(
         initiator: req.currentUser, target: user);
 
-    return ok('Deleted user: ${user.id.value}');
+    return ok('Deleted user: ${user.userId.value}');
   }
 
   Future<Response> _updateEmail(Request req) async {
-    final id = extractIdFromParams(req);
+    final userId = extractUserIdFromParams(req);
 
     final body = await readJsonBody(req);
 
@@ -56,19 +56,19 @@ class UserController {
     final email = Email(newEmail);
 
     final user =
-        _userAdministrationService.get(initiator: req.currentUser, id: id);
+        _userAdministrationService.get(initiator: req.currentUser, userId: userId);
     if (user == null) throw NotFoundException('User not found');
 
     _userAdministrationService.updateUserEmail(
         initiator: req.currentUser, target: user, newEmail: email);
     return ok({
       'message':
-          'Updated email for user: ${id.value} from ${user.email.value} to ${email.value}'
+          'Updated email for user: ${userId.value} from ${user.email.value} to ${email.value}'
     });
   }
 
   Future<Response> _updatePassword(Request req) async {
-    final id = extractIdFromParams(req);
+    final userId = extractUserIdFromParams(req);
 
     final body = await readJsonBody(req);
 
@@ -79,9 +79,9 @@ class UserController {
     }
 
     final user =
-        _userAdministrationService.get(initiator: req.currentUser, id: id);
+        _userAdministrationService.get(initiator: req.currentUser, userId: userId);
     if (user == null) throw NotFoundException('User not found');
 
-    return ok('Updated password for user: ${id.value}');
+    return ok('Updated password for user: ${userId.value}');
   }
 }

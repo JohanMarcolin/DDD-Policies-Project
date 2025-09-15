@@ -20,8 +20,8 @@ class InMemoryUserRepository implements UserRepository {
   List<User> get users => _userdatabase.getAll();
 
   @override
-  User? get({required Id id}) {
-    return _userdatabase.get(id);
+  User? get({required UserId userId}) {
+    return _userdatabase.get(userId);
   }
 
   @override
@@ -32,31 +32,31 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  void updateEmail({required Id id, required Email newEmail}) {
-    final user = _userdatabase.get(id);
+  void updateEmail({required UserId userId, required Email newEmail}) {
+    final user = _userdatabase.get(userId);
     if (user != null) {
       final updated = User(
-        id: user.id,
+        userId: user.userId,
         email: newEmail,
         role: user.role,
       );
-      _userdatabase.put(id, updated);
+      _userdatabase.put(userId, updated);
     }
   }
 
   @override
-  void updatePassword({required Id id, required Password newPassword}) {
-    final userPassword = _userPasswordDatabase.get(id);
+  void updatePassword({required UserId userId, required Password newPassword}) {
+    final userPassword = _userPasswordDatabase.get(userId);
     if (userPassword != null) {
-      _userPasswordDatabase.put(id, newPassword);
+      _userPasswordDatabase.put(userId, newPassword);
     }
   }
 
   @override
-  void delete({required Id id}) {
-    _userdatabase.delete(id);
+  void delete({required UserId userId}) {
+    _userdatabase.delete(userId);
   }
 
-  bool isPasswordVerified({required Id id, required Password password}) =>
-      _userPasswordDatabase.isPasswordVerified(id, password);
+  bool isPasswordVerified({required UserId userId, required Password password}) =>
+      _userPasswordDatabase.isPasswordVerified(userId, password);
 }

@@ -2,12 +2,11 @@ import 'dart:math';
 
 import '../../value_objects/email.dart';
 import '../../value_objects/password.dart';
-import '../../value_objects/validation_result.dart';
 import '../policy_exception.dart';
 import 'validation_policy_result.dart';
 
-part 'user_credentials/email_validation_policy.dart';
-part 'user_credentials/password_validation_policy.dart';
+part 'credentials/email_validation_policy.dart';
+part 'credentials/password_validation_policy.dart';
 
 abstract class ValidationPolicy<TValue> {
   const ValidationPolicy();

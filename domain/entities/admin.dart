@@ -5,7 +5,7 @@ import '../value_objects/role.dart';
 
 class Admin extends User {
   Admin({
-    required Id id,
+    required UserId userId,
     required Email email,
-  }) : super(id: id, email: email, role: Role.admin);
+  }) : super(userId: userId, email: email, role: Role.admin);
 }

@@ -22,7 +22,7 @@ class TokenService {
 
   AccessToken generateAccessToken(User user) {
     final jwt = JWT({
-      'id': user.id.value,
+      'id': user.userId.value,
       'username': user.email.value,
       'role': user.role.name,
     });
@@ -47,9 +47,9 @@ class TokenService {
   }
 
   RefreshToken generateRefreshToken(User user) {
-    final jwt = JWT({'id': user.id.value});
+    final jwt = JWT({'id': user.userId.value});
     final token = _signToken(jwt, _refreshTokenExpiration);
-    _refreshTokenDatabase.put(user.id, token);
+    _refreshTokenDatabase.put(user.userId, token);
     return token;
   }
 
@@ -80,20 +80,20 @@ class TokenService {
     return verifiedRefreshToken;
   }
 
-  void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.id);
+  void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.userId);
 
   String _signToken(JWT token, Duration expiration) =>
       token.sign(_key, expiresIn: expiration);
 
   JWT? _verifyToken(String token) => JWT.tryVerify(token, _key);
 
-  Id extractUserId(JWT token) {
+  UserId extractUserId(JWT token) {
     final claims = _extractTokenClaims(token);
     final id = claims['id'];
     if (id == null) {
       throw InvalidUserClaimsException('Token does not contain a valid user id');
     }
-    return Id(id);
+    return UserId(id);
   }
 
   Email extractUserEmail(JWT token) {

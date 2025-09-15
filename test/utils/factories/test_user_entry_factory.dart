@@ -12,25 +12,25 @@ class TestUserEntry {
   final User user;
   final Password password;
 
-  Id get id => user.id;
+  UserId get userId => user.userId;
   Email get email => user.email;
 }
 
 class TestUserEntryFactory {
   static User user1 = _createUser(
-    id: Id('1'),
+    userId: UserId ('1'),
     email: Email('user1@example.com'),
     role: Role.user,
   );
 
   static User admin1 = _createUser(
-    id: Id('2'),
+    userId: UserId('2'),
     email: Email('user2@example.com'),
     role: Role.admin,
   );
 
   static User analyst1 = _createUser(
-    id: Id('3'),
+    userId: UserId('3'),
     email: Email('user3@example.com'),
     role: Role.analyst,
   );
@@ -42,8 +42,8 @@ class TestUserEntryFactory {
     required UserPasswordDatabase userPasswordDatabase,
   }) {
     for (final entry in defaultUserEntries) {
-      userDatabase.put(entry.id, entry.user);
-      userPasswordDatabase.put(entry.id, entry.password);
+      userDatabase.put(entry.userId, entry.user);
+      userPasswordDatabase.put(entry.userId, entry.password);
     }
   }
 
@@ -58,7 +58,7 @@ class TestUserEntryFactory {
   static TestUserEntry _getDefaultUserEntryWithPassword({required Role role}) {
     return TestUserEntry(
       user: User(
-        id: Id(role.name),
+        userId: UserId(role.name),
         email: Email(role.name),
         role: role,
       ),
@@ -67,9 +67,9 @@ class TestUserEntryFactory {
   }
 
   static User _createUser(
-      {required Id id, required Email email, required Role role}) {
+      {required UserId userId, required Email email, required Role role}) {
     return User(
-      id: id,
+      userId: userId,
       email: email,
       role: role,
     );

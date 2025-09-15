@@ -34,8 +34,8 @@ class UserAdministrationService {
         .toList();
   }
 
-  User? get({required User initiator, required Id id}) {
-    final user = _userRepository.get(id: id);
+  User? get({required User initiator, required UserId userId}) {
+    final user = _userRepository.get(userId: userId);
 
     if (user == null) return null;
 
@@ -52,7 +52,7 @@ class UserAdministrationService {
 
   void deleteUser({required User initiator, required User target}) {
     return deleteUserPolicy.enforce(initiator, target,
-        onGranted: () => _userRepository.delete(id: target.id));
+        onGranted: () => _userRepository.delete(userId: target.userId));
   }
 
   void updateUserEmail(
@@ -63,7 +63,7 @@ class UserAdministrationService {
 
     return updateUserEmailPolicy.enforce(initiator, target,
         onGranted: () =>
-            _userRepository.updateEmail(id: target.id, newEmail: newEmail));
+            _userRepository.updateEmail(userId: target.userId, newEmail: newEmail));
   }
 
   void updateUserPassword(
@@ -74,6 +74,6 @@ class UserAdministrationService {
 
     return updateUserPasswordPolicy.enforce(initiator, target,
         onGranted: () => _userRepository.updatePassword(
-            id: target.id, newPassword: newPassword));
+            userId: target.userId, newPassword: newPassword));
   }
 }

@@ -61,7 +61,7 @@ class SecurityFilterChain {
 
   User _extractCurrentUser(JWT token) {
     return User(
-        id: _tokenService.extractUserId(token),
+        userId: _tokenService.extractUserId(token),
         email: _tokenService.extractUserEmail(token),
         role: _tokenService.extractUserRole(token));
   }

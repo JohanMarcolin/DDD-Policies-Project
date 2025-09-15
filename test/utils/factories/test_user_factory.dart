@@ -40,11 +40,11 @@ class TestUserFactory {
   ];
 
   static Analyst _createAnalyst({required Email email}) =>
-      Analyst(id: Id.generate(), email: email);
+      Analyst(userId: UserId.generate(), email: email);
 
   static Admin _createAdmin({required Email email}) =>
-      Admin(id: Id.generate(), email: email);
+      Admin(userId: UserId.generate(), email: email);
 
   static User _createUser({required Email email, Role role = Role.user}) =>
-      User(id: Id.generate(), email: email, role: role);
+      User(userId: UserId.generate(), email: email, role: role);
 }

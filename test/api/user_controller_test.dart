@@ -36,10 +36,10 @@ void main() {
       });
 
       test('Get user by id returns user', () async {
-        print(tester.user.id.value);
+        print(tester.user.userId.value);
         final response = await http.get(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.user.id.value}'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),
         );
         expect(response.statusCode, 200);
@@ -48,7 +48,7 @@ void main() {
       test('Update email returns success', () async {
         final response = await http.post(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.id.value}/email'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}/email'),
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newEmail': 'new@example.com'}),
         );
@@ -58,7 +58,7 @@ void main() {
       test('Update password returns success', () async {
         final response = await http.post(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.id.value}/password'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}/password'),
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newPassword': 'hello'}),
         );
@@ -67,7 +67,7 @@ void main() {
 
       test('Delete user returns success', () async {
         final response = await http.delete(
-          Uri.parse('${TestServerFactory.baseUrl}/user/${tester.id.value}'),
+          Uri.parse('${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),
         );
         expect(response.statusCode, equals(200));
@@ -76,10 +76,10 @@ void main() {
 
     group('Shall fail', () {
       test('Get user by id fails', () async {
-        print(tester.user.id.value);
+        print(tester.user.userId.value);
         final response = await http.get(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.user.id.value}'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),
         );
         expect(response.statusCode, 404);
@@ -87,7 +87,7 @@ void main() {
 
       test('Delete user fails', () async {
         final response = await http.delete(
-          Uri.parse('${TestServerFactory.baseUrl}/user/${tester.id.value}'),
+          Uri.parse('${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),
         );
         expect(response.statusCode, equals(404));
@@ -96,7 +96,7 @@ void main() {
       test('Update email fails', () async {
         final response = await http.post(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.id.value}/email'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}/email'),
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newEmail': 'example.com'}),
         );
@@ -106,7 +106,7 @@ void main() {
       test('Update password fails', () async {
         final response = await http.post(
           Uri.parse(
-              '${TestServerFactory.baseUrl}/user/${tester.id.value}/password'),
+              '${TestServerFactory.baseUrl}/user/${tester.userId.value}/password'),
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newPassword': 'newpassword123'}),
         );
