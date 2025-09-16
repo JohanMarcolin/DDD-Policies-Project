@@ -20,7 +20,7 @@ import '../../../test/utils/factories/test_user_entry_factory.dart';
 
 class ServerFactory {
   ServerFactory(
-      {this.host = 'localhost', required this.port, this.isTest = false});
+      {this.host = '0.0.0.0', required this.port, this.isTest = false});
   final String host;
   final int port;
   final bool isTest;
