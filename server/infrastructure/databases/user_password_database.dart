@@ -1,5 +1,5 @@
-import '../../../domain/value_objects/id.dart';
-import '../../../domain/value_objects/password.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/password.dart';
 import '../security/password_hasher.dart';
 import 'database.dart';
 

@@ -1,10 +1,9 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../../domain/entities/user.dart';
-import '../../../domain/value_objects/email.dart';
-import '../../../domain/value_objects/id.dart';
-import '../../../domain/value_objects/role.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/role.dart';
 import '../databases/refresh_token_database.dart';
 import '../http/exceptions/request_exceptions.dart';
 
@@ -80,7 +79,8 @@ class TokenService {
     return verifiedRefreshToken;
   }
 
-  void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.userId);
+  void revokeRefreshToken(User user) =>
+      _refreshTokenDatabase.delete(user.userId);
 
   String _signToken(JWT token, Duration expiration) =>
       token.sign(_key, expiresIn: expiration);
@@ -91,7 +91,8 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final id = claims['id'];
     if (id == null) {
-      throw InvalidUserClaimsException('Token does not contain a valid user id');
+      throw InvalidUserClaimsException(
+          'Token does not contain a valid user id');
     }
     return UserId(id);
   }
@@ -100,7 +101,8 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final email = claims['username'];
     if (email == null) {
-      throw InvalidUserClaimsException('Token does not contain a valid user email');
+      throw InvalidUserClaimsException(
+          'Token does not contain a valid user email');
     }
     return Email(email);
   }
@@ -109,7 +111,8 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final role = claims['role'];
     if (role == null) {
-      throw InvalidUserClaimsException('Token does not contain a valid user role');
+      throw InvalidUserClaimsException(
+          'Token does not contain a valid user role');
     }
     switch (role) {
       case 'analyst':

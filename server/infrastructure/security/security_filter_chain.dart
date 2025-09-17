@@ -1,6 +1,6 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
-import '../../../domain/entities/user.dart';
+import 'package:domain/entities/user.dart';
 import '../http/exceptions/request_exceptions.dart';
 import 'token_service.dart';
 

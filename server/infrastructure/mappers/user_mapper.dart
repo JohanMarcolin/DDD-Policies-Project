@@ -1,4 +1,4 @@
-import '../../../domain/entities/user.dart';
+import 'package:domain/entities/user.dart';
 
 typedef UserJson = Map<String, dynamic>;
 

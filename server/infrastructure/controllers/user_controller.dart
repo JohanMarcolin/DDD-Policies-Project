@@ -1,8 +1,9 @@
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
 
-import '../../../domain/services/user_administration/user_administration_service.dart';
-import '../../../domain/value_objects/email.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/request_utils.dart';
 import '../http/response_utils.dart';
@@ -15,8 +16,8 @@ class UserController {
     _userRouter.get('/all', _getAllUsers);
     _userRouter.get('/<userId>', _getUserById);
     _userRouter.delete('/<userId>', _deleteUser);
-    _userRouter.post('/<userId>/email', _updateEmail);
-    _userRouter.post('/<userId>/password', _updatePassword);
+    _userRouter.put('/<userId>/email', _updateEmail);
+    _userRouter.put('/<userId>/password', _updatePassword);
   }
 
   final UserAdministrationService _userAdministrationService;
@@ -25,17 +26,18 @@ class UserController {
   Handler get handler => _userRouter.call;
 
   Future<Response> _getAllUsers(Request req) async {
-    final users = _userAdministrationService.getUsers(initiator: req.currentUser);
+    final users =
+        await _userAdministrationService.getUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
   }
 
   Future<Response> _getUserById(Request req) async {
-    final user = getTargetUser(req, _userAdministrationService);
+    final user = await getTargetUser(req, _userAdministrationService);
     return ok(UserMapper.toJson(user));
   }
 
   Future<Response> _deleteUser(Request req) async {
-    final user = getTargetUser(req, _userAdministrationService);
+    final user = await getTargetUser(req, _userAdministrationService);
 
     _userAdministrationService.deleteUser(
         initiator: req.currentUser, target: user);
@@ -55,11 +57,11 @@ class UserController {
     }
     final email = Email(newEmail);
 
-    final user =
-        _userAdministrationService.get(initiator: req.currentUser, userId: userId);
+    final user = await _userAdministrationService.get(
+        initiator: req.currentUser, userId: userId);
     if (user == null) throw NotFoundException('User not found');
 
-    _userAdministrationService.updateUserEmail(
+    await _userAdministrationService.updateUserEmail(
         initiator: req.currentUser, target: user, newEmail: email);
     return ok({
       'message':
@@ -78,9 +80,15 @@ class UserController {
       throw BadRequestException('Missing or empty new password');
     }
 
-    final user =
-        _userAdministrationService.get(initiator: req.currentUser, userId: userId);
+    final user = await _userAdministrationService.get(
+        initiator: req.currentUser, userId: userId);
+
     if (user == null) throw NotFoundException('User not found');
+
+    await _userAdministrationService.updateUserPassword(
+        initiator: req.currentUser,
+        target: user,
+        newPassword: Password(newPassword));
 
     return ok('Updated password for user: ${userId.value}');
   }

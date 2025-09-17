@@ -2,17 +2,18 @@ import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:domain/value_objects/id.dart';
 
-import '../../../domain/entities/user.dart';
-import '../../../domain/services/user_administration/user_administration_service.dart';
-import '../../../domain/value_objects/id.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
 import '../security/security_filter_chain.dart';
 import 'exceptions/request_exceptions.dart';
 
-User getTargetUser(
-    Request req, UserAdministrationService userAdministrationService) {
+Future<User> getTargetUser(
+    Request req, UserAdministrationService userAdministrationService) async {
   final userId = extractUserIdFromParams(req);
-  final user = userAdministrationService.get(initiator: req.currentUser, userId: userId);
+  final user = await userAdministrationService.get(
+      initiator: req.currentUser, userId: userId);
   if (user == null) throw const NotFoundException('User not found');
   return user;
 }

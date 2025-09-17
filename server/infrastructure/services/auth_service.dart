@@ -1,8 +1,8 @@
 import '../http/request_utils.dart';
 import 'package:shelf/shelf.dart';
 
-import '../../../domain/value_objects/email.dart';
-import '../../../domain/value_objects/password.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/response_utils.dart';
 import '../repositories/in_memory_user_repository.dart';
@@ -32,7 +32,7 @@ class AuthService {
       throw BadRequestException('Missing or empty password');
     }
 
-    final user = _userRepository.getByEmail(email: Email(email));
+    final user = await _userRepository.getByEmail(email: Email(email));
 
     if (user == null) {
       throw NotFoundException('User not found');
@@ -60,7 +60,7 @@ class AuthService {
     final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
 
     final userId = _tokenService.extractUserId(verifiedRefreshToken);
-    final user = _userRepository.get(userId: userId);
+    final user = await _userRepository.get(userId: userId);
 
     if (user == null) {
       throw NotFoundException('User not found');

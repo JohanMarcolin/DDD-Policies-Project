@@ -1,52 +1,31 @@
+import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
-import 'dart:io';
+import 'infrastructure/auth_bloc/auth_bloc.dart';
+import 'infrastructure/user_repository.dart';
+import 'presentation/users_view/blocs/users_view_bloc/users_view_bloc.dart';
 import 'presentation/workspace_screen.dart';
 
-// =====================
-// CONFIGURE YOUR SERVER BASE URL HERE
-// For Android emulator: http://10.0.2.2:8080
-// For Windows/macOS/Linux desktop: http://localhost:8080
-// For real device: http://<YOUR_PC_LAN_IP>:8080 (e.g. http://192.168.1.100:8080)
-const String kBaseUrl = 'http://10.0.2.2:8080'; // CHANGE THIS AS NEEDED
+const String kBaseUrl = 'http://10.0.2.2:8080';
 // =====================
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc()..add(AuthCheckRequested()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isAuthenticated = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuth();
-  }
-
-  Future<void> _checkAuth() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('accessToken');
-    setState(() {
-      _isAuthenticated = accessToken != null;
-    });
-  }
-
-  void _onLoginSuccess() {
-    setState(() {
-      _isAuthenticated = true;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,16 +34,31 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: _isAuthenticated
-          ? const WorkspaceScreen()
-          : LoginScreen(onLoginSuccess: _onLoginSuccess),
+      home: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthAuthenticated) {
+            return BlocProvider(
+              create: (_) => UsersViewBloc(
+                userRepository: UserRepository(UserApi()),
+                accessToken: state.accessToken,
+              )..add(UsersFetchRequested()),
+              child: const WorkspaceScreen(),
+            );
+          }
+          if (state is AuthLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
-  const LoginScreen({super.key, required this.onLoginSuccess});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -73,93 +67,73 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _loading = false;
-  String? _error;
 
-  Future<void> _login() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    // Use the configurable baseUrl above
-    final url = Uri.parse('$kBaseUrl/auth/login');
-    try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': _usernameController.text,
-              'password': _passwordController.text,
-            }),
-          )
-          .timeout(const Duration(seconds: 8));
-      print('Login response: ${response.statusCode} ${response.body}');
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final prefs = await SharedPreferences.getInstance();
-        // Fix: extract tokens from the nested 'result' field
-        final result = data['result'];
-        await prefs.setString('accessToken', result['accessToken'] ?? '');
-        await prefs.setString('refreshToken', result['refreshToken'] ?? '');
-        widget.onLoginSuccess();
-      } else {
-        setState(() {
-          _error = 'Login failed: ${response.body}';
-        });
-      }
-    } on SocketException catch (e) {
-      print('SocketException: $e');
-      setState(() {
-        _error = 'Network error: $e';
-      });
-    } on TimeoutException catch (e) {
-      print('TimeoutException: $e');
-      setState(() {
-        _error = 'Request timed out. Is the server running?';
-      });
-    } catch (e, stack) {
-      print('Login error: $e\n$stack');
-      setState(() {
-        _error = 'Error: $e';
-      });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
+  void _login() {
+    BlocProvider.of<AuthBloc>(context).add(
+      AuthLoginRequested(_usernameController.text, _passwordController.text, (
+        email,
+        password,
+      ) async {
+        final url = Uri.parse('$kBaseUrl/auth/login');
+        final response = await http
+            .post(
+              url,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'email': email, 'password': password}),
+            )
+            .timeout(const Duration(seconds: 8));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final result = data['result'];
+          return {
+            'accessToken': result['accessToken'] ?? '',
+            'refreshToken': result['refreshToken'] ?? '',
+          };
+        } else {
+          throw Exception('Login failed: ${response.body}');
+        }
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Login')),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                ),
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20),
+                if (state is AuthLoading) const CircularProgressIndicator(),
+                ElevatedButton(
+                  onPressed: state is AuthLoading ? null : _login,
+                  child: const Text('Login'),
+                ),
+              ],
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            if (_error != null)
-              Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _login,
-              child: _loading
-                  ? const CircularProgressIndicator()
-                  : const Text('Login'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,8 +1,8 @@
-import '../../../domain/entities/user.dart';
-import '../../../domain/repositories/user_repository.dart';
-import '../../../domain/value_objects/email.dart';
-import '../../../domain/value_objects/id.dart';
-import '../../../domain/value_objects/password.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/repositories/user_repository.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/password.dart';
 import '../databases/user_database.dart';
 import '../databases/user_password_database.dart';
 
@@ -17,23 +17,25 @@ class InMemoryUserRepository implements UserRepository {
   final UserPasswordDatabase _userPasswordDatabase;
 
   @override
-  List<User> get users => _userdatabase.getAll();
-
-  @override
-  User? get({required UserId userId}) {
-    return _userdatabase.get(userId);
+  Future<List<User>> get users async {
+    return await _userdatabase.getAll();
   }
 
   @override
-  User? getByEmail({required Email email}) {
-    final users = _userdatabase.getAll();
+  Future<User?> get({required UserId userId}) async {
+    return await _userdatabase.get(userId);
+  }
+
+  @override
+  Future<User?> getByEmail({required Email email}) async {
+    final users = await _userdatabase.getAll();
 
     return users.firstWhere((user) => user.email.value == email.value);
   }
 
   @override
-  void updateEmail({required UserId userId, required Email newEmail}) {
-    final user = _userdatabase.get(userId);
+  Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
+    final user = await _userdatabase.get(userId);
     if (user != null) {
       final updated = User(
         userId: user.userId,
@@ -45,7 +47,7 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  void updatePassword({required UserId userId, required Password newPassword}) {
+  Future<void> updatePassword({required UserId userId, required Password newPassword}) async {
     final userPassword = _userPasswordDatabase.get(userId);
     if (userPassword != null) {
       _userPasswordDatabase.put(userId, newPassword);
@@ -53,10 +55,11 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  void delete({required UserId userId}) {
+  Future<void> delete({required UserId userId}) async {
     _userdatabase.delete(userId);
   }
 
-  bool isPasswordVerified({required UserId userId, required Password password}) =>
+  bool isPasswordVerified(
+          {required UserId userId, required Password password}) =>
       _userPasswordDatabase.isPasswordVerified(userId, password);
 }

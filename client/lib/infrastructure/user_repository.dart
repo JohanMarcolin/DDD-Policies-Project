@@ -1,67 +1,70 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'models/user.dart';
+import 'package:client/infrastructure/apis/user_api.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/password.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/repositories/user_repository.dart' as domain;
 
-class UserRepository {
-  // Use 10.0.2.2 for Android emulator, 127.0.0.1 for iOS simulator, or your computer's IP for real device
-  static const String baseUrl = 'http://10.0.2.2:8080';
+class UserRepository implements domain.UserRepository {
+  UserRepository(this.userApi);
 
-  Future<List<User>> listUsers(String accessToken) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/users'),
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => User.fromJson(e)).toList();
-    } else {
-      throw Exception('Failed to load users');
+  final UserApi userApi;
+
+  @override
+  Future<void> delete({required UserId userId}) async {
+    try {
+      await userApi.delete(userId: userId);
+    } catch (_) {
+      rethrow;
     }
   }
 
-  Future<void> removeUser(String accessToken, String userId) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/users/$userId'),
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to remove user');
+  @override
+  Future<User?> get({required UserId userId}) async {
+    try {
+      final user = await userApi.get(userId: userId);
+      return user;
+    } catch (_) {
+      rethrow;
     }
   }
 
-  Future<void> updateEmail(
-    String accessToken,
-    String userId,
-    String newEmail,
-  ) async {
-    final response = await http.patch(
-      Uri.parse('$baseUrl/users/$userId/email'),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'email': newEmail}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update email');
+  @override
+  Future<User?> getByEmail({required Email email}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateEmail({
+    required UserId userId,
+    required Email newEmail,
+  }) async {
+    try {
+      await userApi.updateEmail(userId: userId, newEmail: newEmail);
+    } catch (_) {
+      rethrow;
     }
   }
 
-  Future<void> updatePassword(
-    String accessToken,
-    String userId,
-    String newPassword,
-  ) async {
-    final response = await http.patch(
-      Uri.parse('$baseUrl/users/$userId/password'),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'password': newPassword}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update password');
+  @override
+  Future<void> updatePassword({
+    required UserId userId,
+    required Password newPassword,
+  }) async {
+    try {
+      await userApi.updatePassword(userId: userId, newPassword: newPassword);
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<User>> get users async {
+    try {
+      final users = await userApi.users;
+      return users;
+    } catch (_) {
+      rethrow;
     }
   }
 }

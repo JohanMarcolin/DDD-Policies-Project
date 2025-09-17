@@ -1,5 +1,5 @@
-import '../../../domain/entities/user.dart';
-import '../../../domain/value_objects/id.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/value_objects/id.dart';
 import 'database.dart';
 
 class UserDatabase implements Database<User> {

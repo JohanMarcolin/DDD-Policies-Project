@@ -1,4 +1,4 @@
-import '../../../domain/value_objects/id.dart';
+import 'package:domain/value_objects/id.dart';
 
 abstract class Database<T> {
   final Map<Id, T> _items = {};

@@ -1,7 +1,7 @@
 import 'package:shelf/shelf.dart';
-import '../../../domain/policies/policy_exception.dart';
-import '../http/response_utils.dart';
-import '../http/exceptions/request_exceptions.dart';
+import 'package:domain/policies/policy_exception.dart';
+import 'response_utils.dart';
+import 'exceptions/request_exceptions.dart';
 
 Middleware globalExceptionHandler() {
   return (Handler innerHandler) {

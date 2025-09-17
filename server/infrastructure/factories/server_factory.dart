@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
-import '../../../domain/policies/action_policies/action_policy.dart';
-import '../../../domain/policies/validation_policies/validation_policy.dart';
-import '../../../domain/services/user_administration/user_administration_service.dart';
+import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
+import '../../test/utils/factories/test_user_entry_factory.dart';
 import '../databases/user_password_database.dart';
 import '../http/global_exception_handler.dart';
 import '../repositories/in_memory_user_repository.dart';
@@ -16,7 +17,6 @@ import '../databases/user_database.dart';
 import '../security/token_service.dart';
 import '../controllers/user_controller.dart';
 import '../security/security_filter_chain.dart';
-import '../../../test/utils/factories/test_user_entry_factory.dart';
 
 class ServerFactory {
   ServerFactory(
