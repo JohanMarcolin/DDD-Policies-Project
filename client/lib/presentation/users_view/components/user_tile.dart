@@ -1,24 +1,25 @@
+import 'package:domain/entities/user.dart';
 import 'package:flutter/material.dart';
-import '../../../infrastructure/models/user.dart';
 
 class UserTile extends StatelessWidget {
-  final User user;
-  final VoidCallback onRemove;
-  final VoidCallback onUpdateEmail;
-  final VoidCallback onUpdatePassword;
   const UserTile({
     super.key,
     required this.user,
-    required this.onRemove,
+    required this.onDelete,
     required this.onUpdateEmail,
     required this.onUpdatePassword,
   });
 
+  final User user;
+  final VoidCallback onDelete;
+  final VoidCallback onUpdateEmail;
+  final VoidCallback onUpdatePassword;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(user.username),
-      subtitle: Text(user.email),
+      title: Text(user.role.name),
+      subtitle: Text(user.email.value),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -34,8 +35,8 @@ class UserTile extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            tooltip: 'Remove User',
-            onPressed: onRemove,
+            tooltip: 'Delete User',
+            onPressed: onDelete,
           ),
         ],
       ),

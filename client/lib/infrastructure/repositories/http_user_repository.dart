@@ -5,15 +5,15 @@ import 'package:domain/value_objects/password.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/repositories/user_repository.dart' as domain;
 
-class UserRepository implements domain.UserRepository {
-  UserRepository(this.userApi);
+class HttpUserRepository implements domain.UserRepository {
+  HttpUserRepository({required UserApi userApi}) : _userApi = userApi;
 
-  final UserApi userApi;
+  final UserApi _userApi;
 
   @override
   Future<void> delete({required UserId userId}) async {
     try {
-      await userApi.delete(userId: userId);
+      await _userApi.delete(userId: userId);
     } catch (_) {
       rethrow;
     }
@@ -22,7 +22,7 @@ class UserRepository implements domain.UserRepository {
   @override
   Future<User?> get({required UserId userId}) async {
     try {
-      final user = await userApi.get(userId: userId);
+      final user = await _userApi.get(userId: userId);
       return user;
     } catch (_) {
       rethrow;
@@ -40,7 +40,7 @@ class UserRepository implements domain.UserRepository {
     required Email newEmail,
   }) async {
     try {
-      await userApi.updateEmail(userId: userId, newEmail: newEmail);
+      await _userApi.updateEmail(userId: userId, newEmail: newEmail);
     } catch (_) {
       rethrow;
     }
@@ -52,7 +52,7 @@ class UserRepository implements domain.UserRepository {
     required Password newPassword,
   }) async {
     try {
-      await userApi.updatePassword(userId: userId, newPassword: newPassword);
+      await _userApi.updatePassword(userId: userId, newPassword: newPassword);
     } catch (_) {
       rethrow;
     }
@@ -61,7 +61,7 @@ class UserRepository implements domain.UserRepository {
   @override
   Future<List<User>> get users async {
     try {
-      final users = await userApi.users;
+      final users = await _userApi.users;
       return users;
     } catch (_) {
       rethrow;

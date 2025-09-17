@@ -1,22 +1,21 @@
+import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'infrastructure/auth_bloc/auth_bloc.dart';
-import 'infrastructure/user_repository.dart';
+import 'infrastructure/repositories/http_user_repository.dart';
 import 'presentation/users_view/blocs/users_view_bloc/users_view_bloc.dart';
-import 'presentation/workspace_screen.dart';
-
-const String kBaseUrl = 'http://10.0.2.2:8080';
-// =====================
+import 'presentation/users_view.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc()..add(AuthCheckRequested()),
+          create: (_) =>
+              AuthBloc(authApi: AuthApi())..add(AuthCheckRequested()),
         ),
       ],
       child: const MyApp(),
@@ -36,16 +35,15 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          if (state is AuthAuthenticated) {
+          if (state is Authenticated) {
             return BlocProvider(
               create: (_) => UsersViewBloc(
-                userRepository: UserRepository(UserApi()),
-                accessToken: state.accessToken,
+                userRepository: HttpUserRepository(userApi: UserApi()),
               )..add(UsersFetchRequested()),
-              child: const WorkspaceScreen(),
+              child: const UsersView(),
             );
           }
-          if (state is AuthLoading) {
+          if (state is UsersViewLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
@@ -65,34 +63,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   void _login() {
     BlocProvider.of<AuthBloc>(context).add(
-      AuthLoginRequested(_usernameController.text, _passwordController.text, (
-        email,
-        password,
-      ) async {
-        final url = Uri.parse('$kBaseUrl/auth/login');
-        final response = await http
-            .post(
-              url,
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'email': email, 'password': password}),
-            )
-            .timeout(const Duration(seconds: 8));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final result = data['result'];
-          return {
-            'accessToken': result['accessToken'] ?? '',
-            'refreshToken': result['refreshToken'] ?? '',
-          };
-        } else {
-          throw Exception('Login failed: ${response.body}');
-        }
-      }),
+      AuthLoginRequested(
+        email: Email(_emailController.text),
+        password: Password(_passwordController.text),
+      ),
     );
   }
 
@@ -103,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (state is AuthFailure) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          ).showSnackBar(SnackBar(content: Text('Auth failed')));
         }
       },
       builder: (context, state) {
@@ -115,8 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'Username'),
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 TextField(
                   controller: _passwordController,
@@ -137,5 +116,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-// WorkspaceScreen moved to presentation/workspace_screen.dart

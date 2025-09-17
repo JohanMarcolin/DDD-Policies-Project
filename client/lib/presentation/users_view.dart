@@ -1,17 +1,18 @@
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'users_view/blocs/users_view_bloc/users_view_bloc.dart';
-import '../../infrastructure/models/user.dart';
 import 'users_view/components/user_tile.dart';
 
-class WorkspaceScreen extends StatelessWidget {
-  const WorkspaceScreen({super.key});
+class UsersView extends StatelessWidget {
+  const UsersView({super.key});
 
-  Future<void> _showUpdateDialog(
+  Future<void> _showConfirmDialog(
     BuildContext context,
     String title,
     String label,
-    Function(String) onUpdate,
+    Function(String) onConfirm,
   ) async {
     final controller = TextEditingController();
     final result = await showDialog<String>(
@@ -30,13 +31,13 @@ class WorkspaceScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Update'),
+            child: const Text('Confirm'),
           ),
         ],
       ),
     );
     if (result != null && result.isNotEmpty) {
-      onUpdate(result);
+      onConfirm(result);
     }
   }
 
@@ -50,7 +51,7 @@ class WorkspaceScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is UsersViewFailure) {
-            return Center(child: Text(state.message));
+            return Center(child: Text('Failure loading users'));
           }
           if (state is UsersViewLoaded) {
             return ListView.builder(
@@ -59,23 +60,34 @@ class WorkspaceScreen extends StatelessWidget {
                 final user = state.users[index];
                 return UserTile(
                   user: user,
-                  onRemove: () => context.read<UsersViewBloc>().add(
-                    UserRemoveRequested(user.id),
+                  onDelete: () => _showConfirmDialog(
+                    context,
+                    "Delete User",
+                    "Are you sure you want to delete this user?",
+                    (_) => context.read<UsersViewBloc>().add(
+                      UserDeleteRequested(userId: user.userId),
+                    ),
                   ),
-                  onUpdateEmail: () => _showUpdateDialog(
+                  onUpdateEmail: () => _showConfirmDialog(
                     context,
                     'Update Email',
                     'New Email',
-                    (newEmail) => context.read<UsersViewBloc>().add(
-                      UserUpdateEmailRequested(user.id, newEmail),
+                    (value) => context.read<UsersViewBloc>().add(
+                      UserUpdateEmailRequested(
+                        userId: user.userId,
+                        newEmail: Email(value),
+                      ),
                     ),
                   ),
-                  onUpdatePassword: () => _showUpdateDialog(
+                  onUpdatePassword: () => _showConfirmDialog(
                     context,
                     'Update Password',
                     'New Password',
-                    (newPassword) => context.read<UsersViewBloc>().add(
-                      UserUpdatePasswordRequested(user.id, newPassword),
+                    (value) => context.read<UsersViewBloc>().add(
+                      UserUpdatePasswordRequested(
+                        userId: user.userId,
+                        newPassword: Password(value),
+                      ),
                     ),
                   ),
                 );

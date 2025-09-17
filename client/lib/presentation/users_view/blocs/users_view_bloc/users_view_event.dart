@@ -1,34 +1,25 @@
 part of 'users_view_bloc.dart';
 
-abstract class UsersViewEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+abstract class UsersViewEvent {}
 
 class UsersFetchRequested extends UsersViewEvent {}
 
-class UserRemoveRequested extends UsersViewEvent {
-  final String userId;
-  UserRemoveRequested(this.userId);
-
-  @override
-  List<Object?> get props => [userId];
+class UserDeleteRequested extends UsersViewEvent {
+  final UserId userId;
+  UserDeleteRequested({required this.userId});
 }
 
 class UserUpdateEmailRequested extends UsersViewEvent {
-  final String userId;
-  final String newEmail;
-  UserUpdateEmailRequested(this.userId, this.newEmail);
-
-  @override
-  List<Object?> get props => [userId, newEmail];
+  final UserId userId;
+  final Email newEmail;
+  UserUpdateEmailRequested({required this.userId, required this.newEmail});
 }
 
 class UserUpdatePasswordRequested extends UsersViewEvent {
-  final String userId;
-  final String newPassword;
-  UserUpdatePasswordRequested(this.userId, this.newPassword);
-
-  @override
-  List<Object?> get props => [userId, newPassword];
+  final UserId userId;
+  final Password newPassword;
+  UserUpdatePasswordRequested({
+    required this.userId,
+    required this.newPassword,
+  });
 }

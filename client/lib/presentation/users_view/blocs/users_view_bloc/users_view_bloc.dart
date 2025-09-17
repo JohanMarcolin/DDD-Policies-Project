@@ -1,20 +1,23 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import '../../../../infrastructure/user_repository.dart';
+import 'package:domain/entities/user.dart';
+import 'package:domain/repositories/user_repository.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/password.dart';
 part 'users_view_event.dart';
 part 'users_view_state.dart';
 
 class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
-  final UserRepository userRepository;
-  final String accessToken;
-
-  UsersViewBloc({required this.userRepository, required this.accessToken})
-    : super(UsersViewInitial()) {
+  UsersViewBloc({required UserRepository userRepository})
+    : _userRepository = userRepository,
+      super(UsersViewInitial()) {
     on<UsersFetchRequested>(_onFetchRequested);
-    on<UserRemoveRequested>(_onRemoveRequested);
+    on<UserDeleteRequested>(_onDeleteRequested);
     on<UserUpdateEmailRequested>(_onUpdateEmailRequested);
     on<UserUpdatePasswordRequested>(_onUpdatePasswordRequested);
   }
+
+  final UserRepository _userRepository;
 
   Future<void> _onFetchRequested(
     UsersFetchRequested event,
@@ -22,22 +25,21 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
   ) async {
     emit(UsersViewLoading());
     try {
-      final users = await userRepository.listUsers(accessToken);
+      final users = await _userRepository.users;
       emit(UsersViewLoaded(users));
     } catch (e) {
-      emit(UsersViewFailure(e.toString()));
+      emit(UsersViewFailure());
     }
   }
 
-  Future<void> _onRemoveRequested(
-    UserRemoveRequested event,
+  Future<void> _onDeleteRequested(
+    UserDeleteRequested event,
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await userRepository.removeUser(accessToken, event.userId);
-      add(UsersFetchRequested());
+      await _userRepository.delete(userId: event.userId);
     } catch (e) {
-      emit(UsersViewFailure(e.toString()));
+      emit(UsersViewFailure());
     }
   }
 
@@ -46,14 +48,13 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await userRepository.updateEmail(
-        accessToken,
-        event.userId,
-        event.newEmail,
+      await _userRepository.updateEmail(
+        userId: event.userId,
+        newEmail: event.newEmail,
       );
       add(UsersFetchRequested());
     } catch (e) {
-      emit(UsersViewFailure(e.toString()));
+      emit(UsersViewFailure());
     }
   }
 
@@ -62,14 +63,13 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await userRepository.updatePassword(
-        accessToken,
-        event.userId,
-        event.newPassword,
+      await _userRepository.updatePassword(
+        userId: event.userId,
+        newPassword: event.newPassword,
       );
       add(UsersFetchRequested());
     } catch (e) {
-      emit(UsersViewFailure(e.toString()));
+      emit(UsersViewFailure());
     }
   }
 }
