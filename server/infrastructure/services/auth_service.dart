@@ -7,7 +7,6 @@ import '../http/exceptions/request_exceptions.dart';
 import '../http/response_utils.dart';
 import '../mappers/user_mapper.dart';
 import '../repositories/in_memory_user_repository.dart';
-import '../security/security_filter_chain.dart';
 import '../security/token_service.dart';
 
 class AuthService {
@@ -46,6 +45,7 @@ class AuthService {
     }
 
     return ok({
+      'currentUser': UserMapper.toJson(user),
       'accessToken': _tokenService.generateAccessToken(user),
       'refreshToken': _tokenService.generateRefreshToken(user)
     });
@@ -68,10 +68,9 @@ class AuthService {
       throw NotFoundException('User not found');
     }
 
-    return ok({'accessToken': _tokenService.generateAccessToken(user)});
-  }
-
-  Future<Response> getCurrentUser(Request req) async {
-    return ok(UserMapper.toJson(req.currentUser));
+    return ok({
+      'currentUser': UserMapper.toJson(user),
+      'accessToken': _tokenService.generateAccessToken(user)
+    });
   }
 }

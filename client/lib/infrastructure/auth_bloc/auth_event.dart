@@ -9,6 +9,6 @@ class AuthLoginRequested extends AuthEvent {
   AuthLoginRequested({required this.email, required this.password});
 }
 
-class AuthCheckRequested extends AuthEvent {}
+class AuthRefreshRequested extends AuthEvent {}
 
 class AuthLogoutRequested extends AuthEvent {}

@@ -9,7 +9,6 @@ class AuthController {
         _authRouter = Router() {
     _authRouter.post('/login', _handleLogin);
     _authRouter.post('/refresh', _handleRefresh);
-    _authRouter.get('/current', _getCurrentUser);
   }
 
   final AuthService _authService;
@@ -23,9 +22,5 @@ class AuthController {
 
   Future<Response> _handleRefresh(Request request) {
     return _authService.handleRefreshAccessToken(request);
-  }
-
-  Future<Response> _getCurrentUser(Request request) {
-    return _authService.getCurrentUser(request);
   }
 }

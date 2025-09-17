@@ -44,7 +44,7 @@ class AuthApi implements Api {
     }
   }
 
-  Future<void> login({required Email email, required Password password}) async {
+  Future<User> login({required Email email, required Password password}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
@@ -52,11 +52,12 @@ class AuthApi implements Api {
     );
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      final accessToken = decoded['accessToken'];
-      final refreshToken = decoded['refreshToken'];
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('accessToken', accessToken);
-      await prefs.setString('refreshToken', refreshToken);
+      final currentUser = decoded['result']['currentUser'];
+      final accessToken = decoded['result']['accessToken'];
+      final refreshToken = decoded['result']['refreshToken'];
+      await setAccessToken(accessToken);
+      await setRefreshToken(refreshToken);
+      return UserMapper.toDomainUser(currentUser);
     } else {
       throw Exception('Failed to login: ${response.body}');
     }
@@ -67,7 +68,7 @@ class AuthApi implements Api {
     await prefs.remove('accessToken');
   }
 
-  Future<void> refreshAccessToken() async {
+  Future<User> refreshAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     final refreshToken = prefs.getString('refreshToken');
     if (refreshToken == null) {
@@ -80,28 +81,12 @@ class AuthApi implements Api {
     );
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      final newAccessToken = decoded['accessToken'];
-      await prefs.setString('accessToken', newAccessToken);
+      final currentUser = decoded['result']['currentUser'];
+      final newAccessToken = decoded['result']['accessToken'];
+      await setAccessToken(newAccessToken);
+      return UserMapper.toDomainUser(currentUser);
     } else {
       throw Exception('Failed to refresh access token: ${response.body}');
-    }
-  }
-
-  Future<User> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('accessToken');
-    if (accessToken == null) {
-      throw Exception('No access token found');
-    }
-    final response = await http.get(
-      Uri.parse('$baseUrl/auth/current'),
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body)['result'];
-      return UserMapper.toDomainUser(decoded);
-    } else {
-      throw Exception('Failed to get current user: ${response.body}');
     }
   }
 }
