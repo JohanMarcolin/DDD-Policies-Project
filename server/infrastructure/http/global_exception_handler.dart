@@ -15,8 +15,8 @@ Middleware globalExceptionHandler() {
             badRequest(message),
           NotFoundException(:final message) => notFound(message),
           ForbiddenException(:final message) => forbidden(message),
-          InvalidAccessTokenException(:final message) => forbidden(message),
-          InvalidRefreshTokenException(:final message) => forbidden(message),
+          InvalidAccessTokenException(:final message) => unauthorized(message),
+          InvalidRefreshTokenException(:final message) => unauthorized(message),
           AuthenticatedUserNotFoundException(:final message) =>
             forbidden(message),
           ServerErrorException(:final message) => serverError(message),

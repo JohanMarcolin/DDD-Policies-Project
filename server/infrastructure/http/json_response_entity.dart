@@ -12,7 +12,8 @@ class JsonResponseOk extends JsonResponseEntity {
 }
 
 class JsonResponseCreated extends JsonResponseEntity {
-  static Response asShelfResponse([Object? body]) => Response(201,
+  static Response asShelfResponse([Object? body]) => Response(
+        201,
         body: jsonEncode({'success': true, 'result': body}),
         headers: JsonResponseEntity.jsonHeaders,
       );
@@ -43,6 +44,15 @@ class JsonResponseBadRequest extends JsonResponseEntity {
   static Response asShelfResponse([String? message]) => Response.badRequest(
         body:
             jsonEncode({'success': false, 'details': message ?? 'Bad Request'}),
+        headers: JsonResponseEntity.jsonHeaders,
+      );
+}
+
+class JsonResponseUnauthorized extends JsonResponseEntity {
+  static Response asShelfResponse([Object? message]) => Response(
+        401,
+        body: jsonEncode(
+            {'success': false, 'details': message ?? 'Unauthorized'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

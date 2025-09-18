@@ -1,5 +1,6 @@
 import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
+import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/users_view/components/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +15,8 @@ void main() {
       providers: [
         BlocProvider<AuthBloc>(
           create: (_) =>
-              AuthBloc(authApi: AuthApi())..add(AuthRefreshRequested()),
+              AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()))
+                ..add(AuthRefreshRequested()),
         ),
       ],
       child: const MyApp(),
@@ -37,7 +39,12 @@ class MyApp extends StatelessWidget {
           if (state is Authenticated) {
             return BlocProvider(
               create: (_) => UsersViewBloc(
-                userRepository: HttpUserRepository(userApi: UserApi()),
+                userRepository: HttpUserRepository(
+                  userApi: UserApi(
+                    authApi: AuthApi(authTokenService: AuthTokenService()),
+                    authTokenService: AuthTokenService(),
+                  ),
+                ),
               )..add(UsersFetchRequested()),
               child: const UsersView(),
             );

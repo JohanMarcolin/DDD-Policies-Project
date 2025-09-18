@@ -19,5 +19,8 @@ Response forbidden([Object? object]) =>
 Response badRequest([String? message]) =>
     JsonResponseBadRequest.asShelfResponse(message);
 
+Response unauthorized([Object? message]) =>
+    JsonResponseUnauthorized.asShelfResponse(message);
+
 Response serverError([String? message]) =>
     JsonResponseServerError.asShelfResponse(message);

@@ -28,6 +28,7 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
       final users = await _userRepository.users;
       emit(UsersViewLoaded(users));
     } catch (e) {
+      print(e);
       emit(UsersViewFailure());
     }
   }
