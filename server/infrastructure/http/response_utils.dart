@@ -8,18 +8,18 @@ Response ok([Object? body]) => JsonResponseOk.asShelfResponse(body);
 
 Response created([Object? body]) => JsonResponseCreated.asShelfResponse(body);
 
-Response deleted([Object? body]) => JsonResponseDeleted.asShelfResponse(body);
+Response deleted([String? message]) => JsonResponseDeleted.asShelfResponse(message);
 
 Response notFound([String? message]) =>
     JsonResponseNotFound.asShelfResponse(message);
 
-Response forbidden([Object? object]) =>
-    JsonResponseForbidden.asShelfResponse(object);
+Response forbidden([String? message]) =>
+    JsonResponseForbidden.asShelfResponse(message);
 
 Response badRequest([String? message]) =>
     JsonResponseBadRequest.asShelfResponse(message);
 
-Response unauthorized([Object? message]) =>
+Response unauthorized([String? message]) =>
     JsonResponseUnauthorized.asShelfResponse(message);
 
 Response serverError([String? message]) =>

@@ -2,6 +2,9 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/users_view/components/login_screen.dart';
+import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'infrastructure/auth_bloc/auth_bloc.dart';
@@ -39,11 +42,22 @@ class MyApp extends StatelessWidget {
           if (state is Authenticated) {
             return BlocProvider(
               create: (_) => UsersViewBloc(
-                userRepository: HttpUserRepository(
-                  userApi: UserApi(
-                    authApi: AuthApi(authTokenService: AuthTokenService()),
-                    authTokenService: AuthTokenService(),
+                currentUser: state.currentUser,
+                userAdministrationService: UserAdministrationService(
+                  userRepository: HttpUserRepository(
+                    userApi: UserApi(
+                      authApi: AuthApi(
+                        authTokenService: AuthTokenService(),
+                      ),
+                      authTokenService: AuthTokenService(),
+                    ),
                   ),
+                  viewUserPolicy: ViewUserPolicy(),
+                  updateUserEmailPolicy: UpdateUserEmailPolicy(),
+                  updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
+                  deleteUserPolicy: DeleteUserPolicy(),
+                  emailValidationPolicy: EmailValidationPolicy(),
+                  passwordValidationPolicy: PasswordValidationPolicy(),
                 ),
               )..add(UsersFetchRequested()),
               child: const UsersView(),

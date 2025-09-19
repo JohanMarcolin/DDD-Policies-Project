@@ -37,12 +37,14 @@ class UserController {
   }
 
   Future<Response> _deleteUser(Request req) async {
-    final user = await getTargetUser(req, _userAdministrationService);
+    final userId = extractUserIdFromParams(req);
 
-    _userAdministrationService.deleteUser(
-        initiator: req.currentUser, target: user);
+    await _userAdministrationService.deleteUser(
+      initiator: req.currentUser,
+      userId: userId,
+    );
 
-    return ok('Deleted user: ${user.userId.value}');
+    return ok('Deleted user: ${userId.value}');
   }
 
   Future<Response> _updateEmail(Request req) async {
@@ -62,7 +64,7 @@ class UserController {
     if (user == null) throw NotFoundException('User not found');
 
     await _userAdministrationService.updateUserEmail(
-        initiator: req.currentUser, target: user, newEmail: email);
+        initiator: req.currentUser, userId: user.userId, newEmail: email);
     return ok({
       'message':
           'Updated email for user: ${userId.value} from ${user.email.value} to ${email.value}'
@@ -87,7 +89,7 @@ class UserController {
 
     await _userAdministrationService.updateUserPassword(
         initiator: req.currentUser,
-        target: user,
+        userId: userId,
         newPassword: Password(newPassword));
 
     return ok('Updated password for user: ${userId.value}');

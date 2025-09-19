@@ -20,7 +20,7 @@ class JsonResponseCreated extends JsonResponseEntity {
 }
 
 class JsonResponseDeleted extends JsonResponseEntity {
-  static Response asShelfResponse([Object? message]) => Response.ok(
+  static Response asShelfResponse([String? message]) => Response.ok(
         jsonEncode({'success': true, 'details': message ?? 'Deleted'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
@@ -34,8 +34,8 @@ class JsonResponseNotFound extends JsonResponseEntity {
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse([Object? object]) => Response.forbidden(
-        jsonEncode({'success': false, 'details': object ?? 'Forbidden'}),
+  static Response asShelfResponse([String? message]) => Response.forbidden(
+        jsonEncode({'success': false, 'details': message ?? 'Forbidden'}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

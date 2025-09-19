@@ -47,7 +47,7 @@ class UserApi extends HttpApi {
   }) async {
     await callPut<void>(
       endpoint: '/user/${userId.value}/email',
-      data: jsonEncode({'email': newEmail.value}),
+      data: jsonEncode({'newEmail': newEmail.value}),
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
       map: (_) {},

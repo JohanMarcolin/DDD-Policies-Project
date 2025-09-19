@@ -1,10 +1,10 @@
+import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
-import 'package:domain/value_objects/password.dart';
 import 'package:test/test.dart';
 import '../../repositories/dummy_user_repository.dart';
-import '../../utils/policies/action_policies/dummy_action_policy.dart';
-import '../../utils/policies/validation_policies/dummy_validation_policy.dart';
+
 import '../../utils/users.dart';
 
 void main() {
@@ -16,12 +16,12 @@ void main() {
   setUpAll(() {
     userAdministrationService = UserAdministrationService(
       userRepository: DummyUserRepository([user1, user2]),
-      viewUserPolicy: DummyAlwaysGrantedActionPolicy(),
-      updateUserEmailPolicy: DummyAlwaysGrantedActionPolicy(),
-      updateUserPasswordPolicy: DummyAlwaysGrantedActionPolicy(),
-      deleteUserPolicy: DummyAlwaysGrantedActionPolicy(),
-      emailValidationPolicy: DummyAlwaysValidValidationPolicy<Email>(),
-      passwordValidationPolicy: DummyAlwaysValidValidationPolicy<Password>(),
+      viewUserPolicy: ViewUserPolicy(),
+      updateUserEmailPolicy: UpdateUserEmailPolicy(),
+      updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
+      deleteUserPolicy: DeleteUserPolicy(),
+      emailValidationPolicy: EmailValidationPolicy(),
+      passwordValidationPolicy: PasswordValidationPolicy(),
     );
   });
   group('UserAdministrationService', () {
@@ -41,14 +41,14 @@ void main() {
     });
     test('deleteUser removes user', () async {
       await userAdministrationService.deleteUser(
-          initiator: user1, target: user2);
+          initiator: user1, userId: user2.userId);
       final users = await userAdministrationService.getUsers(initiator: user1);
       expect(users, isNot(contains(user2)));
     });
     test('updateUserEmail updates email', () async {
       final newEmail = Email('new@email.com');
       userAdministrationService.updateUserEmail(
-          initiator: user1, target: user1, newEmail: newEmail);
+          initiator: user1, userId: user1.userId, newEmail: newEmail);
       final users = await userAdministrationService.getUsers(initiator: user1);
       final updatedUser = users.firstWhere((u) => u.userId == user1.userId);
       expect(updatedUser.email, equals(newEmail));

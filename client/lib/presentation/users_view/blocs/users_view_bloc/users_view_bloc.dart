@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/repositories/user_repository.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
@@ -8,16 +8,20 @@ part 'users_view_event.dart';
 part 'users_view_state.dart';
 
 class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
-  UsersViewBloc({required UserRepository userRepository})
-    : _userRepository = userRepository,
-      super(UsersViewInitial()) {
+  UsersViewBloc({
+    required User currentUser,
+    required UserAdministrationService userAdministrationService,
+  }) : _currentUser = currentUser,
+       _userAdministrationService = userAdministrationService,
+       super(UsersViewInitial()) {
     on<UsersFetchRequested>(_onFetchRequested);
     on<UserDeleteRequested>(_onDeleteRequested);
     on<UserUpdateEmailRequested>(_onUpdateEmailRequested);
     on<UserUpdatePasswordRequested>(_onUpdatePasswordRequested);
   }
 
-  final UserRepository _userRepository;
+  final User _currentUser;
+  final UserAdministrationService _userAdministrationService;
 
   Future<void> _onFetchRequested(
     UsersFetchRequested event,
@@ -25,7 +29,9 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
   ) async {
     emit(UsersViewLoading());
     try {
-      final users = await _userRepository.users;
+      final users = await _userAdministrationService.getUsers(
+        initiator: _currentUser,
+      );
       emit(UsersViewLoaded(users));
     } catch (e) {
       print(e);
@@ -38,7 +44,10 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await _userRepository.delete(userId: event.userId);
+      await _userAdministrationService.deleteUser(
+        initiator: _currentUser,
+        userId: event.userId,
+      );
     } catch (e) {
       emit(UsersViewFailure());
     }
@@ -49,7 +58,8 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await _userRepository.updateEmail(
+      await _userAdministrationService.updateUserEmail(
+        initiator: _currentUser,
         userId: event.userId,
         newEmail: event.newEmail,
       );
@@ -64,7 +74,8 @@ class UsersViewBloc extends Bloc<UsersViewEvent, UsersViewState> {
     Emitter<UsersViewState> emit,
   ) async {
     try {
-      await _userRepository.updatePassword(
+      await _userAdministrationService.updateUserPassword(
+        initiator: _currentUser,
         userId: event.userId,
         newPassword: event.newPassword,
       );

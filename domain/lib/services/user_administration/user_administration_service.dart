@@ -19,18 +19,19 @@ class UserAdministrationService {
 
   final UserRepository _userRepository;
 
-  final ActionPolicy viewUserPolicy;
-  final ActionPolicy updateUserEmailPolicy;
-  final ActionPolicy updateUserPasswordPolicy;
-  final ActionPolicy deleteUserPolicy;
+  final ViewUserPolicy viewUserPolicy;
+  final UpdateUserEmailPolicy updateUserEmailPolicy;
+  final UpdateUserPasswordPolicy updateUserPasswordPolicy;
+  final DeleteUserPolicy deleteUserPolicy;
 
-  final ValidationPolicy emailValidationPolicy;
-  final ValidationPolicy passwordValidationPolicy;
+  final EmailValidationPolicy emailValidationPolicy;
+  final PasswordValidationPolicy passwordValidationPolicy;
 
   Future<List<User>> getUsers({required User initiator}) async {
     final users = await _userRepository.users;
-    return users.where(
-        (targetUser) => viewUserPolicy.isPermitted(initiator, targetUser))
+    return users
+        .where(
+            (targetUser) => viewUserPolicy.isPermitted(initiator, targetUser))
         .toList();
   }
 
@@ -42,7 +43,8 @@ class UserAdministrationService {
     return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
   }
 
-  Future<User?> getByEmail({required User initiator, required Email email}) async {
+  Future<User?> getByEmail(
+      {required User initiator, required Email email}) async {
     final user = await _userRepository.getByEmail(email: email);
 
     if (user == null) return null;
@@ -50,30 +52,43 @@ class UserAdministrationService {
     return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
   }
 
-  Future<void> deleteUser({required User initiator, required User target}) async {
-    return deleteUserPolicy.enforce(initiator, target,
-        onGranted: () => _userRepository.delete(userId: target.userId));
+  Future<void> deleteUser(
+      {required User initiator, required UserId userId}) async {
+    final user = await _userRepository.get(userId: userId);
+
+    if (user == null) return;
+
+    return deleteUserPolicy.enforce(initiator, user,
+        onGranted: () => _userRepository.delete(userId: user.userId));
   }
 
   Future<void> updateUserEmail(
       {required User initiator,
-      required User target,
+      required UserId userId,
       required Email newEmail}) async {
     emailValidationPolicy.enforce(newEmail);
 
-    return updateUserEmailPolicy.enforce(initiator, target,
-        onGranted: () =>
-            _userRepository.updateEmail(userId: target.userId, newEmail: newEmail));
+    final user = await _userRepository.get(userId: userId);
+
+    if (user == null) return;
+
+    return updateUserEmailPolicy.enforce(initiator, user,
+        onGranted: () => _userRepository.updateEmail(
+            userId: user.userId, newEmail: newEmail));
   }
 
   Future<void> updateUserPassword(
       {required User initiator,
-      required User target,
+      required UserId userId,
       required Password newPassword}) async {
     passwordValidationPolicy.enforce(newPassword);
 
-    return updateUserPasswordPolicy.enforce(initiator, target,
+    final user = await _userRepository.get(userId: userId);
+
+    if (user == null) return;
+
+    return updateUserPasswordPolicy.enforce(initiator, user,
         onGranted: () => _userRepository.updatePassword(
-            userId: target.userId, newPassword: newPassword));
+            userId: user.userId, newPassword: newPassword));
   }
 }

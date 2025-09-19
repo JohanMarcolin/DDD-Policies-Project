@@ -20,7 +20,7 @@ Middleware globalExceptionHandler() {
           AuthenticatedUserNotFoundException(:final message) =>
             forbidden(message),
           ServerErrorException(:final message) => serverError(message),
-          PolicyException(:final reason) => forbidden(reason),
+          PolicyException(:final reason) => forbidden(reason.toString()),
           _ => serverError('An unexpected error occurred'),
         };
       }
