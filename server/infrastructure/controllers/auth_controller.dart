@@ -9,6 +9,7 @@ class AuthController {
         _authRouter = Router() {
     _authRouter.post('/login', _handleLogin);
     _authRouter.post('/refresh', _handleRefresh);
+    _authRouter.delete('/logout/<refreshToken>', _handleLogout);
   }
 
   final AuthService _authService;
@@ -22,5 +23,9 @@ class AuthController {
 
   Future<Response> _handleRefresh(Request request) {
     return _authService.handleRefreshAccessToken(request);
+  }
+
+  Future<Response> _handleLogout(Request request) {
+    return _authService.handleLogout(request);
   }
 }

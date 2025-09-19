@@ -18,24 +18,24 @@ class InMemoryUserRepository implements UserRepository {
 
   @override
   Future<List<User>> get users async {
-    return await _userdatabase.getAll();
+    return _userdatabase.getAll();
   }
 
   @override
   Future<User?> get({required UserId userId}) async {
-    return await _userdatabase.get(userId);
+    return _userdatabase.get(userId);
   }
 
   @override
   Future<User?> getByEmail({required Email email}) async {
-    final users = await _userdatabase.getAll();
+    final users = _userdatabase.getAll();
 
     return users.firstWhere((user) => user.email.value == email.value);
   }
 
   @override
   Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
-    final user = await _userdatabase.get(userId);
+    final user = _userdatabase.get(userId);
     if (user != null) {
       final updated = User(
         userId: user.userId,

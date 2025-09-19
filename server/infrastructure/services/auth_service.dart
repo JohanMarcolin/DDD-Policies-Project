@@ -1,4 +1,5 @@
 import '../http/request_utils.dart';
+import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 
 import 'package:domain/value_objects/email.dart';
@@ -72,5 +73,32 @@ class AuthService {
       'currentUser': UserMapper.toJson(user),
       'accessToken': _tokenService.generateAccessToken(user)
     });
+  }
+
+  Future<Response> handleLogout(Request req) async {
+    final refreshToken = req.params['refreshToken'];
+
+    if (refreshToken == null || refreshToken.isEmpty) {
+      throw BadRequestException('Missing or empty refresh token');
+    }
+
+    final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
+
+    final userId = _tokenService.extractUserId(verifiedRefreshToken);
+    final user = await _userRepository.get(userId: userId);
+
+    if (user == null) {
+      throw NotFoundException('User not found');
+    }
+
+    _tokenService.revokeRefreshToken(user);
+
+    final revokedAccessToken = refreshToken;
+
+    if (!_tokenService.isVerifiedAccessToken(revokedAccessToken)) {
+      return deleted();
+    }
+
+    return badRequest('Could not revoke access token');
   }
 }
