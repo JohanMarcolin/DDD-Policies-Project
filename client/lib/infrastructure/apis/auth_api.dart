@@ -5,14 +5,14 @@ import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 typedef CurrentUser = User;
 
 class AuthApi extends HttpApi {
-  AuthApi({required this.authTokenService});
+  AuthApi({required AuthTokenService authTokenService})
+    : _authTokenService = authTokenService;
 
-  final AuthTokenService authTokenService;
+  final AuthTokenService _authTokenService;
 
   Future<CurrentUser> login({
     required Email email,
@@ -22,7 +22,7 @@ class AuthApi extends HttpApi {
       endpoint: '/auth/login',
       data: jsonEncode({'email': email.value, 'password': password.value}),
       map: (response) {
-        authTokenService.saveTokens(
+        _authTokenService.saveTokens(
           accessToken: response.result['accessToken'],
           refreshToken: response.result['refreshToken'],
         );
@@ -32,20 +32,27 @@ class AuthApi extends HttpApi {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('accessToken');
+    final refreshToken = await _authTokenService.refreshToken;
+
+    await callDelete<void>(
+      endpoint: '/auth/logout/$refreshToken',
+      accessToken: await _authTokenService.accessToken,
+      map: (_) {},
+    );
+    
+    await _authTokenService.clearTokens();
   }
 
   Future<CurrentUser> refreshAccessToken() async {
-    final hasRefreshToken = await authTokenService.hasRefreshToken;
+    final hasRefreshToken = await _authTokenService.hasRefreshToken;
     if (!hasRefreshToken) {
       throw Exception('No refresh token found');
     }
     return await callPost<CurrentUser>(
       endpoint: '/auth/refresh',
-      data: jsonEncode({'refreshToken': await authTokenService.refreshToken}),
+      data: jsonEncode({'refreshToken': await _authTokenService.refreshToken}),
       map: (response) {
-        authTokenService.setAccessToken(
+        _authTokenService.setAccessToken(
           accessToken: response.result['accessToken'],
         );
         return UserMapper.toDomainUser(response.result['currentUser']);

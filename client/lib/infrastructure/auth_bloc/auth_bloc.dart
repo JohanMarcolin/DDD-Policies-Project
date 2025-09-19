@@ -52,7 +52,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    await _authApi.logout();
-    emit(Unauthenticated());
+    try {
+      await _authApi.logout();
+      emit(Unauthenticated());
+    } catch (e) {
+      emit(AuthFailure());
+    }
   }
 }

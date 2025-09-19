@@ -1,8 +1,9 @@
-import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
-import 'package:domain/value_objects/email.dart';
-import 'package:domain/value_objects/password.dart';
+import 'package:client/presentation/users_view/components/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
+import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,15 +15,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  void _login() {
-    BlocProvider.of<AuthBloc>(context).add(
-      AuthLoginRequested(
-        email: Email(_emailController.text),
-        password: Password(_passwordController.text),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +44,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 20),
-                if (state is AuthLoading) const CircularProgressIndicator(),
-                ElevatedButton(
-                  onPressed: state is AuthLoading ? null : _login,
-                  child: const Text('Login'),
+                LoginButton(
+                  onPressed: () {
+                    BlocProvider.of<AuthBloc>(context).add(
+                      AuthLoginRequested(
+                        email: Email(_emailController.text),
+                        password: Password(_passwordController.text),
+                      ),
+                    );
+                  },
+                  loading: state is AuthLoading,
                 ),
               ],
             ),

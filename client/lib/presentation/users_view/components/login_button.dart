@@ -1,3 +1,4 @@
+import 'package:client/presentation/users_view/components/button.dart';
 import 'package:flutter/material.dart';
 
 class LoginButton extends StatelessWidget {
@@ -11,15 +12,6 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: loading ? null : onPressed,
-      child: loading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Text('Login'),
-    );
+    return Button(text: 'Login', onPressed: onPressed, loading: loading);
   }
 }

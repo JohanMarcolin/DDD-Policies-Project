@@ -4,47 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'users_view/blocs/users_view_bloc/users_view_bloc.dart';
 import 'users_view/components/user_tile.dart';
+import 'users_view/components/confirm_dialog.dart';
+import 'users_view/components/users_app_bar.dart';
 
 class UsersView extends StatelessWidget {
   const UsersView({super.key});
 
-  Future<void> _showConfirmDialog(
-    BuildContext context,
-    String title,
-    String label,
-    Function(String) onConfirm,
-  ) async {
-    final controller = TextEditingController();
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(labelText: label),
-          obscureText: label.toLowerCase().contains('password'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
-    );
-    if (result != null && result.isNotEmpty) {
-      onConfirm(result);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('User Administration')),
+      appBar: const UsersAppBar(),
       body: BlocBuilder<UsersViewBloc, UsersViewState>(
         builder: (context, state) {
           if (state is UsersViewLoading) {
@@ -60,30 +29,30 @@ class UsersView extends StatelessWidget {
                 final user = state.users[index];
                 return UserTile(
                   user: user,
-                  onDelete: () => _showConfirmDialog(
+                  onDelete: () => ConfirmDialog.show(
                     context,
-                    "Delete User",
-                    "Are you sure you want to delete this user?",
-                    (_) => context.read<UsersViewBloc>().add(
+                    title: "Delete User",
+                    label: "Are you sure you want to delete this user?",
+                    onConfirm: (_) => context.read<UsersViewBloc>().add(
                       UserDeleteRequested(userId: user.userId),
                     ),
                   ),
-                  onUpdateEmail: () => _showConfirmDialog(
+                  onUpdateEmail: () => ConfirmDialog.show(
                     context,
-                    'Update Email',
-                    'New Email',
-                    (value) => context.read<UsersViewBloc>().add(
+                    title: 'Update Email',
+                    label: 'New Email',
+                    onConfirm: (value) => context.read<UsersViewBloc>().add(
                       UserUpdateEmailRequested(
                         userId: user.userId,
                         newEmail: Email(value),
                       ),
                     ),
                   ),
-                  onUpdatePassword: () => _showConfirmDialog(
+                  onUpdatePassword: () => ConfirmDialog.show(
                     context,
-                    'Update Password',
-                    'New Password',
-                    (value) => context.read<UsersViewBloc>().add(
+                    title: 'Update Password',
+                    label: 'New Password',
+                    onConfirm: (value) => context.read<UsersViewBloc>().add(
                       UserUpdatePasswordRequested(
                         userId: user.userId,
                         newPassword: Password(value),
