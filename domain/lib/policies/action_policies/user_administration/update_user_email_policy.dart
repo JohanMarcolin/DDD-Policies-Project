@@ -1,10 +1,5 @@
 part of '../action_policy.dart';
 
-enum UpdateUserEmailPolicyDenialReason {
-  cannotModifyAnalyst,
-  canOnlyModifySelf,
-}
-
 class UpdateUserEmailPolicy extends ActionPolicy<User, User> {
   const UpdateUserEmailPolicy();
 

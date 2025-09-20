@@ -2,13 +2,15 @@ import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class UsersAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const UsersAppBar({super.key});
+class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const BaseAppBar({super.key, required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('User Administration'),
+      title: Text(title),
       actions: [
         BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {

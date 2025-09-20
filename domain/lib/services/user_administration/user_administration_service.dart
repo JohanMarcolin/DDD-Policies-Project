@@ -27,7 +27,7 @@ class UserAdministrationService {
   final EmailValidationPolicy emailValidationPolicy;
   final PasswordValidationPolicy passwordValidationPolicy;
 
-  Future<List<User>> getUsers({required User initiator}) async {
+  Future<List<User>> viewUsers({required User initiator}) async {
     final users = await _userRepository.users;
     return users
         .where(
@@ -35,7 +35,8 @@ class UserAdministrationService {
         .toList();
   }
 
-  Future<User?> get({required User initiator, required UserId userId}) async {
+  Future<User?> viewUser(
+      {required User initiator, required UserId userId}) async {
     final user = await _userRepository.get(userId: userId);
 
     if (user == null) return null;
@@ -43,7 +44,7 @@ class UserAdministrationService {
     return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
   }
 
-  Future<User?> getByEmail(
+  Future<User?> viewUserByEmail(
       {required User initiator, required Email email}) async {
     final user = await _userRepository.getByEmail(email: email);
 
@@ -53,42 +54,30 @@ class UserAdministrationService {
   }
 
   Future<void> deleteUser(
-      {required User initiator, required UserId userId}) async {
-    final user = await _userRepository.get(userId: userId);
-
-    if (user == null) return;
-
-    return deleteUserPolicy.enforce(initiator, user,
-        onGranted: () => _userRepository.delete(userId: user.userId));
+      {required User initiator, required User target}) async {
+    return deleteUserPolicy.enforce(initiator, target,
+        onGranted: () => _userRepository.delete(userId: target.userId));
   }
 
   Future<void> updateUserEmail(
       {required User initiator,
-      required UserId userId,
+      required User target,
       required Email newEmail}) async {
     emailValidationPolicy.enforce(newEmail);
 
-    final user = await _userRepository.get(userId: userId);
-
-    if (user == null) return;
-
-    return updateUserEmailPolicy.enforce(initiator, user,
+    return updateUserEmailPolicy.enforce(initiator, target,
         onGranted: () => _userRepository.updateEmail(
-            userId: user.userId, newEmail: newEmail));
+            userId: target.userId, newEmail: newEmail));
   }
 
   Future<void> updateUserPassword(
       {required User initiator,
-      required UserId userId,
+      required User target,
       required Password newPassword}) async {
     passwordValidationPolicy.enforce(newPassword);
 
-    final user = await _userRepository.get(userId: userId);
-
-    if (user == null) return;
-
-    return updateUserPasswordPolicy.enforce(initiator, user,
+    return updateUserPasswordPolicy.enforce(initiator, target,
         onGranted: () => _userRepository.updatePassword(
-            userId: user.userId, newPassword: newPassword));
+            userId: target.userId, newPassword: newPassword));
   }
 }

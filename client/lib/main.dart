@@ -1,7 +1,7 @@
 import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
-import 'package:client/presentation/users_view/components/login_screen.dart';
+import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'infrastructure/auth_bloc/auth_bloc.dart';
 import 'infrastructure/repositories/http_user_repository.dart';
-import 'presentation/users_view/blocs/users_view_bloc/users_view_bloc.dart';
-import 'presentation/users_view.dart';
+import 'presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
+import 'presentation/views/user_administration_view/user_administration_view.dart';
 
 void main() {
   runApp(
@@ -22,18 +22,18 @@ void main() {
                 ..add(AuthRefreshRequested()),
         ),
       ],
-      child: const MyApp(),
+      child: const UserAdministrationApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class UserAdministrationApp extends StatelessWidget {
+  const UserAdministrationApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'User Admin App',
+      title: 'User Administration App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
@@ -41,14 +41,12 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           if (state is Authenticated) {
             return BlocProvider(
-              create: (_) => UsersViewBloc(
+              create: (_) => UserAdministrationViewBloc(
                 currentUser: state.currentUser,
                 userAdministrationService: UserAdministrationService(
                   userRepository: HttpUserRepository(
                     userApi: UserApi(
-                      authApi: AuthApi(
-                        authTokenService: AuthTokenService(),
-                      ),
+                      authApi: AuthApi(authTokenService: AuthTokenService()),
                       authTokenService: AuthTokenService(),
                     ),
                   ),
@@ -60,15 +58,15 @@ class MyApp extends StatelessWidget {
                   passwordValidationPolicy: PasswordValidationPolicy(),
                 ),
               )..add(UsersFetchRequested()),
-              child: const UsersView(),
+              child: const UserAdministrationView(),
             );
           }
-          if (state is UsersViewLoading) {
+          if (state is UserAdministrationViewLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          return const LoginScreen();
+          return const LoginView();
         },
       ),
     );

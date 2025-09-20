@@ -1,10 +1,10 @@
-import 'package:client/presentation/users_view/components/button.dart';
+import 'package:client/presentation/widgets/button.dart';
 import 'package:flutter/material.dart';
 
-class LoginButton extends StatelessWidget {
+class LogoutButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool loading;
-  const LoginButton({
+  const LogoutButton({
     super.key,
     required this.onPressed,
     required this.loading,
@@ -12,6 +12,6 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Button(text: 'Login', onPressed: onPressed, loading: loading);
+    return Button(text: 'Logout', onPressed: onPressed, loading: loading);
   }
 }

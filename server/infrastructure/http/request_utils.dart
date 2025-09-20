@@ -12,7 +12,7 @@ import 'exceptions/request_exceptions.dart';
 Future<User> getTargetUser(
     Request req, UserAdministrationService userAdministrationService) async {
   final userId = extractUserIdFromParams(req);
-  final user = await userAdministrationService.get(
+  final user = await userAdministrationService.viewUser(
       initiator: req.currentUser, userId: userId);
   if (user == null) throw const NotFoundException('User not found');
   return user;

@@ -27,7 +27,7 @@ class UserController {
 
   Future<Response> _getAllUsers(Request req) async {
     final users =
-        await _userAdministrationService.getUsers(initiator: req.currentUser);
+        await _userAdministrationService.viewUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
   }
 
@@ -37,21 +37,20 @@ class UserController {
   }
 
   Future<Response> _deleteUser(Request req) async {
-    final userId = extractUserIdFromParams(req);
+    final targetUser = await getTargetUser(req, _userAdministrationService);
 
     await _userAdministrationService.deleteUser(
       initiator: req.currentUser,
-      userId: userId,
+      target: targetUser,
     );
 
-    return ok('Deleted user: ${userId.value}');
+    return ok('Deleted user: ${targetUser.userId.value}');
   }
 
   Future<Response> _updateEmail(Request req) async {
-    final userId = extractUserIdFromParams(req);
+    final targetUser = await getTargetUser(req, _userAdministrationService);
 
     final body = await readJsonBody(req);
-
     final newEmail = body['newEmail'] as String?;
 
     if (newEmail == null || newEmail.isEmpty) {
@@ -59,20 +58,14 @@ class UserController {
     }
     final email = Email(newEmail);
 
-    final user = await _userAdministrationService.get(
-        initiator: req.currentUser, userId: userId);
-    if (user == null) throw NotFoundException('User not found');
-
     await _userAdministrationService.updateUserEmail(
-        initiator: req.currentUser, userId: user.userId, newEmail: email);
-    return ok({
-      'message':
-          'Updated email for user: ${userId.value} from ${user.email.value} to ${email.value}'
-    });
+        initiator: req.currentUser, target: targetUser, newEmail: email);
+    return ok(
+        'Updated email for user: ${targetUser.userId.value} from ${targetUser.email.value} to ${email.value}');
   }
 
   Future<Response> _updatePassword(Request req) async {
-    final userId = extractUserIdFromParams(req);
+    final targetUser = await getTargetUser(req, _userAdministrationService);
 
     final body = await readJsonBody(req);
 
@@ -82,16 +75,11 @@ class UserController {
       throw BadRequestException('Missing or empty new password');
     }
 
-    final user = await _userAdministrationService.get(
-        initiator: req.currentUser, userId: userId);
-
-    if (user == null) throw NotFoundException('User not found');
-
     await _userAdministrationService.updateUserPassword(
         initiator: req.currentUser,
-        userId: userId,
+        target: targetUser,
         newPassword: Password(newPassword));
 
-    return ok('Updated password for user: ${userId.value}');
+    return ok('Updated password for user: ${targetUser.userId.value}');
   }
 }

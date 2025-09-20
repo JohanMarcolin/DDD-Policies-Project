@@ -11,9 +11,9 @@ class UserTile extends StatelessWidget {
   });
 
   final User user;
-  final VoidCallback onDelete;
-  final VoidCallback onUpdateEmail;
-  final VoidCallback onUpdatePassword;
+  final VoidCallback? onDelete;
+  final VoidCallback? onUpdateEmail;
+  final VoidCallback? onUpdatePassword;
 
   @override
   Widget build(BuildContext context) {

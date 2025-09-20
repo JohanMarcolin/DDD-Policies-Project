@@ -1,10 +1,5 @@
 part of '../action_policy.dart';
 
-enum UpdateUserPasswordPolicyDenialReason {
-  cannotModifyAnalyst,
-  canOnlyModifySelf,
-}
-
 class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
   const UpdateUserPasswordPolicy();
 

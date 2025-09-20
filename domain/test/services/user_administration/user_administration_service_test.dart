@@ -25,31 +25,31 @@ void main() {
     );
   });
   group('UserAdministrationService', () {
-    test('getUsers returns all users permitted', () async {
-      final users = await userAdministrationService.getUsers(initiator: user1);
+    test('viewUsers returns all users permitted', () async {
+      final users = await userAdministrationService.viewUsers(initiator: user1);
       expect(users, containsAll([user1, user2]));
     });
-    test('get returns user by id', () async {
-      final user = await userAdministrationService.get(
+    test('viewUser returns user by id', () async {
+      final user = await userAdministrationService.viewUser(
           initiator: user1, userId: user2.userId);
       expect(user, equals(user2));
     });
-    test('getByEmail returns user by email', () async {
-      final user = await userAdministrationService.getByEmail(
+    test('viewUserByEmail returns user by email', () async {
+      final user = await userAdministrationService.viewUserByEmail(
           initiator: user1, email: user2.email);
       expect(user, equals(user2));
     });
     test('deleteUser removes user', () async {
       await userAdministrationService.deleteUser(
-          initiator: user1, userId: user2.userId);
-      final users = await userAdministrationService.getUsers(initiator: user1);
+          initiator: user1, target: user2);
+      final users = await userAdministrationService.viewUsers(initiator: user1);
       expect(users, isNot(contains(user2)));
     });
     test('updateUserEmail updates email', () async {
       final newEmail = Email('new@email.com');
       userAdministrationService.updateUserEmail(
-          initiator: user1, userId: user1.userId, newEmail: newEmail);
-      final users = await userAdministrationService.getUsers(initiator: user1);
+          initiator: user1, target: user1, newEmail: newEmail);
+      final users = await userAdministrationService.viewUsers(initiator: user1);
       final updatedUser = users.firstWhere((u) => u.userId == user1.userId);
       expect(updatedUser.email, equals(newEmail));
     });
