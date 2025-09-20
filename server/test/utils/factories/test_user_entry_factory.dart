@@ -18,7 +18,7 @@ class TestUserEntry {
 
 class TestUserEntryFactory {
   static User user1 = _createUser(
-    userId: UserId ('1'),
+    userId: UserId('1'),
     email: Email('user1@example.com'),
     role: Role.user,
   );
@@ -49,20 +49,28 @@ class TestUserEntryFactory {
 
   static List<TestUserEntry> _getDefaultUserEntries() {
     return [
-      _getDefaultUserEntryWithPassword(role: Role.user),
-      _getDefaultUserEntryWithPassword(role: Role.admin),
-      _getDefaultUserEntryWithPassword(role: Role.analyst),
+      _getDefaultUserEntryWithPassword(role: Role.user, number: 1),
+      _getDefaultUserEntryWithPassword(role: Role.user, number: 2),
+      _getDefaultUserEntryWithPassword(role: Role.user, number: 3),
+      _getDefaultUserEntryWithPassword(role: Role.admin, number: 1),
+      _getDefaultUserEntryWithPassword(role: Role.admin, number: 2),
+      _getDefaultUserEntryWithPassword(role: Role.admin, number: 3),
+      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 1),
+      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 2),
+      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 3),
     ];
   }
 
-  static TestUserEntry _getDefaultUserEntryWithPassword({required Role role}) {
+  static TestUserEntry _getDefaultUserEntryWithPassword(
+      {required Role role, required int number}) {
+    final roleName = role.name;
     return TestUserEntry(
       user: User(
-        userId: UserId(role.name),
-        email: Email(role.name),
+        userId: UserId('$roleName$number'),
+        email: Email('$roleName$number'),
         role: role,
       ),
-      password: Password(role.name),
+      password: Password('$roleName$number'),
     );
   }
 

@@ -9,10 +9,10 @@ class DeleteUserPolicy extends ActionPolicy<User, User> {
 
     switch (initiator.role) {
       case Role.analyst:
-        if (!isDeletingSelf) {
-          return Granted();
-        } else {
+        if (target.isAnalyst() && !isDeletingSelf) {
           return Denied(reason: CanOnlyDeleteSelf());
+        } else {
+          return Granted();
         }
       case Role.admin:
         if (!target.isAnalyst()) {

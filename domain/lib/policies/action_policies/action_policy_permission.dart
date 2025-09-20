@@ -1,4 +1,6 @@
-sealed class ActionPolicyPermission {}
+sealed class ActionPolicyPermission {
+  bool get isGranted => this is Granted;
+}
 
 class Granted extends ActionPolicyPermission {}
 
