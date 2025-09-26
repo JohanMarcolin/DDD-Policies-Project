@@ -2,49 +2,34 @@ import 'package:flutter/material.dart';
 
 class ActionIcon extends StatelessWidget {
   final IconData icon;
-  final bool isCrossedOut;
+  final bool isGreyedOut;
   final VoidCallback onPressed;
 
   const ActionIcon({
     super.key,
     required this.icon,
-    required this.isCrossedOut,
+    required this.isGreyedOut,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
+      clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
         IconButton(
           icon: Icon(icon),
-          color: isCrossedOut ? Colors.grey : null,
+          color: isGreyedOut ? Colors.grey : null,
           onPressed: onPressed,
         ),
-        if (isCrossedOut)
-          IgnorePointer(
-            child: CustomPaint(
-              size: const Size(20, 20),
-              painter: _CrossPainter(),
-            ),
+        if (isGreyedOut)
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Icon(Icons.info_outline, size: 16, color: Colors.blueAccent),
           ),
       ],
     );
   }
-}
-
-class _CrossPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), paint);
-    canvas.drawLine(Offset(size.width, 0), Offset(0, size.height), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -6,16 +6,17 @@ version: 1.0.0+1
 environment:
   sdk: ^3.9.2
 dependencies:
+  bloc_presentation: 1.1.1
   flutter:
     sdk: flutter
   domain:
     path: ../domain
   http: ^1.2.1
   shared_preferences: ^2.2.2
-  flutter_bloc: ^8.1.3
+  flutter_bloc: ^9.0.0
   equatable: ^2.0.5
   cupertino_icons: ^1.0.8
-  bloc: ^8.1.4
+  bloc: ^9.0.0
 
 dev_dependencies:
   flutter_test:

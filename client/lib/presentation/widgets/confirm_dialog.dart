@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class ConfirmDialog extends StatelessWidget {
   final String title;
   final String label;
+  final bool isTextObscured;
   final void Function(String) onConfirm;
 
   const ConfirmDialog({
     super.key,
     required this.title,
     required this.label,
+    required this.isTextObscured,
     required this.onConfirm,
   });
 
@@ -20,7 +22,7 @@ class ConfirmDialog extends StatelessWidget {
       content: TextField(
         controller: controller,
         decoration: InputDecoration(labelText: label),
-        obscureText: label.toLowerCase().contains('password'),
+        obscureText: isTextObscured,
       ),
       actions: [
         TextButton(
@@ -41,12 +43,17 @@ class ConfirmDialog extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String label,
+    bool isTextObscured = false,
     required void Function(String) onConfirm,
   }) async {
     final result = await showDialog<String>(
       context: context,
-      builder: (context) =>
-          ConfirmDialog(title: title, label: label, onConfirm: onConfirm),
+      builder: (context) => ConfirmDialog(
+        title: title,
+        label: label,
+        isTextObscured: isTextObscured,
+        onConfirm: onConfirm,
+      ),
     );
     if (result != null && result.isNotEmpty) {
       onConfirm(result);

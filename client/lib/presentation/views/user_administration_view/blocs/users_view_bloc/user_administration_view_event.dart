@@ -15,6 +15,11 @@ class UserUpdateEmailRequested extends UserAdministrationViewEvent {
   UserUpdateEmailRequested({required this.targetUser, required this.newEmail});
 }
 
+class UserUpdateEmailInvalid extends UserAdministrationViewEvent {
+  UserUpdateEmailInvalid({required this.reason});
+  final EmailInvalidReason reason;
+}
+
 class UserUpdatePasswordRequested extends UserAdministrationViewEvent {
   final User targetUser;
   final Password newPassword;
@@ -22,4 +27,9 @@ class UserUpdatePasswordRequested extends UserAdministrationViewEvent {
     required this.targetUser,
     required this.newPassword,
   });
+}
+
+class UserUpdatePasswordInvalid extends UserAdministrationViewEvent {
+  UserUpdatePasswordInvalid({required this.reason});
+  final PasswordInvalidReason reason;
 }

@@ -1,6 +1,12 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
+import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:domain/entities/user.dart';
+import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
+import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/validation_policies/validation_policy_result.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
@@ -8,7 +14,12 @@ part 'user_administration_view_event.dart';
 part 'user_administration_view_state.dart';
 
 class UserAdministrationViewBloc
-    extends Bloc<UserAdministrationViewEvent, UserAdministrationViewState> {
+    extends Bloc<UserAdministrationViewEvent, UserAdministrationViewState>
+    with
+        BlocPresentationMixin<
+          UserAdministrationViewState,
+          UserAdministrationViewEvent
+        > {
   UserAdministrationViewBloc({
     required User currentUser,
     required UserAdministrationService userAdministrationService,
@@ -40,6 +51,14 @@ class UserAdministrationViewBloc
       _userAdministrationService.updateUserPasswordPolicy.evaluatePermission(
         _currentUser,
         targetUser,
+      );
+
+  ValidationPolicyResult _emailValidationResult(Email email) =>
+      _userAdministrationService.emailValidationPolicy.evaluateValidity(email);
+
+  ValidationPolicyResult _passwordValidationResult(Password password) =>
+      _userAdministrationService.passwordValidationPolicy.evaluateValidity(
+        password,
       );
 
   Future<void> _onFetchRequested(
@@ -76,6 +95,11 @@ class UserAdministrationViewBloc
     UserUpdateEmailRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
+    final validationResult = _emailValidationResult(event.newEmail);
+    if (validationResult is Invalid) {
+      emitPresentation(UserUpdateEmailInvalid(reason: validationResult.reason));
+      return;
+    }
     try {
       await _userAdministrationService.updateUserEmail(
         initiator: _currentUser,
@@ -92,6 +116,13 @@ class UserAdministrationViewBloc
     UserUpdatePasswordRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
+    final validationResult = _passwordValidationResult(event.newPassword);
+    if (validationResult is Invalid) {
+      emitPresentation(
+        UserUpdatePasswordInvalid(reason: validationResult.reason),
+      );
+      return;
+    }
     try {
       await _userAdministrationService.updateUserPassword(
         initiator: _currentUser,
