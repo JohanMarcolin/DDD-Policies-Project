@@ -1,12 +1,12 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
+import 'package:client/presentation/views/user_administration_view/components/update_user_email_icon.dart';
 import 'package:client/presentation/widgets/confirm_dialog.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
-import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,17 +23,6 @@ class UserTile extends StatelessWidget {
       UserAdministrationViewEvent
     >(
       listener: (context, event) {
-        if (event is UserUpdateEmailInvalid) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(switch (event.reason) {
-                  EmailInvalidFormat() => 'Invalid email format',
-                }),
-              ),
-            );
-        }
         if (event is UserUpdatePasswordInvalid) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -60,7 +49,6 @@ class UserTile extends StatelessWidget {
             builder: (context, state) {
               final bloc = context.read<UserAdministrationViewBloc>();
               final deletePermission = bloc.deleteUserPermission(user);
-              final updateEmailPermission = bloc.updateEmailPermission(user);
               final updatePasswordPermission = bloc.updatePasswordPermission(
                 user,
               );
@@ -71,15 +59,7 @@ class UserTile extends StatelessWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ActionIcon(
-                      icon: Icons.email,
-                      isGreyedOut: !updateEmailPermission.isGranted,
-                      onPressed: _onUpdateEmail(
-                        context,
-                        updateEmailPermission,
-                        user,
-                      ),
-                    ),
+                    UpdateUserEmailIcon(user: user),
                     ActionIcon(
                       icon: Icons.lock,
                       isGreyedOut: !updatePasswordPermission.isGranted,
@@ -111,8 +91,7 @@ VoidCallback _onDelete(
   return () {
     switch (permission) {
       case Granted():
-        ConfirmDialog.show(
-          context,
+        ConfirmDialog(
           title: 'Delete User',
           label: 'Are you sure you want to delete this user?',
           onConfirm: (_) => context.read<UserAdministrationViewBloc>().add(
@@ -133,37 +112,6 @@ VoidCallback _onDelete(
   };
 }
 
-VoidCallback _onUpdateEmail(
-  BuildContext context,
-  ActionPolicyPermission permission,
-  User user,
-) {
-  return () {
-    switch (permission) {
-      case Granted():
-        ConfirmDialog.show(
-          context,
-          title: 'Update Email',
-          label: 'New Email',
-          onConfirm: (value) => context.read<UserAdministrationViewBloc>().add(
-            UserUpdateEmailRequested(targetUser: user, newEmail: Email(value)),
-          ),
-        );
-      case Denied(:final reason as UpdateUserEmailDeniedReason):
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(switch (reason) {
-              CannotUpdateEmailOnAnalyst() =>
-                'You cannot update the email of an analyst.',
-              CanOnlyUpdateEmailOnSelf() =>
-                'You can only update your own email.',
-            }),
-          ),
-        );
-    }
-  };
-}
-
 VoidCallback _onUpdatePassword(
   BuildContext context,
   ActionPolicyPermission permission,
@@ -172,8 +120,7 @@ VoidCallback _onUpdatePassword(
   return () {
     switch (permission) {
       case Granted():
-        ConfirmDialog.show(
-          context,
+        ConfirmDialog(
           title: 'Update Password',
           label: 'New Password',
           isTextObscured: true,

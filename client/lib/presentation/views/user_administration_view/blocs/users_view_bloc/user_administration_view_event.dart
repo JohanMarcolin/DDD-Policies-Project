@@ -20,6 +20,10 @@ class UserUpdateEmailInvalid extends UserAdministrationViewEvent {
   final EmailInvalidReason reason;
 }
 
+class UserUpdateEmailFailure extends UserAdministrationViewEvent {}
+
+class UserUpdateEmailSuccess extends UserAdministrationViewEvent {}
+
 class UserUpdatePasswordRequested extends UserAdministrationViewEvent {
   final User targetUser;
   final Password newPassword;

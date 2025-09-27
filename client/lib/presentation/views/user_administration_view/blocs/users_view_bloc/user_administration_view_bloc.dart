@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:domain/entities/user.dart';
@@ -106,9 +104,10 @@ class UserAdministrationViewBloc
         target: event.targetUser,
         newEmail: event.newEmail,
       );
+      emitPresentation(UserUpdateEmailSuccess());
       add(UsersFetchRequested());
     } catch (e) {
-      emit(UserAdministrationViewFailure());
+      emitPresentation(UserUpdateEmailFailure());
     }
   }
 

@@ -10,7 +10,7 @@ class ConfirmDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.label,
-    required this.isTextObscured,
+    this.isTextObscured = false,
     required this.onConfirm,
   });
 
@@ -30,33 +30,10 @@ class ConfirmDialog extends StatelessWidget {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () {
-            Navigator.pop(context, controller.text);
-          },
+          onPressed: () => onConfirm(controller.text),
           child: const Text('Confirm'),
         ),
       ],
     );
-  }
-
-  static Future<void> show(
-    BuildContext context, {
-    required String title,
-    required String label,
-    bool isTextObscured = false,
-    required void Function(String) onConfirm,
-  }) async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => ConfirmDialog(
-        title: title,
-        label: label,
-        isTextObscured: isTextObscured,
-        onConfirm: onConfirm,
-      ),
-    );
-    if (result != null && result.isNotEmpty) {
-      onConfirm(result);
-    }
   }
 }
