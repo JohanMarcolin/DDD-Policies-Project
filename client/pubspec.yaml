@@ -17,6 +17,7 @@ dependencies:
   equatable: ^2.0.5
   cupertino_icons: ^1.0.8
   bloc: ^9.0.0
+  another_flushbar: ^1.12.30
 
 dev_dependencies:
   flutter_test:

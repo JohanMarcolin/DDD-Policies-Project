@@ -1,4 +1,5 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
+import 'package:client/presentation/utils/action_flush_bar.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/confirm_dialog.dart';
@@ -38,35 +39,21 @@ class UpdateUserEmailIcon extends StatelessWidget {
                             UserAdministrationViewEvent
                           >(
                             listener: (_, event) {
-                              if (event is UserUpdateEmailInvalid) {
-                                ScaffoldMessenger.of(dialogContext)
-                                  ..hideCurrentSnackBar()
-                                  ..showSnackBar(
-                                    SnackBar(
-                                      content: Text('Invalid email format'),
-                                    ),
-                                  );
-                              }
-                              if (event is UserUpdateEmailFailure) {
-                                ScaffoldMessenger.of(dialogContext)
-                                  ..hideCurrentSnackBar()
-                                  ..showSnackBar(
-                                    SnackBar(
-                                      content: Text('Failed to update email'),
-                                    ),
-                                  );
-                              }
+                              showAppFlushbar(
+                                message: switch (event) {
+                                  UserUpdateEmailInvalid() =>
+                                    'Invalid email format',
+                                  UserUpdateEmailFailure() =>
+                                    'Failed to update email',
+                                  UserUpdateEmailSuccess() =>
+                                    'Email updated successfully',
+                                  _ => '',
+                                },
+                                context: dialogContext,
+                              );
+                              
                               if (event is UserUpdateEmailSuccess) {
                                 Navigator.of(dialogContext).pop();
-                                ScaffoldMessenger.of(dialogContext)
-                                  ..hideCurrentSnackBar()
-                                  ..showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Email updated successfully',
-                                      ),
-                                    ),
-                                  );
                               }
                             },
                             child: ConfirmDialog(
@@ -86,15 +73,14 @@ class UpdateUserEmailIcon extends StatelessWidget {
                   },
                 );
               case Denied(:final reason as UpdateUserEmailDeniedReason):
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(switch (reason) {
-                      CannotUpdateEmailOnAnalyst() =>
-                        'You cannot update the email of an analyst.',
-                      CanOnlyUpdateEmailOnSelf() =>
-                        'You can only update your own email.',
-                    }),
-                  ),
+                showAppFlushbar(
+                  message: switch (reason) {
+                    CannotUpdateEmailOnAnalyst() =>
+                      'You cannot update the email of an analyst.',
+                    CanOnlyUpdateEmailOnSelf() =>
+                      'You can only update your own email.',
+                  },
+                  context: context,
                 );
             }
           },
