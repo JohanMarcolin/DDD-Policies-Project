@@ -24,7 +24,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
 
         return ActionIcon(
           icon: Icons.email,
-          isGreyedOut: !updateEmailPermission.isGranted,
+          isGreyedOut: updateEmailPermission is Denied,
           onPressed: () {
             switch (updateEmailPermission) {
               case Granted():
@@ -51,10 +51,6 @@ class UpdateUserEmailIcon extends StatelessWidget {
                                 },
                                 context: dialogContext,
                               );
-                              
-                              if (event is UserUpdateEmailSuccess) {
-                                Navigator.of(dialogContext).pop();
-                              }
                             },
                             child: ConfirmDialog(
                               title: 'Update Email',
