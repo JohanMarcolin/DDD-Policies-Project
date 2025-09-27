@@ -60,7 +60,7 @@ class UserApi extends HttpApi {
   }) async {
     await callPut<void>(
       endpoint: '/user/${userId.value}/password',
-      data: jsonEncode({'password': newPassword.value}),
+      data: jsonEncode({'newPassword': newPassword.value}),
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
       map: (_) {},

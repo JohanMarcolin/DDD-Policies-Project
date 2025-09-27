@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy_result.dart';
@@ -24,10 +23,10 @@ class UserAdministrationViewBloc
   }) : _currentUser = currentUser,
        _userAdministrationService = userAdministrationService,
        super(UserAdministrationViewInitial()) {
-    on<UsersFetchRequested>(_onFetchRequested);
-    on<UserDeleteRequested>(_onDeleteRequested);
-    on<UserUpdateEmailRequested>(_onUpdateEmailRequested);
-    on<UserUpdatePasswordRequested>(_onUpdatePasswordRequested);
+    on<FetchUsersRequested>(_onFetchRequested);
+    on<DeleteUserRequested>(_onDeleteRequested);
+    on<UpdateUserEmailRequested>(_onUpdateEmailRequested);
+    on<UpdateUserPasswordRequested>(_onUpdatePasswordRequested);
   }
 
   final User _currentUser;
@@ -60,7 +59,7 @@ class UserAdministrationViewBloc
       );
 
   Future<void> _onFetchRequested(
-    UsersFetchRequested event,
+    FetchUsersRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
     emit(UserAdministrationViewLoading());
@@ -76,7 +75,7 @@ class UserAdministrationViewBloc
   }
 
   Future<void> _onDeleteRequested(
-    UserDeleteRequested event,
+    DeleteUserRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
     try {
@@ -84,18 +83,20 @@ class UserAdministrationViewBloc
         initiator: _currentUser,
         target: event.targetUser,
       );
+      emitPresentation(DeleteUserSuccess());
+      add(FetchUsersRequested());
     } catch (e) {
-      emit(UserAdministrationViewFailure());
+      emitPresentation(DeleteUserFailure());
     }
   }
 
   Future<void> _onUpdateEmailRequested(
-    UserUpdateEmailRequested event,
+    UpdateUserEmailRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
     final validationResult = _emailValidationResult(event.newEmail);
     if (validationResult is Invalid) {
-      emitPresentation(UserUpdateEmailInvalid(reason: validationResult.reason));
+      emitPresentation(UpdateUserEmailInvalid(reason: validationResult.reason));
       return;
     }
     try {
@@ -104,21 +105,21 @@ class UserAdministrationViewBloc
         target: event.targetUser,
         newEmail: event.newEmail,
       );
-      emitPresentation(UserUpdateEmailSuccess());
-      add(UsersFetchRequested());
+      emitPresentation(UpdateUserEmailSuccess());
+      add(FetchUsersRequested());
     } catch (e) {
-      emitPresentation(UserUpdateEmailFailure());
+      emitPresentation(UpdateUserEmailFailure());
     }
   }
 
   Future<void> _onUpdatePasswordRequested(
-    UserUpdatePasswordRequested event,
+    UpdateUserPasswordRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
     final validationResult = _passwordValidationResult(event.newPassword);
     if (validationResult is Invalid) {
       emitPresentation(
-        UserUpdatePasswordInvalid(reason: validationResult.reason),
+        UpdateUserPasswordInvalid(reason: validationResult.reason),
       );
       return;
     }
@@ -128,9 +129,10 @@ class UserAdministrationViewBloc
         target: event.targetUser,
         newPassword: event.newPassword,
       );
-      add(UsersFetchRequested());
+      emitPresentation(UpdateUserPasswordSuccess());
+      add(FetchUsersRequested());
     } catch (e) {
-      emit(UserAdministrationViewFailure());
+      emitPresentation(UpdateUserPasswordFailure());
     }
   }
 }

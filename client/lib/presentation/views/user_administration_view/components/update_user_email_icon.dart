@@ -41,11 +41,11 @@ class UpdateUserEmailIcon extends StatelessWidget {
                             listener: (_, event) {
                               showAppFlushbar(
                                 message: switch (event) {
-                                  UserUpdateEmailInvalid() =>
+                                  UpdateUserEmailInvalid() =>
                                     'Invalid email format',
-                                  UserUpdateEmailFailure() =>
+                                  UpdateUserEmailFailure() =>
                                     'Failed to update email',
-                                  UserUpdateEmailSuccess() =>
+                                  UpdateUserEmailSuccess() =>
                                     'Email updated successfully',
                                   _ => '',
                                 },
@@ -57,7 +57,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
                               label: 'New Email',
                               onConfirm: (value) {
                                 bloc.add(
-                                  UserUpdateEmailRequested(
+                                  UpdateUserEmailRequested(
                                     targetUser: user,
                                     newEmail: Email(value),
                                   ),

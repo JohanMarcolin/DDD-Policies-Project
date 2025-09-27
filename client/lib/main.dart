@@ -57,7 +57,7 @@ class UserAdministrationApp extends StatelessWidget {
                   emailValidationPolicy: EmailValidationPolicy(),
                   passwordValidationPolicy: PasswordValidationPolicy(),
                 ),
-              )..add(UsersFetchRequested()),
+              )..add(FetchUsersRequested()),
               child: const UserAdministrationView(),
             );
           }

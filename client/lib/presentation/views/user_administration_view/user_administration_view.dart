@@ -13,20 +13,19 @@ class UserAdministrationView extends StatelessWidget {
       body:
           BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
             builder: (context, state) {
-              if (state is UserAdministrationViewLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state is UserAdministrationViewFailure) {
-                return Center(child: Text('Failure loading users'));
-              }
-              if (state is UserAdministrationViewLoaded) {
-                return ListView.builder(
-                  itemCount: state.users.length,
-                  itemBuilder: (context, index) =>
-                      UserTile(user: state.users[index]),
-                );
-              }
-              return const SizedBox.shrink();
+              return switch (state) {
+                UserAdministrationViewLoading() => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                UserAdministrationViewFailure() => Center(
+                  child: Text('Failure loading users'),
+                ),
+                UserAdministrationViewLoaded(:final users) => ListView.builder(
+                  itemCount: users.length,
+                  itemBuilder: (context, index) => UserTile(user: users[index]),
+                ),
+                _ => const SizedBox.shrink(),
+              };
             },
           ),
     );
