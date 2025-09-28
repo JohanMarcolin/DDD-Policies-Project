@@ -1,8 +1,8 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
-import 'package:client/presentation/utils/action_flush_bar.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/widgets/action_dialog.dart';
+import 'package:client/presentation/widgets/action_dialog_helper.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
+import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
@@ -37,7 +37,7 @@ class DeleteUserIcon extends StatelessWidget {
                           UserAdministrationViewEvent
                         >(
                           listener: (_, event) async {
-                            showAppFlushbar(
+                            ActionSnackBarHelper.show(
                               context: context,
                               message: switch (event) {
                                 DeleteUserFailure() => 'Failed to delete user',
@@ -62,7 +62,7 @@ class DeleteUserIcon extends StatelessWidget {
                   ),
                 );
               case Denied(:final reason as DeleteUserDeniedReason):
-                showAppFlushbar(
+                ActionSnackBarHelper.show(
                   context: context,
                   message: switch (reason) {
                     CannotDeleteSelf() => 'You cannot delete yourself.',

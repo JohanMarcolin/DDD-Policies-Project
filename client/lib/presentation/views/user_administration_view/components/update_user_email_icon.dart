@@ -1,7 +1,7 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
-import 'package:client/presentation/utils/action_flush_bar.dart';
+import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/widgets/action_dialog.dart';
+import 'package:client/presentation/widgets/action_dialog_helper.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
@@ -38,7 +38,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
                           UserAdministrationViewEvent
                         >(
                           listener: (_, event) async {
-                            showAppFlushbar(
+                            ActionSnackBarHelper.show(
                               context: context,
                               message: switch (event) {
                                 UpdateUserEmailInvalid() =>
@@ -51,13 +51,13 @@ class UpdateUserEmailIcon extends StatelessWidget {
                               },
                             );
                             if (event is UpdateUserEmailSuccess) {
-                              ActionDialogHelper.hide();
+                              await ActionDialogHelper.hide();
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Update Email',
                             label: 'New Email',
-                            onCancel: () => ActionDialogHelper.hide(),
+                            onCancel: () async => await ActionDialogHelper.hide(),
                             onConfirm: (value) {
                               bloc.add(
                                 UpdateUserEmailRequested(
@@ -71,7 +71,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
                   ),
                 );
               case Denied(:final reason as UpdateUserEmailDeniedReason):
-                showAppFlushbar(
+                ActionSnackBarHelper.show(
                   context: context,
                   message: switch (reason) {
                     CannotUpdateEmailOnAnalyst() =>

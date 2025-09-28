@@ -1,7 +1,7 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
-import 'package:client/presentation/utils/action_flush_bar.dart';
+import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/widgets/action_dialog.dart';
+import 'package:client/presentation/widgets/action_dialog_helper.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
@@ -39,7 +39,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                           UserAdministrationViewEvent
                         >(
                           listener: (_, event) async {
-                            showAppFlushbar(
+                            ActionSnackBarHelper.show(
                               context: context,
                               message: switch (event) {
                                 UpdateUserPasswordInvalid() => switch (event
@@ -84,7 +84,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                   ),
                 );
               case Denied(:final reason as UpdateUserPasswordDeniedReason):
-                showAppFlushbar(
+                ActionSnackBarHelper.show(
                   context: context,
                   message: switch (reason) {
                     CannotUpdatePasswordOnAnalyst() =>
