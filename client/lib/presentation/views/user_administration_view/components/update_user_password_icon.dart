@@ -40,7 +40,6 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                         >(
                           listener: (_, event) async {
                             ActionSnackBarHelper.show(
-                              context: context,
                               message: switch (event) {
                                 UpdateUserPasswordInvalid() => switch (event
                                     .reason) {
@@ -85,7 +84,6 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                 );
               case Denied(:final reason as UpdateUserPasswordDeniedReason):
                 ActionSnackBarHelper.show(
-                  context: context,
                   message: switch (reason) {
                     CannotUpdatePasswordOnAnalyst() =>
                       'You cannot update the password of an analyst.',

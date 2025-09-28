@@ -6,12 +6,17 @@ class ActionDialogHelper {
 
   static Future<void> show({required Widget child}) {
     return FlutterEasyDialogs.show(
-      EasyDialog.positioned(
+      EasyDialog.fullScreen(
         id: _dialogId,
         autoHideDuration: null,
         content: child,
-        decoration: const EasyDialogDecoration.combine([
-          EasyDialogDismiss.animatedTap(),
+        decoration: EasyDialogDecoration.combine([
+          const EasyDialogAnimation.expansion(),
+          const EasyDialogAnimation.fade(),
+          EasyDialogAnimation.blurBackground(
+            backgroundColor: Colors.black.withValues(alpha: 0.5),
+            amount: 0,
+          ),
         ]),
       ),
     );

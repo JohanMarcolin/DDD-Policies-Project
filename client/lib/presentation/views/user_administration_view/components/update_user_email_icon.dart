@@ -39,7 +39,6 @@ class UpdateUserEmailIcon extends StatelessWidget {
                         >(
                           listener: (_, event) async {
                             ActionSnackBarHelper.show(
-                              context: context,
                               message: switch (event) {
                                 UpdateUserEmailInvalid() =>
                                   'Invalid email format',
@@ -72,7 +71,6 @@ class UpdateUserEmailIcon extends StatelessWidget {
                 );
               case Denied(:final reason as UpdateUserEmailDeniedReason):
                 ActionSnackBarHelper.show(
-                  context: context,
                   message: switch (reason) {
                     CannotUpdateEmailOnAnalyst() =>
                       'You cannot update the email of an analyst.',

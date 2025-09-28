@@ -38,7 +38,6 @@ class DeleteUserIcon extends StatelessWidget {
                         >(
                           listener: (_, event) async {
                             ActionSnackBarHelper.show(
-                              context: context,
                               message: switch (event) {
                                 DeleteUserFailure() => 'Failed to delete user',
                                 DeleteUserSuccess() =>
@@ -63,7 +62,6 @@ class DeleteUserIcon extends StatelessWidget {
                 );
               case Denied(:final reason as DeleteUserDeniedReason):
                 ActionSnackBarHelper.show(
-                  context: context,
                   message: switch (reason) {
                     CannotDeleteSelf() => 'You cannot delete yourself.',
                     CannotDeleteAnalyst() => 'You cannot delete an analyst.',
