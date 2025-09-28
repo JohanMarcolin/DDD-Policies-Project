@@ -1,15 +1,15 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:client/presentation/utils/action_flush_bar.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
+import 'package:client/presentation/widgets/action_dialog.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
-import 'package:client/presentation/widgets/confirm_dialog.dart';
+import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easy_dialogs/flutter_easy_dialogs.dart';
 
 class UpdateUserEmailIcon extends StatelessWidget {
   const UpdateUserEmailIcon({super.key, required this.user});
@@ -29,61 +29,56 @@ class UpdateUserEmailIcon extends StatelessWidget {
           onPressed: () {
             switch (updateEmailPermission) {
               case Granted():
-                FlutterEasyDialogs.show(
-                  EasyDialog.positioned(
-                    autoHideDuration: null,
-                    position: EasyDialogPosition.center,
-                    content: BlocProvider.value(
-                      value: bloc,
-                      child:
-                          BlocPresentationListener<
-                            UserAdministrationViewBloc,
-                            UserAdministrationViewEvent
-                          >(
-                            listener: (_, event) async {
-                              showAppFlushbar(
-                                message: switch (event) {
-                                  UpdateUserEmailInvalid() =>
-                                    'Invalid email format',
-                                  UpdateUserEmailFailure() =>
-                                    'Failed to update email',
-                                  UpdateUserEmailSuccess() =>
-                                    'Email updated successfully',
-                                  _ => '',
-                                },
-                                context: context,
-                              );
-                              if (event is UpdateUserEmailSuccess) {
-                                await FlutterEasyDialogs.hide(
-                                  id: EasyDialogPosition.center,
-                                );
-                              }
-                            },
-                            child: ConfirmDialog(
-                              title: 'Update Email',
-                              label: 'New Email',
-                              onConfirm: (value) {
-                                bloc.add(
-                                  UpdateUserEmailRequested(
-                                    targetUser: user,
-                                    newEmail: Email(value),
-                                  ),
-                                );
+                ActionDialogHelper.show(
+                  child: BlocProvider.value(
+                    value: bloc,
+                    child:
+                        BlocPresentationListener<
+                          UserAdministrationViewBloc,
+                          UserAdministrationViewEvent
+                        >(
+                          listener: (_, event) async {
+                            showAppFlushbar(
+                              context: context,
+                              message: switch (event) {
+                                UpdateUserEmailInvalid() =>
+                                  'Invalid email format',
+                                UpdateUserEmailFailure() =>
+                                  'Failed to update email',
+                                UpdateUserEmailSuccess() =>
+                                  'Email updated successfully',
+                                _ => '',
                               },
-                            ),
+                            );
+                            if (event is UpdateUserEmailSuccess) {
+                              ActionDialogHelper.hide();
+                            }
+                          },
+                          child: ConfirmInputDialog(
+                            title: 'Update Email',
+                            label: 'New Email',
+                            onCancel: () => ActionDialogHelper.hide(),
+                            onConfirm: (value) {
+                              bloc.add(
+                                UpdateUserEmailRequested(
+                                  targetUser: user,
+                                  newEmail: Email(value),
+                                ),
+                              );
+                            },
                           ),
-                    ),
+                        ),
                   ),
                 );
               case Denied(:final reason as UpdateUserEmailDeniedReason):
                 showAppFlushbar(
+                  context: context,
                   message: switch (reason) {
                     CannotUpdateEmailOnAnalyst() =>
                       'You cannot update the email of an analyst.',
                     CanOnlyUpdateEmailOnSelf() =>
                       'You can only update your own email.',
                   },
-                  context: context,
                 );
             }
           },

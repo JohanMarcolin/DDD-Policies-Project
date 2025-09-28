@@ -1,8 +1,9 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:client/presentation/utils/action_flush_bar.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
+import 'package:client/presentation/widgets/action_dialog.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
-import 'package:client/presentation/widgets/confirm_dialog.dart';
+import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
@@ -29,69 +30,68 @@ class UpdateUserPasswordIcon extends StatelessWidget {
           onPressed: () {
             switch (updatePasswordPermission) {
               case Granted():
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) {
-                    return BlocProvider.value(
-                      value: bloc,
-                      child:
-                          BlocPresentationListener<
-                            UserAdministrationViewBloc,
-                            UserAdministrationViewEvent
-                          >(
-                            listener: (_, event) {
-                              showAppFlushbar(
-                                message: switch (event) {
-                                  UpdateUserPasswordInvalid() => switch (event
-                                      .reason) {
-                                    PasswordTooShort() =>
-                                      'Password is too short',
-                                    PasswordTooLong() => 'Password is too long',
-                                    PasswordMissingUppercase() =>
-                                      'Password must contain at least one uppercase letter',
-                                    PasswordMissingLowercase() =>
-                                      'Password must contain at least one lowercase letter',
-                                    PasswordMissingNumber() =>
-                                      'Password must contain at least one number',
-                                    PasswordMissingSpecialCharacter() =>
-                                      'Password must contain at least one special character',
-                                  },
-                                  UpdateUserPasswordFailure() =>
-                                    'Failed to update password',
-                                  UpdateUserPasswordSuccess() =>
-                                    'Password updated successfully',
-                                  _ => '',
+                ActionDialogHelper.show(
+                  child: BlocProvider.value(
+                    value: bloc,
+                    child:
+                        BlocPresentationListener<
+                          UserAdministrationViewBloc,
+                          UserAdministrationViewEvent
+                        >(
+                          listener: (_, event) async {
+                            showAppFlushbar(
+                              context: context,
+                              message: switch (event) {
+                                UpdateUserPasswordInvalid() => switch (event
+                                    .reason) {
+                                  PasswordTooShort() => 'Password is too short',
+                                  PasswordTooLong() => 'Password is too long',
+                                  PasswordMissingUppercase() =>
+                                    'Password must contain at least one uppercase letter',
+                                  PasswordMissingLowercase() =>
+                                    'Password must contain at least one lowercase letter',
+                                  PasswordMissingNumber() =>
+                                    'Password must contain at least one number',
+                                  PasswordMissingSpecialCharacter() =>
+                                    'Password must contain at least one special character',
                                 },
-                                context: dialogContext,
+                                UpdateUserPasswordFailure() =>
+                                  'Failed to update password',
+                                UpdateUserPasswordSuccess() =>
+                                  'Password updated successfully',
+                                _ => '',
+                              },
+                            );
+                            if (event is UpdateUserPasswordSuccess) {
+                              ActionDialogHelper.hide();
+                            }
+                          },
+                          child: ConfirmInputDialog(
+                            title: 'Update Password',
+                            label: 'New Password',
+                            isTextObscured: true,
+                            onCancel: () => ActionDialogHelper.hide(),
+                            onConfirm: (value) {
+                              bloc.add(
+                                UpdateUserPasswordRequested(
+                                  targetUser: user,
+                                  newPassword: Password(value),
+                                ),
                               );
                             },
-                            child: ConfirmDialog(
-                              title: 'Update Password',
-                              label: 'New Password',
-                              isTextObscured: true,
-                              onConfirm: (value) {
-                                print(value);
-                                bloc.add(
-                                  UpdateUserPasswordRequested(
-                                    targetUser: user,
-                                    newPassword: Password(value),
-                                  ),
-                                );
-                              },
-                            ),
                           ),
-                    );
-                  },
+                        ),
+                  ),
                 );
               case Denied(:final reason as UpdateUserPasswordDeniedReason):
                 showAppFlushbar(
+                  context: context,
                   message: switch (reason) {
                     CannotUpdatePasswordOnAnalyst() =>
                       'You cannot update the password of an analyst.',
                     CanOnlyUpdatePasswordOnSelf() =>
                       'You can only update your own password.',
                   },
-                  context: context,
                 );
             }
           },

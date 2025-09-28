@@ -1,8 +1,9 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:client/presentation/utils/action_flush_bar.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
+import 'package:client/presentation/widgets/action_dialog.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
-import 'package:client/presentation/widgets/confirm_dialog.dart';
+import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/action_policies/action_policy_permission.dart';
@@ -27,48 +28,48 @@ class DeleteUserIcon extends StatelessWidget {
           onPressed: () {
             switch (deleteUserPermission) {
               case Granted():
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) {
-                    return BlocProvider.value(
-                      value: bloc,
-                      child:
-                          BlocPresentationListener<
-                            UserAdministrationViewBloc,
-                            UserAdministrationViewEvent
-                          >(
-                            listener: (_, event) {
-                              showAppFlushbar(
-                                message: switch (event) {
-                                  DeleteUserFailure() =>
-                                    'Failed to delete user',
-                                  DeleteUserSuccess() =>
-                                    'User deleted successfully',
-                                  _ => '',
-                                },
-                                context: dialogContext,
-                              );
-                            },
-                            child: ConfirmDialog(
-                              title: 'Delete User',
-                              label: 'Are you sure you want to delete this user?',
-                              onConfirm: (value) {
-                                bloc.add(DeleteUserRequested(targetUser: user));
+                ActionDialogHelper.show(
+                  child: BlocProvider.value(
+                    value: bloc,
+                    child:
+                        BlocPresentationListener<
+                          UserAdministrationViewBloc,
+                          UserAdministrationViewEvent
+                        >(
+                          listener: (_, event) async {
+                            showAppFlushbar(
+                              context: context,
+                              message: switch (event) {
+                                DeleteUserFailure() => 'Failed to delete user',
+                                DeleteUserSuccess() =>
+                                  'User deleted successfully',
+                                _ => '',
                               },
-                            ),
+                            );
+                            if (event is DeleteUserSuccess) {
+                              ActionDialogHelper.hide();
+                            }
+                          },
+                          child: ConfirmInputDialog(
+                            title: 'Delete User',
+                            label: 'Are you sure you want to delete this user?',
+                            onCancel: () => ActionDialogHelper.hide(),
+                            onConfirm: (value) {
+                              bloc.add(DeleteUserRequested(targetUser: user));
+                            },
                           ),
-                    );
-                  },
+                        ),
+                  ),
                 );
               case Denied(:final reason as DeleteUserDeniedReason):
                 showAppFlushbar(
+                  context: context,
                   message: switch (reason) {
                     CannotDeleteSelf() => 'You cannot delete yourself.',
                     CannotDeleteAnalyst() => 'You cannot delete an analyst.',
                     CanOnlyDeleteSelf() =>
                       'You can only delete your own account.',
                   },
-                  context: context,
                 );
             }
           },
