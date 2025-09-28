@@ -9,6 +9,7 @@ import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easy_dialogs/flutter_easy_dialogs.dart';
 
 class UpdateUserEmailIcon extends StatelessWidget {
   const UpdateUserEmailIcon({super.key, required this.user});
@@ -28,17 +29,18 @@ class UpdateUserEmailIcon extends StatelessWidget {
           onPressed: () {
             switch (updateEmailPermission) {
               case Granted():
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) {
-                    return BlocProvider.value(
+                FlutterEasyDialogs.show(
+                  EasyDialog.positioned(
+                    autoHideDuration: null,
+                    position: EasyDialogPosition.center,
+                    content: BlocProvider.value(
                       value: bloc,
                       child:
                           BlocPresentationListener<
                             UserAdministrationViewBloc,
                             UserAdministrationViewEvent
                           >(
-                            listener: (_, event) {
+                            listener: (_, event) async {
                               showAppFlushbar(
                                 message: switch (event) {
                                   UpdateUserEmailInvalid() =>
@@ -49,8 +51,13 @@ class UpdateUserEmailIcon extends StatelessWidget {
                                     'Email updated successfully',
                                   _ => '',
                                 },
-                                context: dialogContext,
+                                context: context,
                               );
+                              if (event is UpdateUserEmailSuccess) {
+                                await FlutterEasyDialogs.hide(
+                                  id: EasyDialogPosition.center,
+                                );
+                              }
                             },
                             child: ConfirmDialog(
                               title: 'Update Email',
@@ -65,8 +72,8 @@ class UpdateUserEmailIcon extends StatelessWidget {
                               },
                             ),
                           ),
-                    );
-                  },
+                    ),
+                  ),
                 );
               case Denied(:final reason as UpdateUserEmailDeniedReason):
                 showAppFlushbar(

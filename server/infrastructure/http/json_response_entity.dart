@@ -49,7 +49,7 @@ class JsonResponseBadRequest extends JsonResponseEntity {
 }
 
 class JsonResponseUnauthorized extends JsonResponseEntity {
-  static Response asShelfResponse([Object? message]) => Response(
+  static Response asShelfResponse([String? message]) => Response(
         401,
         body: jsonEncode(
             {'success': false, 'details': message ?? 'Unauthorized'}),

@@ -1,7 +1,7 @@
 class HttpApiResponse<TResult> {
   final bool success;
   final TResult result;
-  final Map<String, dynamic> details;
+  final String? details;
   final Map<String, dynamic> raw;
 
   HttpApiResponse({
@@ -19,11 +19,12 @@ class HttpApiResponse<TResult> {
     var result = hasResult ? map['result'] : {};
     if (result is List) result = List<Map<String, dynamic>>.from(result);
     if (result is Map) result = Map<String, dynamic>.from(result);
+    if (result is String) result = result;
 
     return HttpApiResponse(
       success: isSuccess,
       result: result,
-      details: hasDetails ? map['details'] : {},
+      details: hasDetails ? map['details'] : null,
       raw: map,
     );
   }

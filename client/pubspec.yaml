@@ -18,6 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   bloc: ^9.0.0
   another_flushbar: ^1.12.30
+  flutter_easy_dialogs: ^4.0.4
 
 dev_dependencies:
   flutter_test:

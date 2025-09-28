@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easy_dialogs/flutter_easy_dialogs.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
@@ -26,7 +27,8 @@ class ConfirmDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              FlutterEasyDialogs.hide(id: EasyDialogPosition.center),
           child: const Text('Cancel'),
         ),
         TextButton(

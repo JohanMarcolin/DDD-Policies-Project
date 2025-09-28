@@ -39,24 +39,37 @@ class AuthApi extends HttpApi {
       accessToken: await _authTokenService.accessToken,
       map: (_) {},
     );
-    
+
     await _authTokenService.clearTokens();
   }
 
-  Future<CurrentUser> refreshAccessToken() async {
-    final hasRefreshToken = await _authTokenService.hasRefreshToken;
-    if (!hasRefreshToken) {
-      throw Exception('No refresh token found');
-    }
-    return await callPost<CurrentUser>(
+Future<CurrentUser?> refreshAccessToken() async {
+  final hasRefreshToken = await _authTokenService.hasRefreshToken;
+  if (!hasRefreshToken) {
+    return null;
+  }
+  try {
+    return await callPost<CurrentUser?>(
       endpoint: '/auth/refresh',
-      data: jsonEncode({'refreshToken': await _authTokenService.refreshToken}),
+      data: jsonEncode({
+        'refreshToken': await _authTokenService.refreshToken,
+      }),
       map: (response) {
-        _authTokenService.setAccessToken(
-          accessToken: response.result['accessToken'],
-        );
-        return UserMapper.toDomainUser(response.result['currentUser']);
+        final accessToken = response.result['accessToken'];
+        if (accessToken == null || accessToken.isEmpty) {
+          return null;
+        }
+        _authTokenService.setAccessToken(accessToken: accessToken);
+
+        final currentUser = response.result['currentUser'];
+        if (currentUser == null) {
+          return null;
+        }
+        return UserMapper.toDomainUser(currentUser);
       },
     );
+  } catch (e) {
+    return null;
   }
+}
 }

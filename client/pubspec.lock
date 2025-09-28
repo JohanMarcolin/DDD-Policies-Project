@@ -189,6 +189,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.1"
+  flutter_easy_dialogs:
+    dependency: "direct main"
+    description:
+      name: flutter_easy_dialogs
+      sha256: "2b2ccd2e1a2f76e6a0418eabab947f07e3d0fcfca01ee0d1f261af4579a53172"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter

@@ -41,6 +41,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final currentUser = await _authApi.refreshAccessToken();
+      if (currentUser == null) {
+        emit(Unauthenticated());
+        return;
+      }
       emit(Authenticated(currentUser: currentUser));
     } catch (e) {
       emit(Unauthenticated());
