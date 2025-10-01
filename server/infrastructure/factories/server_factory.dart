@@ -17,6 +17,7 @@ import '../databases/user_database.dart';
 import '../security/token_service.dart';
 import '../controllers/user_controller.dart';
 import '../security/security_filter_chain.dart';
+import '../services/user_service.dart';
 
 class ServerFactory {
   ServerFactory(
@@ -62,9 +63,12 @@ class ServerFactory {
       emailValidationPolicy: emailValidationPolicy,
       passwordValidationPolicy: passwordValidationPolicy,
     );
+
+    final userService =
+        UserService(userAdministrationService: userAdministrationService);
+
     final authController = AuthController(authService: authService);
-    final userController =
-        UserController(userAdministrationService: userAdministrationService);
+    final userController = UserController(userService: userService);
 
     router.mount('/auth/', authController.handler);
     router.mount('/user/', userController.handler);

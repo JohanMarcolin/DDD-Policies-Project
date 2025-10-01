@@ -1,19 +1,10 @@
-import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:domain/services/user_administration/user_administration_service.dart';
-import 'package:domain/value_objects/email.dart';
-import 'package:domain/value_objects/password.dart';
-
-import '../http/exceptions/request_exceptions.dart';
-import '../http/request_utils.dart';
-import '../http/response_utils.dart';
-import '../mappers/user_mapper.dart';
-import '../security/security_filter_chain.dart';
+import '../services/user_service.dart';
 
 class UserController {
-  UserController({required UserAdministrationService userAdministrationService})
-      : _userAdministrationService = userAdministrationService {
+  UserController({required UserService userService})
+      : _userService = userService {
     _userRouter.get('/all', _getAllUsers);
     _userRouter.get('/<userId>', _getUserById);
     _userRouter.delete('/<userId>', _deleteUser);
@@ -21,66 +12,28 @@ class UserController {
     _userRouter.put('/<userId>/password', _updatePassword);
   }
 
-  final UserAdministrationService _userAdministrationService;
+  final UserService _userService;
   final Router _userRouter = Router();
 
   Handler get handler => _userRouter.call;
 
   Future<Response> _getAllUsers(Request req) async {
-    final users =
-        await _userAdministrationService.viewUsers(initiator: req.currentUser);
-    return ok(UserMapper.toJsonList(users));
+    return await _userService.getAllUsers(req);
   }
 
   Future<Response> _getUserById(Request req) async {
-    final user = await getTargetUser(req, _userAdministrationService);
-    return ok(UserMapper.toJson(user));
+    return await _userService.getUserById(req);
   }
 
   Future<Response> _deleteUser(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
-
-    await _userAdministrationService.deleteUser(
-      initiator: req.currentUser,
-      target: targetUser,
-    );
-
-    return ok();
+    return await _userService.deleteUser(req);
   }
 
   Future<Response> _updateEmail(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
-
-    final body = await readJsonBody(req);
-    final newEmail = body['newEmail'] as String?;
-
-    if (newEmail == null || newEmail.isEmpty) {
-      throw BadRequestException(UpdateUserEmailMissingNewEmail());
-    }
-    final email = Email(newEmail);
-
-    await _userAdministrationService.updateUserEmail(
-        initiator: req.currentUser, target: targetUser, newEmail: email);
-
-    return ok();
+    return await _userService.updateEmail(req);
   }
 
   Future<Response> _updatePassword(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
-
-    final body = await readJsonBody(req);
-
-    final newPassword = body['newPassword'] as String?;
-
-    if (newPassword == null || newPassword.isEmpty) {
-      throw BadRequestException(UpdateUserPasswordMissingNewPassword());
-    }
-
-    await _userAdministrationService.updateUserPassword(
-        initiator: req.currentUser,
-        target: targetUser,
-        newPassword: Password(newPassword));
-
-    return ok();
+    return await _userService.updatePassword(req);
   }
 }
