@@ -12,7 +12,7 @@ Future<String> getAccessToken({required TestUserEntry testUserEntry}) async {
     }),
   );
   final data = jsonDecode(response.body);
-  return data['result']['accessToken'] as String;
+  return data['data']['accessToken'] as String;
 }
 
 Map<String, String> getAuthHeader(String accessToken) => {

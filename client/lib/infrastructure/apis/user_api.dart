@@ -7,6 +7,7 @@ import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
+import 'package:error_codes/error_codes.dart';
 
 class UserApi extends HttpApi {
   UserApi({required this.authApi, required this.authTokenService});
@@ -19,7 +20,12 @@ class UserApi extends HttpApi {
       endpoint: '/user/all',
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
-      map: (response) => UserMapper.toDomainUserList(response.result),
+      map: (response) {
+        if (response.isSuccess) {
+          return UserMapper.toDomainUserList(response.data);
+        }
+        throw UserApiException(response.errorCode!);
+      },
     );
   }
 
@@ -28,7 +34,15 @@ class UserApi extends HttpApi {
       endpoint: '/user/${userId.value}',
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
-      map: (response) => UserMapper.toDomainUser(response.result),
+      map: (response) {
+        if (response.isSuccess) {
+          if (response.data == null) {
+            return null;
+          }
+          return UserMapper.toDomainUser(response.data);
+        }
+        throw UserApiException(response.errorCode!);
+      },
     );
   }
 
@@ -37,7 +51,12 @@ class UserApi extends HttpApi {
       endpoint: '/user/${userId.value}',
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
-      map: (_) {},
+      map: (response) {
+        if (response.isSuccess) {
+          return;
+        }
+        throw UserApiException(response.errorCode!);
+      },
     );
   }
 
@@ -50,7 +69,12 @@ class UserApi extends HttpApi {
       data: jsonEncode({'newEmail': newEmail.value}),
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
-      map: (_) {},
+      map: (response) {
+        if (response.isSuccess) {
+          return;
+        }
+        throw UserApiException(response.errorCode!);
+      },
     );
   }
 
@@ -63,7 +87,12 @@ class UserApi extends HttpApi {
       data: jsonEncode({'newPassword': newPassword.value}),
       accessToken: await authTokenService.accessToken,
       refreshAccessToken: _refreshAccessToken,
-      map: (_) {},
+      map: (response) {
+        if (response.isSuccess) {
+          return;
+        }
+        throw UserApiException(response.errorCode!);
+      },
     );
   }
 
@@ -71,4 +100,10 @@ class UserApi extends HttpApi {
     await authApi.refreshAccessToken();
     return await authTokenService.accessToken;
   }
+}
+
+class UserApiException implements Exception {
+  final ErrorCode errorCode;
+  UserApiException(String errorCode)
+    : errorCode = errorCodeFromString(errorCode);
 }

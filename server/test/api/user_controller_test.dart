@@ -27,9 +27,8 @@ void main() {
         );
         expect(response.statusCode, 200);
         final data = jsonDecode(response.body);
-        expect(data['result'], isNotNull);
-        for (final user in data['result']) {
-          print(user);
+        expect(data['data'], isNotNull);
+        for (final user in data['data']) {
           expect(user['id'], isNotNull);
           expect(user['email'], isNotNull);
           expect(user['role'], isNotNull);
@@ -37,7 +36,6 @@ void main() {
       });
 
       test('Get user by id returns user', () async {
-        print(tester.user.userId.value);
         final response = await http.get(
           Uri.parse('${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),
@@ -64,7 +62,6 @@ void main() {
           headers: getAuthHeader(accessToken),
           body: jsonEncode({'newPassword': password.value}),
         );
-        print(response.body);
         expect(response.statusCode, equals(200));
       });
 
@@ -79,7 +76,6 @@ void main() {
 
     group('Shall fail', () {
       test('Get user by id fails', () async {
-        print(tester.user.userId.value);
         final response = await http.get(
           Uri.parse('${TestServerFactory.baseUrl}/user/${tester.userId.value}'),
           headers: getAuthHeader(accessToken),

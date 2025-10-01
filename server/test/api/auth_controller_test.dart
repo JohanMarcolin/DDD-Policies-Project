@@ -32,8 +32,8 @@ void main() {
           expect(response.statusCode, 200);
 
           final data = jsonDecode(response.body);
-          final accessToken = data['result']['accessToken'];
-          final refreshToken = data['result']['refreshToken'];
+          final accessToken = data['data']['accessToken'];
+          final refreshToken = data['data']['refreshToken'];
 
           expect(accessToken, isNotNull);
           expect(refreshToken, isNotNull);
@@ -51,7 +51,7 @@ void main() {
           );
 
           final loginData = jsonDecode(loginResponse.body);
-          final refreshToken = loginData['result']['refreshToken'];
+          final refreshToken = loginData['data']['refreshToken'];
 
           final refreshResponse = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
@@ -62,7 +62,7 @@ void main() {
 
           final refreshData = jsonDecode(refreshResponse.body);
 
-          expect(refreshData['result']['accessToken'], isNotNull);
+          expect(refreshData['data']['accessToken'], isNotNull);
         });
       }
     });

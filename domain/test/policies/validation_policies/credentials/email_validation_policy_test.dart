@@ -10,7 +10,6 @@ void main() {
     test('valid email passes', () {
       final email = Email('user@example.com');
       final result = policy.evaluateValidity(email);
-      print(result);
       expect(result, isA<Valid>());
       expect(policy.isValid(email), isTrue);
     });

@@ -1,3 +1,4 @@
+import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
@@ -44,7 +45,7 @@ class UserController {
       target: targetUser,
     );
 
-    return ok('Deleted user: ${targetUser.userId.value}');
+    return ok();
   }
 
   Future<Response> _updateEmail(Request req) async {
@@ -54,14 +55,14 @@ class UserController {
     final newEmail = body['newEmail'] as String?;
 
     if (newEmail == null || newEmail.isEmpty) {
-      throw BadRequestException('Missing or empty new email');
+      throw BadRequestException(UpdateUserEmailMissingNewEmail());
     }
     final email = Email(newEmail);
 
     await _userAdministrationService.updateUserEmail(
         initiator: req.currentUser, target: targetUser, newEmail: email);
-    return ok(
-        'Updated email for user: ${targetUser.userId.value} from ${targetUser.email.value} to ${email.value}');
+
+    return ok();
   }
 
   Future<Response> _updatePassword(Request req) async {
@@ -72,7 +73,7 @@ class UserController {
     final newPassword = body['newPassword'] as String?;
 
     if (newPassword == null || newPassword.isEmpty) {
-      throw BadRequestException('Missing or empty new password');
+      throw BadRequestException(UpdateUserPasswordMissingNewPassword());
     }
 
     await _userAdministrationService.updateUserPassword(
@@ -80,6 +81,6 @@ class UserController {
         target: targetUser,
         newPassword: Password(newPassword));
 
-    return ok('Updated password for user: ${targetUser.userId.value}');
+    return ok();
   }
 }

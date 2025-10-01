@@ -69,7 +69,6 @@ class UserAdministrationViewBloc
       );
       emit(UserAdministrationViewLoaded(users));
     } catch (e) {
-      print(e);
       emit(UserAdministrationViewFailure());
     }
   }

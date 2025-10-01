@@ -6,7 +6,7 @@ sealed class JsonResponseEntity {
 
 class JsonResponseOk extends JsonResponseEntity {
   static Response asShelfResponse([Object? body]) => Response.ok(
-        jsonEncode({'success': true, 'result': body}),
+        jsonEncode({'isSuccess': true, 'data': body}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
@@ -14,54 +14,64 @@ class JsonResponseOk extends JsonResponseEntity {
 class JsonResponseCreated extends JsonResponseEntity {
   static Response asShelfResponse([Object? body]) => Response(
         201,
-        body: jsonEncode({'success': true, 'result': body}),
+        body: jsonEncode({'isSuccess': true, 'data': body}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseDeleted extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) => Response.ok(
-        jsonEncode({'success': true, 'details': message ?? 'Deleted'}),
+  static Response asShelfResponse() => Response.ok(
+        jsonEncode({'isSuccess': true}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseNotFound extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) => Response.notFound(
-        jsonEncode({'success': false, 'details': message ?? 'Not Found'}),
+  static Response asShelfResponse(ErrorCode errorCode) => Response.notFound(
+        jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) => Response.forbidden(
-        jsonEncode({'success': false, 'details': message ?? 'Forbidden'}),
-        headers: JsonResponseEntity.jsonHeaders,
-      );
+  static Response asShelfResponse(
+      [ErrorCode? errorCode, String? policyViolationDetails]) {
+    final body = <String, Object>{'isSuccess': false};
+
+    if (errorCode != null) body['errorCode'] = errorCode.toString();
+
+    if (policyViolationDetails != null) {
+      body['policyViolationDetails'] = policyViolationDetails;
+    }
+    return Response.forbidden(
+      jsonEncode(body),
+      headers: JsonResponseEntity.jsonHeaders,
+    );
+  }
 }
 
 class JsonResponseBadRequest extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) => Response.badRequest(
+  static Response asShelfResponse(ErrorCode errorCode) => Response.badRequest(
         body:
-            jsonEncode({'success': false, 'details': message ?? 'Bad Request'}),
+            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseUnauthorized extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) => Response(
+  static Response asShelfResponse(ErrorCode errorCode) => Response(
         401,
-        body: jsonEncode(
-            {'success': false, 'details': message ?? 'Unauthorized'}),
+        body:
+            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseServerError extends JsonResponseEntity {
-  static Response asShelfResponse([String? message]) =>
+  static Response asShelfResponse(ErrorCode errorCode) =>
       Response.internalServerError(
-        body: jsonEncode(
-            {'success': false, 'details': message ?? 'Internal Server Error'}),
+        body:
+            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

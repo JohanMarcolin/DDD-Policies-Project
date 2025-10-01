@@ -22,12 +22,12 @@ void main() {
       expect(result, equals('allowed'));
     });
 
-    test('enforce throws ActionPolicyException for Denied', () {
+    test('enforce throws ActionPolicyViolationException for Denied', () {
       final policy = DummyAlwaysDeniedActionPolicy();
       expect(
         () => policy.enforce('initiator', 'target',
             onGranted: () => 'should not reach'),
-        throwsA(isA<ActionPolicyException>()),
+        throwsA(isA<ActionPolicyViolationException>()),
       );
     });
   });

@@ -1,4 +1,5 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/entities/user.dart';
 import '../http/exceptions/request_exceptions.dart';
@@ -9,7 +10,7 @@ extension CurrentUserRequestExtension on Request {
     final user = context['currentUser'] as User?;
     if (user == null) {
       throw AuthenticatedUserNotFoundException(
-          'No authenticated user found in request context');
+          SecurityMissingAuthorizationHeader());
     }
     return user;
   }
@@ -69,8 +70,14 @@ class SecurityFilterChain {
   String _extractAccessToken(Request req) {
     final authHeader = req.headers['authorization'];
 
-    if (authHeader == null || !authHeader.startsWith('Bearer ')) {
-      throw MalformedAuthorizationHeaderException('Missing or malformed authorization header');
+    if (authHeader == null) {
+      throw MissingAuthorizationHeaderException(
+          SecurityMissingAuthorizationHeader());
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw MalformedAuthorizationHeaderException(
+          SecurityMalformedAuthorizationHeader());
     }
 
     return authHeader.substring(7);

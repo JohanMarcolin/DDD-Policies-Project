@@ -21,7 +21,7 @@ abstract class ValidationPolicy<TValue> {
       case Valid():
         return;
       case Invalid(:final reason):
-        throw ValidationPolicyException(reason);
+        throw ValidationPolicyViolationException(reason);
     }
   }
 }

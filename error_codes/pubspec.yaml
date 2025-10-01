@@ -1,0 +1,8 @@
+name: error_codes
+version: 1.0.0
+publish_to: "none"
+description: Shared error codes for client and server communication.
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+# No dependencies for now

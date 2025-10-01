@@ -1,3 +1,5 @@
+import 'package:error_codes/error_codes.dart';
+
 import '../http/request_utils.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
@@ -25,24 +27,24 @@ class AuthService {
     final email = data['email'] as String?;
 
     if (email == null || email.isEmpty) {
-      throw BadRequestException('Missing or empty email');
+      throw BadRequestException(LoginMissingEmail());
     }
 
     final password = data['password'] as String?;
 
     if (password == null || password.isEmpty) {
-      throw BadRequestException('Missing or empty password');
+      throw BadRequestException(LoginMissingPassword());
     }
 
     final user = await _userRepository.getByEmail(email: Email(email));
 
     if (user == null) {
-      throw NotFoundException('User not found');
+      throw NotFoundException(LoginUserNotFound());
     }
 
     if (!_userRepository.isPasswordVerified(
         userId: user.userId, password: Password(password))) {
-      throw ForbiddenException('Invalid password');
+      throw ForbiddenException(LoginInvalidPassword());
     }
 
     return ok({
@@ -57,7 +59,7 @@ class AuthService {
     final refreshToken = data['refreshToken'] as String?;
 
     if (refreshToken == null || refreshToken.isEmpty) {
-      throw BadRequestException('Missing or empty refresh token');
+      throw BadRequestException(RefreshMissingRefreshToken());
     }
 
     final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
@@ -66,7 +68,7 @@ class AuthService {
     final user = await _userRepository.get(userId: userId);
 
     if (user == null) {
-      throw NotFoundException('User not found');
+      throw NotFoundException(RefreshUserNotFound());
     }
 
     return ok({
@@ -79,7 +81,7 @@ class AuthService {
     final refreshToken = req.params['refreshToken'];
 
     if (refreshToken == null || refreshToken.isEmpty) {
-      throw BadRequestException('Missing or empty refresh token');
+      throw BadRequestException(LogoutMissingRefreshToken());
     }
 
     final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
@@ -88,17 +90,17 @@ class AuthService {
     final user = await _userRepository.get(userId: userId);
 
     if (user == null) {
-      throw NotFoundException('User not found');
+      throw NotFoundException(LogoutMissingUser());
     }
 
     _tokenService.revokeRefreshToken(user);
 
-    final revokedAccessToken = refreshToken;
+    final revokedRefreshToken = refreshToken;
 
-    if (!_tokenService.isVerifiedAccessToken(revokedAccessToken)) {
+    if (!_tokenService.isVerifiedRefreshToken(revokedRefreshToken)) {
       return deleted();
     }
 
-    return badRequest('Could not revoke access token');
+    throw ServerErrorException(LogoutCouldNotRevokeRefreshToken());
   }
 }

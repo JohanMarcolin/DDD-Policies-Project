@@ -1,43 +1,49 @@
+import 'package:error_codes/error_codes.dart';
+
 sealed class RequestException implements Exception {
-  final String message;
-  const RequestException(this.message);
+  const RequestException(this.errorCode);
+  final ErrorCode errorCode;
 
   @override
-  String toString() => message;
+  String toString() => '${runtimeType.toString()}: ${errorCode.toString()}';
 }
 
 class AuthenticatedUserNotFoundException extends RequestException {
-  const AuthenticatedUserNotFoundException(super.message);
+  const AuthenticatedUserNotFoundException(super.errorcode);
+}
+
+class MissingAuthorizationHeaderException extends RequestException {
+  const MissingAuthorizationHeaderException(super.errorcode);
 }
 
 class MalformedAuthorizationHeaderException extends RequestException {
-  const MalformedAuthorizationHeaderException(super.message);
+  const MalformedAuthorizationHeaderException(super.errorcode);
 }
 
 class InvalidAccessTokenException extends RequestException {
-  const InvalidAccessTokenException(super.message);
+  const InvalidAccessTokenException(super.errorcode);
 }
 
 class InvalidRefreshTokenException extends RequestException {
-  const InvalidRefreshTokenException(super.message);
+  const InvalidRefreshTokenException(super.errorcode);
 }
 
 class InvalidUserClaimsException extends RequestException {
-  const InvalidUserClaimsException(super.message);
+  const InvalidUserClaimsException(super.errorcode);
 }
 
 class BadRequestException extends RequestException {
-  const BadRequestException(super.message);
+  const BadRequestException(super.errorcode);
 }
 
 class NotFoundException extends RequestException {
-  const NotFoundException(super.message);
+  const NotFoundException(super.errorcode);
 }
 
 class ForbiddenException extends RequestException {
-  const ForbiddenException(super.message);
+  const ForbiddenException(super.errorcode);
 }
 
 class ServerErrorException extends RequestException {
-  const ServerErrorException(super.message);
+  const ServerErrorException(super.errorcode);
 }

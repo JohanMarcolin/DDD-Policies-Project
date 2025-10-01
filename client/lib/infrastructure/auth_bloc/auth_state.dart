@@ -12,6 +12,14 @@ class Authenticated extends AuthState {
   final User currentUser;
 }
 
-class Unauthenticated extends AuthState {}
+class Unauthenticated extends AuthState {
+  Unauthenticated([this.errorCode]);
 
-class AuthFailure extends AuthState {}
+  final ErrorCode? errorCode;
+}
+
+class AuthFailure extends AuthState {
+  AuthFailure([this.errorCode]);
+
+  final ErrorCode? errorCode;
+}

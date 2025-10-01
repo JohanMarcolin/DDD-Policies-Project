@@ -25,7 +25,7 @@ abstract class ActionPolicy<TInitiator, TTarget> {
     final permission = evaluatePermission(initiator, target);
     return switch (permission) {
       Granted() => onGranted(),
-      Denied(:final reason) => throw ActionPolicyException(reason),
+      Denied(:final reason) => throw ActionPolicyViolationException(reason),
     };
   }
 }

@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   domain:
     path: ../domain
+  error_codes:
+    path: ../error_codes
   http: ^1.2.1
   shared_preferences: ^2.2.2
   flutter_bloc: ^9.0.0

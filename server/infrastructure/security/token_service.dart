@@ -1,4 +1,5 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:error_codes/error_codes.dart';
 import 'package:uuid/uuid.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
@@ -40,7 +41,7 @@ class TokenService {
   JWT verifyAccessToken(AccessToken token) {
     final verifiedAccessToken = _verifyToken(token);
     if (verifiedAccessToken == null) {
-      throw InvalidAccessTokenException('Invalid access token');
+      throw InvalidAccessTokenException(TokenInvalidAccessToken());
     }
     return verifiedAccessToken;
   }
@@ -65,7 +66,7 @@ class TokenService {
     final verifiedRefreshToken = _verifyToken(token);
 
     if (verifiedRefreshToken == null) {
-      throw InvalidRefreshTokenException('Invalid or expired refresh token');
+      throw InvalidRefreshTokenException(TokenInvalidRefreshToken());
     }
 
     final tokenId = extractUserId(verifiedRefreshToken);
@@ -73,7 +74,7 @@ class TokenService {
     final storedToken = _refreshTokenDatabase.get(tokenId);
 
     if (storedToken == null || storedToken != token) {
-      throw InvalidRefreshTokenException('Could not find stored refresh token');
+      throw InvalidRefreshTokenException(TokenInvalidRefreshToken());
     }
 
     return verifiedRefreshToken;
@@ -91,8 +92,7 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final id = claims['id'];
     if (id == null) {
-      throw InvalidUserClaimsException(
-          'Token does not contain a valid user id');
+      throw InvalidUserClaimsException(TokenInvalidUserIdInToken());
     }
     return UserId(id);
   }
@@ -101,8 +101,7 @@ class TokenService {
     final claims = _extractTokenClaims(token);
     final email = claims['username'];
     if (email == null) {
-      throw InvalidUserClaimsException(
-          'Token does not contain a valid user email');
+      throw InvalidUserClaimsException(TokenInvalidUserEmailInToken());
     }
     return Email(email);
   }
@@ -110,10 +109,7 @@ class TokenService {
   Role extractUserRole(JWT token) {
     final claims = _extractTokenClaims(token);
     final role = claims['role'];
-    if (role == null) {
-      throw InvalidUserClaimsException(
-          'Token does not contain a valid user role');
-    }
+
     switch (role) {
       case 'analyst':
         return Role.analyst;
@@ -122,7 +118,7 @@ class TokenService {
       case 'user':
         return Role.user;
       default:
-        throw InvalidUserClaimsException('Unknown user role: $role');
+        throw InvalidUserClaimsException(TokenInvalidUserRoleInToken());
     }
   }
 

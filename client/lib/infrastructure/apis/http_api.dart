@@ -82,33 +82,29 @@ abstract class HttpApi {
     String? accessToken,
     Future<String?> Function()? refreshAccessToken,
   }) async {
-    try {
-      http.Response response;
-      if (accessToken == null) {
-        response = await _doPlainRequest(
-          method: method,
-          endpoint: endpoint,
-          data: data,
-        );
-      } else {
-        response = await _doAuthedRequest(
-          method: method,
-          endpoint: endpoint,
-          data: data,
-          accessToken: accessToken,
-          refreshAccessToken: refreshAccessToken,
-        );
-      }
-      final decoded = response.body.isNotEmpty
-          ? jsonDecode(response.body)
-          : <String, dynamic>{};
-      if (decoded is Map<String, dynamic>) {
-        return decoded;
-      }
-      throw Exception('Invalid response format: expected a JSON object');
-    } catch (e) {
-      rethrow;
+    http.Response response;
+    if (accessToken == null) {
+      response = await _doPlainRequest(
+        method: method,
+        endpoint: endpoint,
+        data: data,
+      );
+    } else {
+      response = await _doAuthedRequest(
+        method: method,
+        endpoint: endpoint,
+        data: data,
+        accessToken: accessToken,
+        refreshAccessToken: refreshAccessToken,
+      );
     }
+    final decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : <String, dynamic>{};
+    if (decoded is Map<String, dynamic>) {
+      return decoded;
+    }
+    throw Exception('Invalid response format: expected a JSON object');
   }
 
   Future<http.Response> _doPlainRequest({

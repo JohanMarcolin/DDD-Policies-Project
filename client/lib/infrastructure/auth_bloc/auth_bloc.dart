@@ -3,6 +3,7 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
+import 'package:error_codes/error_codes.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -29,8 +30,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
       emit(Authenticated(currentUser: currentUser));
+    } on AuthApiException catch (e) {
+      emit(Unauthenticated(e.errorCode));
     } catch (e) {
-      emit(Unauthenticated());
+      emit(AuthFailure());
     }
   }
 
@@ -41,13 +44,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final currentUser = await _authApi.refreshAccessToken();
-      if (currentUser == null) {
-        emit(Unauthenticated());
-        return;
-      }
       emit(Authenticated(currentUser: currentUser));
+    } on AuthApiException catch (e) {
+      emit(Unauthenticated(e.errorCode));
     } catch (e) {
-      emit(Unauthenticated());
+      emit(AuthFailure());
     }
   }
 
@@ -59,6 +60,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _authApi.logout();
       emit(Unauthenticated());
+    } on AuthApiException catch (e) {
+      emit(AuthFailure(e.errorCode));
     } catch (e) {
       emit(AuthFailure());
     }

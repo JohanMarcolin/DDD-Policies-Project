@@ -3,7 +3,13 @@ import 'package:domain/value_objects/id.dart';
 abstract class Database<T> {
   final Map<Id, T> _items = {};
 
-  T? get(Id id) => _items[id];
+  T? get(Id id) {
+    try {
+      return _items[id];
+    } catch (_) {
+      return null;
+    }
+  }
 
   List<T> getAll() => _items.values.toList();
 
@@ -12,6 +18,10 @@ abstract class Database<T> {
   }
 
   void delete(Id id) {
-    _items.remove(id);
+    try {
+      _items.remove(id);
+    } catch (_) {
+      rethrow;
+    }
   }
 }

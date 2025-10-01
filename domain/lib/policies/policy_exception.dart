@@ -1,15 +1,15 @@
-sealed class PolicyException<TReason> implements Exception {
-  PolicyException(this.reason);
+sealed class PolicyViolationException<TReason> implements Exception {
+  PolicyViolationException(this.reason);
 
   final TReason reason;
   @override
-  String toString() => 'PolicyException: ${reason.toString()}';
+  String toString() => 'PolicyViolationException: ${reason.toString()}';
 }
 
-class ActionPolicyException extends PolicyException {
-  ActionPolicyException(super.reason);
+class ActionPolicyViolationException extends PolicyViolationException {
+  ActionPolicyViolationException(super.reason);
 }
 
-class ValidationPolicyException extends PolicyException {
-  ValidationPolicyException(super.reason);
+class ValidationPolicyViolationException extends PolicyViolationException {
+  ValidationPolicyViolationException(super.reason);
 }

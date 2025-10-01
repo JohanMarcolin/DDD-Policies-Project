@@ -5,6 +5,7 @@ import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
+import 'package:error_codes/error_codes.dart';
 
 typedef CurrentUser = User;
 
@@ -22,11 +23,15 @@ class AuthApi extends HttpApi {
       endpoint: '/auth/login',
       data: jsonEncode({'email': email.value, 'password': password.value}),
       map: (response) {
-        _authTokenService.saveTokens(
-          accessToken: response.result['accessToken'],
-          refreshToken: response.result['refreshToken'],
-        );
-        return UserMapper.toDomainUser(response.result['currentUser']);
+        if (response.isSuccess) {
+          _authTokenService.saveTokens(
+            accessToken: response.data['accessToken'],
+            refreshToken: response.data['refreshToken'],
+          );
+          return UserMapper.toDomainUser(response.data['currentUser']);
+        }
+
+        throw AuthApiException(response.errorCode!);
       },
     );
   }
@@ -37,39 +42,36 @@ class AuthApi extends HttpApi {
     await callDelete<void>(
       endpoint: '/auth/logout/$refreshToken',
       accessToken: await _authTokenService.accessToken,
-      map: (_) {},
+      map: (response) {
+        if (response.isSuccess) {
+          return;
+        }
+        throw AuthApiException(response.errorCode!);
+      },
     );
 
     await _authTokenService.clearTokens();
   }
 
-Future<CurrentUser?> refreshAccessToken() async {
-  final hasRefreshToken = await _authTokenService.hasRefreshToken;
-  if (!hasRefreshToken) {
-    return null;
-  }
-  try {
-    return await callPost<CurrentUser?>(
+  Future<CurrentUser> refreshAccessToken() async {
+    return await callPost<CurrentUser>(
       endpoint: '/auth/refresh',
-      data: jsonEncode({
-        'refreshToken': await _authTokenService.refreshToken,
-      }),
+      data: jsonEncode({'refreshToken': await _authTokenService.refreshToken}),
       map: (response) {
-        final accessToken = response.result['accessToken'];
-        if (accessToken == null || accessToken.isEmpty) {
-          return null;
+        if (response.isSuccess) {
+          _authTokenService.setAccessToken(
+            accessToken: response.data['accessToken'],
+          );
+          return UserMapper.toDomainUser(response.data['currentUser']);
         }
-        _authTokenService.setAccessToken(accessToken: accessToken);
-
-        final currentUser = response.result['currentUser'];
-        if (currentUser == null) {
-          return null;
-        }
-        return UserMapper.toDomainUser(currentUser);
+        throw AuthApiException(response.errorCode!);
       },
     );
-  } catch (e) {
-    return null;
   }
 }
+
+class AuthApiException implements Exception {
+  final ErrorCode errorCode;
+  AuthApiException(String errorCode)
+    : errorCode = errorCodeFromString(errorCode);
 }

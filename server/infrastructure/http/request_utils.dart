@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/value_objects/id.dart';
@@ -14,7 +15,9 @@ Future<User> getTargetUser(
   final userId = extractUserIdFromParams(req);
   final user = await userAdministrationService.viewUser(
       initiator: req.currentUser, userId: userId);
-  if (user == null) throw const NotFoundException('User not found');
+  if (user == null) {
+    throw NotFoundException(RefreshUserNotFound());
+  }
   return user;
 }
 
@@ -22,7 +25,7 @@ Future<Map<String, dynamic>> readJsonBody(Request req) async {
   final body = await req.readAsString();
 
   if (body.isEmpty) {
-    throw BadRequestException('Request body cannot be empty');
+    throw BadRequestException(PayloadMissingRequestBody());
   }
 
   return jsonDecode(body) as Map<String, dynamic>;
@@ -32,7 +35,7 @@ UserId extractUserIdFromParams(Request req) {
   final userIdParam = req.params['userId'];
 
   if (userIdParam == null || userIdParam.isEmpty) {
-    throw BadRequestException('Missing or empty user ID');
+    throw BadRequestException(PayloadMissingUserId());
   }
 
   return UserId(userIdParam);
