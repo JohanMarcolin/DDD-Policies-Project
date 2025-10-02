@@ -79,6 +79,8 @@ class AuthService {
 
   Future<Response> handleLogout(Request req) async {
     final refreshToken = req.params['refreshToken'];
+    print(refreshToken);
+    print('logout called');
 
     if (refreshToken == null || refreshToken.isEmpty) {
       throw BadRequestException(LogoutMissingRefreshToken());

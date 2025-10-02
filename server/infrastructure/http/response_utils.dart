@@ -9,6 +9,8 @@ Response ok([Object? body]) => JsonResponseOk.asShelfResponse(body);
 
 Response created([Object? body]) => JsonResponseCreated.asShelfResponse(body);
 
+Response noContent() => JsonResponseNoContent.asShelfResponse();
+
 Response deleted() => JsonResponseDeleted.asShelfResponse();
 
 Response notFound(ErrorCode errorCode) =>

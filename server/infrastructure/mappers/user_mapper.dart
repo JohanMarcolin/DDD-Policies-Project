@@ -4,7 +4,7 @@ typedef UserJson = Map<String, dynamic>;
 
 class UserMapper {
   static UserJson toJson(User user) => {
-        'id': user.userId.value,
+        'userId': user.userId.value,
         'email': user.email.value,
         'role': user.role.name,
       };

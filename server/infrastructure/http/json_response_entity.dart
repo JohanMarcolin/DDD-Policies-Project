@@ -19,11 +19,13 @@ class JsonResponseCreated extends JsonResponseEntity {
       );
 }
 
+class JsonResponseNoContent extends JsonResponseEntity {
+  static Response asShelfResponse() =>
+      Response(204, headers: JsonResponseEntity.jsonHeaders);
+}
+
 class JsonResponseDeleted extends JsonResponseEntity {
-  static Response asShelfResponse() => Response.ok(
-        jsonEncode({'isSuccess': true}),
-        headers: JsonResponseEntity.jsonHeaders,
-      );
+  static Response asShelfResponse() => JsonResponseNoContent.asShelfResponse();
 }
 
 class JsonResponseNotFound extends JsonResponseEntity {

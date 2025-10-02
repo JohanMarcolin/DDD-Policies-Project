@@ -5,7 +5,7 @@ import 'package:domain/value_objects/role.dart';
 
 class UserMapper {
   static User toDomainUser(Map<String, dynamic> json) => User(
-    userId: UserId(json['id'].toString()),
+    userId: UserId(json['userId'].toString()),
     email: Email(json['email'] as String),
     role: Role.values.firstWhere((r) => r.name == json['role']),
   );

@@ -19,7 +19,8 @@ void main() {
   group('Auth Controller', () {
     group('Shall succeed', () {
       for (final testEntry in testEntries) {
-        test('Login returns tokens for valid {$testEntry} credentials',
+        test(
+            'Login returns tokens and current user for valid {$testEntry} credentials',
             () async {
           final response = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
@@ -31,17 +32,21 @@ void main() {
 
           expect(response.statusCode, 200);
 
-          final data = jsonDecode(response.body);
-          final accessToken = data['data']['accessToken'];
-          final refreshToken = data['data']['refreshToken'];
+          final body = jsonDecode(response.body);
+          final accessToken = body['data']['accessToken'];
+          final refreshToken = body['data']['refreshToken'];
+          final currentUser = body['data']['currentUser'];
 
           expect(accessToken, isNotNull);
           expect(refreshToken, isNotNull);
+          expect(currentUser['userId'], equals(testEntry.user.userId.value));
         });
       }
 
       for (final testEntry in testEntries) {
-        test('Refresh returns new access token', () async {
+        test(
+            'Refresh returns new access token and current user for valid {$testEntry} credentials',
+            () async {
           final loginResponse = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
             body: jsonEncode({
@@ -50,8 +55,8 @@ void main() {
             }),
           );
 
-          final loginData = jsonDecode(loginResponse.body);
-          final refreshToken = loginData['data']['refreshToken'];
+          final loginBody = jsonDecode(loginResponse.body);
+          final refreshToken = loginBody['data']['refreshToken'];
 
           final refreshResponse = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
@@ -60,9 +65,30 @@ void main() {
 
           expect(refreshResponse.statusCode, equals(200));
 
-          final refreshData = jsonDecode(refreshResponse.body);
+          final refreshBody = jsonDecode(refreshResponse.body);
+          final newAccessToken = refreshBody['data']['accessToken'];
+          final currentUser = refreshBody['data']['currentUser'];
 
-          expect(refreshData['data']['accessToken'], isNotNull);
+          expect(newAccessToken, isNotNull);
+          expect(currentUser['userId'], equals(testEntry.user.userId.value));
+        });
+      }
+      for (final testEntry in testEntries) {
+        test('Logout succeeds with valid refresh token', () async {
+          final loginResponse = await http.post(
+            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+            body: jsonEncode({
+              'email': testEntry.email.value,
+              'password': testEntry.password.value
+            }),
+          );
+          final loginBody = jsonDecode(loginResponse.body);
+          final refreshToken = loginBody['data']['refreshToken'];
+
+          final logoutResponse = await http.delete(
+            Uri.parse('${TestServerFactory.baseUrl}/auth/logout/$refreshToken'),
+          );
+          expect(logoutResponse.statusCode, equals(204));
         });
       }
     });
@@ -76,6 +102,56 @@ void main() {
         );
         expect(response.statusCode, equals(403));
       });
+      test('Login fails for invalid credentials', () async {
+        final response = await http.post(
+          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+          body: jsonEncode(
+              {'email': testEntries.first.email.value, 'password': 'wrong'}),
+        );
+        expect(response.statusCode, equals(403));
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('LoginInvalidPassword'));
+      });
+
+      test('Login fails for missing email', () async {
+        final response = await http.post(
+          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+          body: jsonEncode({'password': testEntries.first.password.value}),
+        );
+        expect(response.statusCode, equals(400));
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('LoginMissingEmail'));
+      });
+
+      test('Login fails for missing password', () async {
+        final response = await http.post(
+          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+          body: jsonEncode({'email': testEntries.first.email.value}),
+        );
+        expect(response.statusCode, equals(400));
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('LoginMissingPassword'));
+      });
+
+      test('Login fails for user not found', () async {
+        final response = await http.post(
+          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+          body: jsonEncode(
+              {'email': 'notfound@example.com', 'password': 'irrelevant'}),
+        );
+        expect(response.statusCode, equals(404));
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('LoginUserNotFound'));
+      });
+
+      test('Logout fails for invalid refresh token', () async {
+        final response = await http.delete(
+          Uri.parse('${TestServerFactory.baseUrl}/auth/logout/invalidtoken'),
+        );
+        expect(response.statusCode, equals(401));
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('TokenInvalidRefreshToken'));
+      });
     });
 
     group('Login input validation', () {
@@ -85,40 +161,38 @@ void main() {
           body: '',
         );
         expect(response.statusCode, 400);
+        final body = jsonDecode(response.body);
+        expect(body['errorCode'], equals('PayloadMissingRequestBody'));
       });
 
-      test('Missing email field returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'password': testEntries.first.password.value}),
-        );
-        expect(response.statusCode, 400);
+      test('Missing email returns 400', () async {
+        for (final missingEmail in [null, '']) {
+          final response = await http.post(
+            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+            body: jsonEncode({
+              'password': testEntries.first.password.value,
+              'email': missingEmail
+            }),
+          );
+          expect(response.statusCode, 400);
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginMissingEmail'));
+        }
       });
 
-      test('Empty email returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode(
-              {'email': '', 'password': testEntries.first.password.value}),
-        );
-        expect(response.statusCode, 400);
-      });
-
-      test('Missing password field returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'email': testEntries.first.email.value}),
-        );
-        expect(response.statusCode, 400);
-      });
-
-      test('Empty password returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode(
-              {'email': testEntries.first.email.value, 'password': ''}),
-        );
-        expect(response.statusCode, 400);
+      test('Missing password returns 400', () async {
+        for (final missingPassword in [null, '']) {
+          final response = await http.post(
+            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+            body: jsonEncode({
+              'email': testEntries.first.email.value,
+              'password': missingPassword
+            }),
+          );
+          expect(response.statusCode, 400);
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginMissingPassword'));
+        }
       });
     });
 
@@ -131,20 +205,14 @@ void main() {
         expect(response.statusCode, 400);
       });
 
-      test('Missing refreshToken field returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
-          body: jsonEncode({}),
-        );
-        expect(response.statusCode, 400);
-      });
-
-      test('Empty refreshToken returns 400', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
-          body: jsonEncode({'refreshToken': ''}),
-        );
-        expect(response.statusCode, 400);
+      test('Missing refreshToken returns 400', () async {
+        for (final missingRefreshToken in [null, '']) {
+          final response = await http.post(
+            Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
+            body: jsonEncode({'refreshToken': missingRefreshToken}),
+          );
+          expect(response.statusCode, 400);
+        }
       });
     });
   });
