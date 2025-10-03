@@ -41,8 +41,8 @@ void main() {
     });
     test('deleteUser removes user', () async {
       await userAdministrationService.deleteUser(
-          initiator: user1, target: user2);
-      final users = await userAdministrationService.viewUsers(initiator: user1);
+          initiator: admin, target: user2);
+      final users = await userAdministrationService.viewUsers(initiator: admin);
       expect(users, isNot(contains(user2)));
     });
     test('updateUserEmail updates email', () async {

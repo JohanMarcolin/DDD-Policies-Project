@@ -1,6 +1,7 @@
 part of '../validation_policy.dart';
 
-class PasswordValidationPolicy extends ValidationPolicy<Password> {
+final class PasswordValidationPolicy
+    extends ValidationPolicy<Password, PasswordValidationPolicyResult> {
   static const minLength = 8;
   static const maxLength = 64;
   static const includeUppercase = true;
@@ -9,29 +10,44 @@ class PasswordValidationPolicy extends ValidationPolicy<Password> {
   static const includeSpecialCharacters = true;
 
   @override
-  ValidationPolicyResult evaluateValidity(Password password) {
+  bool isValid(Password value) {
+    return validate(value) is PasswordValid;
+  }
+
+  @override
+  PasswordValidationPolicyResult validate(Password password) {
     final value = password.value;
 
     if (value.length < minLength) {
-      return Invalid(reason: PasswordTooShort());
+      return PasswordInvalid(reason: PasswordTooShort());
     }
     if (value.length > maxLength) {
-      return Invalid(reason: PasswordTooLong());
+      return PasswordInvalid(reason: PasswordTooLong());
     }
     if (includeUppercase && !value.contains(RegExp(r'[A-Z]'))) {
-      return Invalid(reason: PasswordMissingUppercase());
+      return PasswordInvalid(reason: PasswordMissingUppercase());
     }
     if (includeLowercase && !value.contains(RegExp(r'[a-z]'))) {
-      return Invalid(reason: PasswordMissingLowercase());
+      return PasswordInvalid(reason: PasswordMissingLowercase());
     }
     if (includeNumbers && !value.contains(RegExp(r'[0-9]'))) {
-      return Invalid(reason: PasswordMissingNumber());
+      return PasswordInvalid(reason: PasswordMissingNumber());
     }
     if (includeSpecialCharacters &&
         !value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-      return Invalid(reason: PasswordMissingSpecialCharacter());
+      return PasswordInvalid(reason: PasswordMissingSpecialCharacter());
     }
-    return Valid();
+    return PasswordValid();
+  }
+
+  @override
+  void enforce(Password value) {
+    switch (validate(value)) {
+      case PasswordValid():
+        return;
+      case PasswordInvalid(:final reason):
+        throw ValidationPolicyViolationException(reason);
+    }
   }
 
   Password generatePassword({
@@ -58,41 +74,34 @@ class PasswordValidationPolicy extends ValidationPolicy<Password> {
         List.generate(length, (_) => chars[random.nextInt(chars.length)])
             .join(),
       );
-      if (PasswordValidationPolicy().evaluateValidity(candidate) is Valid) {
+      if (PasswordValidationPolicy().validate(candidate)
+          is PasswordValid) {
         return candidate;
       }
     }
   }
 }
 
+sealed class PasswordValidationPolicyResult {}
+
+class PasswordValid extends PasswordValidationPolicyResult {}
+
+class PasswordInvalid extends PasswordValidationPolicyResult {
+  PasswordInvalid({required this.reason});
+
+  final PasswordInvalidReason reason;
+}
+
 sealed class PasswordInvalidReason {}
 
-class PasswordTooShort implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is too short.';
-}
+class PasswordTooShort implements PasswordInvalidReason {}
 
-class PasswordTooLong implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is too long.';
-}
+class PasswordTooLong implements PasswordInvalidReason {}
 
-class PasswordMissingUppercase implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is missing an uppercase letter.';
-}
+class PasswordMissingUppercase implements PasswordInvalidReason {}
 
-class PasswordMissingLowercase implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is missing a lowercase letter.';
-}
+class PasswordMissingLowercase implements PasswordInvalidReason {}
 
-class PasswordMissingNumber implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is missing a number.';
-}
+class PasswordMissingNumber implements PasswordInvalidReason {}
 
-class PasswordMissingSpecialCharacter implements PasswordInvalidReason {
-  @override
-  String toString() => 'Password is missing a special character.';
-}
+class PasswordMissingSpecialCharacter implements PasswordInvalidReason {}

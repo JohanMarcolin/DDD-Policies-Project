@@ -31,7 +31,7 @@ class UserAdministrationService {
     final users = await _userRepository.users;
     return users
         .where(
-            (targetUser) => viewUserPolicy.isPermitted(initiator, targetUser))
+            (targetUser) => viewUserPolicy.isAuthorized(initiator, targetUser))
         .toList();
   }
 
@@ -41,7 +41,8 @@ class UserAdministrationService {
 
     if (user == null) return null;
 
-    return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
+    return viewUserPolicy.requireAuthorization(initiator, user,
+        onAuthorized: () => user);
   }
 
   Future<User?> viewUserByEmail(
@@ -50,13 +51,14 @@ class UserAdministrationService {
 
     if (user == null) return null;
 
-    return viewUserPolicy.enforce(initiator, user, onGranted: () => user);
+    return viewUserPolicy.requireAuthorization(initiator, user,
+        onAuthorized: () => user);
   }
 
   Future<void> deleteUser(
       {required User initiator, required User target}) async {
-    return deleteUserPolicy.enforce(initiator, target,
-        onGranted: () => _userRepository.delete(userId: target.userId));
+    return deleteUserPolicy.requireAuthorization(initiator, target,
+        onAuthorized: () => _userRepository.delete(userId: target.userId));
   }
 
   Future<void> updateUserEmail(
@@ -65,8 +67,8 @@ class UserAdministrationService {
       required Email newEmail}) async {
     emailValidationPolicy.enforce(newEmail);
 
-    return updateUserEmailPolicy.enforce(initiator, target,
-        onGranted: () => _userRepository.updateEmail(
+    return updateUserEmailPolicy.requireAuthorization(initiator, target,
+        onAuthorized: () => _userRepository.updateEmail(
             userId: target.userId, newEmail: newEmail));
   }
 
@@ -76,8 +78,8 @@ class UserAdministrationService {
       required Password newPassword}) async {
     passwordValidationPolicy.enforce(newPassword);
 
-    return updateUserPasswordPolicy.enforce(initiator, target,
-        onGranted: () => _userRepository.updatePassword(
+    return updateUserPasswordPolicy.requireAuthorization(initiator, target,
+        onAuthorized: () => _userRepository.updatePassword(
             userId: target.userId, newPassword: newPassword));
   }
 }

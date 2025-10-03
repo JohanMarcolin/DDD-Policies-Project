@@ -2,26 +2,16 @@ import 'dart:math';
 
 import '../../../value_objects/email.dart';
 import '../../../value_objects/password.dart';
-import '../policy_exception.dart';
-import 'validation_policy_result.dart';
-
+import '../policy_violation_exception.dart';
 part 'credentials/email_validation_policy.dart';
 part 'credentials/password_validation_policy.dart';
 
-abstract class ValidationPolicy<TValue> {
+abstract base class ValidationPolicy<TValue, TResult> {
   const ValidationPolicy();
 
-  bool isValid(TValue value) => evaluateValidity(value) is Valid;
+  bool isValid(TValue value);
 
-  ValidationPolicyResult evaluateValidity(TValue value);
+  TResult validate(TValue value);
 
-  void enforce(TValue value) {
-    final result = evaluateValidity(value);
-    switch (result) {
-      case Valid():
-        return;
-      case Invalid(:final reason):
-        throw ValidationPolicyViolationException(reason);
-    }
-  }
+  void enforce(TValue value);
 }

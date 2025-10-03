@@ -1,12 +1,48 @@
+import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy_result.dart';
 
-class DummyAlwaysValidValidationPolicy<T> extends ValidationPolicy<T> {
+final class DummyAlwaysValidValidationPolicy
+    extends ValidationPolicy<String, DummyValidationPolicyResult> {
+  const DummyAlwaysValidValidationPolicy();
+
   @override
-  ValidationPolicyResult evaluateValidity(T value) => Valid();
+  bool isValid(String value) => true;
+
+  @override
+  void enforce(String value) => {};
+
+  @override
+  DummyValidationPolicyResult validate(String value) => DummyValid();
 }
 
-class DummyAlwaysInvalidValidationPolicy<T> extends ValidationPolicy<T> {
+final class DummyAlwaysInvalidValidationPolicy
+    extends ValidationPolicy<String, DummyValidationPolicyResult> {
+  const DummyAlwaysInvalidValidationPolicy();
+
   @override
-  ValidationPolicyResult evaluateValidity(T value) => Invalid(reason: 'invalid');
+  bool isValid(String value) => false;
+
+  @override
+  DummyValidationPolicyResult validate(String value) {
+    return DummyInvalid(reason: DummyIsAlwaysInvalid());
+  }
+
+  @override
+  void enforce(String value) {
+    throw ValidationPolicyViolationException(DummyIsAlwaysInvalid());
+  }
 }
+
+sealed class DummyValidationPolicyResult {}
+
+class DummyValid extends DummyValidationPolicyResult {}
+
+class DummyInvalid extends DummyValidationPolicyResult {
+  DummyInvalid({required this.reason});
+
+  final DummyInvalidReason reason;
+}
+
+sealed class DummyInvalidReason {}
+
+class DummyIsAlwaysInvalid implements DummyInvalidReason {}

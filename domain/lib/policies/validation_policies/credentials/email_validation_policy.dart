@@ -1,6 +1,7 @@
 part of '../validation_policy.dart';
 
-class EmailValidationPolicy extends ValidationPolicy<Email> {
+final class EmailValidationPolicy
+    extends ValidationPolicy<Email, EmailValidationPolicyResult> {
   const EmailValidationPolicy();
 
   static final RegExp _emailRegex =
@@ -9,17 +10,39 @@ class EmailValidationPolicy extends ValidationPolicy<Email> {
   bool _hasValidFormat(Email email) => _emailRegex.hasMatch(email.value);
 
   @override
-  ValidationPolicyResult evaluateValidity(Email email) {
-    if (!_hasValidFormat(email)) {
-      return Invalid(reason: EmailInvalidFormat());
-    }
-    return Valid();
+  bool isValid(Email value) {
+    return validate(value) is EmailValid;
   }
+
+  @override
+  EmailValidationPolicyResult validate(Email email) {
+    if (!_hasValidFormat(email)) {
+      return EmailInvalid(reason: EmailInvalidFormat());
+    }
+    return EmailValid();
+  }
+
+  @override
+  void enforce(Email value) {
+    switch (validate(value)) {
+      case EmailValid():
+        return;
+      case EmailInvalid(:final reason):
+        throw ValidationPolicyViolationException(reason);
+    }
+  }
+}
+
+sealed class EmailValidationPolicyResult {}
+
+class EmailValid extends EmailValidationPolicyResult {}
+
+class EmailInvalid extends EmailValidationPolicyResult {
+  EmailInvalid({required this.reason});
+
+  final EmailInvalidReason reason;
 }
 
 sealed class EmailInvalidReason {}
 
-class EmailInvalidFormat implements EmailInvalidReason {
-  @override
-  String toString() => 'Email format is invalid.';
-}
+class EmailInvalidFormat implements EmailInvalidReason {}

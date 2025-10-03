@@ -6,7 +6,6 @@ import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,14 +20,14 @@ class UpdateUserEmailIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final updateEmailPermission = bloc.updateEmailPermission(user);
+        final updateEmailPermission = bloc.authorizeUpdateEmail(user);
 
         return ActionIcon(
           icon: Icons.email,
-          isGreyedOut: updateEmailPermission is Denied,
+          isGreyedOut: updateEmailPermission is UpdateUserEmailDenied,
           onPressed: () {
             switch (updateEmailPermission) {
-              case Granted():
+              case UpdateUserEmailGranted():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -69,7 +68,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case Denied(:final reason as UpdateUserEmailDeniedReason):
+              case UpdateUserEmailDenied(:final reason):
                 ActionSnackBarHelper.show(
                   message: switch (reason) {
                     CannotUpdateEmailOnAnalyst() =>

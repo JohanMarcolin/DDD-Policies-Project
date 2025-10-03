@@ -1,48 +1,64 @@
 part of '../action_policy.dart';
 
-class DeleteUserPolicy extends ActionPolicy<User, User> {
+final class DeleteUserPolicy extends ActionPolicy<User, User, DeleteUserPermission> {
   const DeleteUserPolicy();
 
   @override
-  ActionPolicyPermission evaluatePermission(User initiator, User target) {
+  bool isAuthorized(User initiator, User target) =>
+      authorize(initiator, target) is DeleteUserGranted;
+
+  @override
+  DeleteUserPermission authorize(User initiator, User target) {
     final isDeletingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {
       case Role.analyst:
-        if (target.isAnalyst() && !isDeletingSelf) {
-          return Denied(reason: CanOnlyDeleteSelf());
+        if (!isDeletingSelf) {
+          return DeleteUserGranted();
         } else {
-          return Granted();
+          return DeleteUserDenied(reason: CanOnlyDeleteSelf());
         }
       case Role.admin:
         if (!target.isAnalyst()) {
-          return Granted();
+          return DeleteUserGranted();
         } else {
-          return Denied(reason: CannotDeleteAnalyst());
+          return DeleteUserDenied(reason: CannotDeleteAnalyst());
         }
       case Role.user:
         if (isDeletingSelf) {
-          return Granted();
+          return DeleteUserGranted();
         } else {
-          return Denied(reason: CanOnlyDeleteSelf());
+          return DeleteUserDenied(reason: CanOnlyDeleteSelf());
         }
+    }
+  }
+
+  @override
+  requireAuthorization(User initiator, User target,
+      {required Function() onAuthorized}) {
+    switch (authorize(initiator, target)) {
+      case DeleteUserGranted():
+        return onAuthorized();
+      case DeleteUserDenied(:final reason):
+        throw ActionPolicyViolationException(reason);
     }
   }
 }
 
+sealed class DeleteUserPermission {}
+
+class DeleteUserGranted extends DeleteUserPermission {}
+
+class DeleteUserDenied extends DeleteUserPermission {
+  DeleteUserDenied({required this.reason});
+
+  final DeleteUserDeniedReason reason;
+}
+
 sealed class DeleteUserDeniedReason {}
 
-class CannotDeleteSelf implements DeleteUserDeniedReason {
-  @override
-  String toString() => 'Cannot delete self.';
-}
+class CannotDeleteSelf implements DeleteUserDeniedReason {}
 
-class CannotDeleteAnalyst implements DeleteUserDeniedReason {
-  @override
-  String toString() => 'Cannot delete analyst.';
-}
+class CannotDeleteAnalyst implements DeleteUserDeniedReason {}
 
-class CanOnlyDeleteSelf implements DeleteUserDeniedReason {
-  @override
-  String toString() => 'Can only delete self.';
-}
+class CanOnlyDeleteSelf implements DeleteUserDeniedReason {}

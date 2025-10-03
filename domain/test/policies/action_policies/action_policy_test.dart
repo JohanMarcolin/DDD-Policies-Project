@@ -1,32 +1,32 @@
-import 'package:domain/policies/policy_exception.dart';
+import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:test/test.dart';
 
 import '../../utils/policies/action_policies/dummy_action_policy.dart';
 
 void main() {
   group('ActionPolicy', () {
-    test('isPermitted returns true for Granted', () {
+    test('isAuthorized returns true for Granted', () {
       final policy = DummyAlwaysGrantedActionPolicy();
-      expect(policy.isPermitted('initiator', 'target'), isTrue);
+      expect(policy.isAuthorized('initiator', 'target'), isTrue);
     });
 
-    test('isPermitted returns false for Denied', () {
+    test('isAuthorized returns false for Denied', () {
       final policy = DummyAlwaysDeniedActionPolicy();
-      expect(policy.isPermitted('initiator', 'target'), isFalse);
+      expect(policy.isAuthorized('initiator', 'target'), isFalse);
     });
 
     test('enforce returns value for Granted', () {
       final policy = DummyAlwaysGrantedActionPolicy();
-      final result =
-          policy.enforce('initiator', 'target', onGranted: () => 'allowed');
+      final result = policy.requireAuthorization('initiator', 'target',
+          onAuthorized: () => 'allowed');
       expect(result, equals('allowed'));
     });
 
     test('enforce throws ActionPolicyViolationException for Denied', () {
       final policy = DummyAlwaysDeniedActionPolicy();
       expect(
-        () => policy.enforce('initiator', 'target',
-            onGranted: () => 'should not reach'),
+        () => policy.requireAuthorization('initiator', 'target',
+            onAuthorized: () => 'should not reach'),
         throwsA(isA<ActionPolicyViolationException>()),
       );
     });

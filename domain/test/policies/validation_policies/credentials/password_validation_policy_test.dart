@@ -1,5 +1,5 @@
+import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy_result.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:test/test.dart';
 
@@ -9,58 +9,58 @@ void main() {
 
     test('valid password passes', () {
       final password = Password('Abcdef1!');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Valid>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordValid>());
       expect(policy.isValid(password), isTrue);
     });
 
     test('too short fails', () {
       final password = Password('A1!a');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
-      expect((result as Invalid).reason, isA<PasswordTooShort>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
+      expect((result as PasswordInvalid).reason, isA<PasswordTooShort>());
       expect(policy.isValid(password), isFalse);
     });
 
     test('too long fails', () {
       final password = Password('A' * 65 + '1!a');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
-      expect((result as Invalid).reason, isA<PasswordTooLong>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
+      expect((result as PasswordInvalid).reason, isA<PasswordTooLong>());
     });
 
     test('missing uppercase fails', () {
       final password = Password('abcdef1!');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
-      expect((result as Invalid).reason, isA<PasswordMissingUppercase>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
+      expect((result as PasswordInvalid).reason, isA<PasswordMissingUppercase>());
     });
 
     test('missing lowercase fails', () {
       final password = Password('ABCDEF1!');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
-      expect((result as Invalid).reason, isA<PasswordMissingLowercase>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
+      expect((result as PasswordInvalid).reason, isA<PasswordMissingLowercase>());
     });
 
     test('missing number fails', () {
       final password = Password('Abcdefg!');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
-      expect((result as Invalid).reason, isA<PasswordMissingNumber>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
+      expect((result as PasswordInvalid).reason, isA<PasswordMissingNumber>());
     });
 
     test('missing special character fails', () {
       final password = Password('Abcdefg1');
-      final result = policy.evaluateValidity(password);
-      expect(result, isA<Invalid>());
+      final result = policy.validate(password);
+      expect(result, isA<PasswordInvalid>());
       expect(
-          (result as Invalid).reason, isA<PasswordMissingSpecialCharacter>());
+          (result as PasswordInvalid).reason, isA<PasswordMissingSpecialCharacter>());
     });
 
     test('enforce throws for invalid password', () {
       final password = Password('abc');
-      expect(() => policy.enforce(password), throwsA(isA<Exception>()));
+      expect(() => policy.enforce(password), throwsA(isA<PolicyViolationException>()));
     });
 
     test('enforce does not throw for valid password', () {

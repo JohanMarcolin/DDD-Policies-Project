@@ -8,16 +8,16 @@ void main() {
     final policy = UpdateUserEmailPolicy();
 
     test('analyst can update anyone', () {
-      expect(policy.isPermitted(analyst, otherUser), isTrue);
-      expect(policy.isPermitted(analyst, analyst), isTrue);
+      expect(policy.isAuthorized(analyst, otherUser), isTrue);
+      expect(policy.isAuthorized(analyst, analyst), isTrue);
     });
     test('admin can update non-analyst, not analyst', () {
-      expect(policy.isPermitted(admin, user), isTrue);
-      expect(policy.isPermitted(admin, analyst), isFalse);
+      expect(policy.isAuthorized(admin, user), isTrue);
+      expect(policy.isAuthorized(admin, analyst), isFalse);
     });
     test('user can only update self', () {
-      expect(policy.isPermitted(user, user), isTrue);
-      expect(policy.isPermitted(user, otherUser), isFalse);
+      expect(policy.isAuthorized(user, user), isTrue);
+      expect(policy.isAuthorized(user, otherUser), isFalse);
     });
   });
 }

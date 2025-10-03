@@ -6,7 +6,6 @@ import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
@@ -22,14 +21,14 @@ class UpdateUserPasswordIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final updatePasswordPermission = bloc.updatePasswordPermission(user);
+        final updatePasswordPermission = bloc.authorizeUpdatePassword(user);
 
         return ActionIcon(
           icon: Icons.password,
-          isGreyedOut: updatePasswordPermission is Denied,
+          isGreyedOut: updatePasswordPermission is UpdateUserPasswordDenied,
           onPressed: () {
             switch (updatePasswordPermission) {
-              case Granted():
+              case UpdateUserPasswordGranted():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -82,7 +81,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case Denied(:final reason as UpdateUserPasswordDeniedReason):
+              case UpdateUserPasswordDenied(:final reason):
                 ActionSnackBarHelper.show(
                   message: switch (reason) {
                     CannotUpdatePasswordOnAnalyst() =>

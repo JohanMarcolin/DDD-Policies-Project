@@ -1,39 +1,59 @@
 part of '../action_policy.dart';
 
-class UpdateUserEmailPolicy extends ActionPolicy<User, User> {
+final class UpdateUserEmailPolicy
+    extends ActionPolicy<User, User, UpdateUserEmailPermission> {
   const UpdateUserEmailPolicy();
 
   @override
-  ActionPolicyPermission evaluatePermission(User initiator, User target) {
+  bool isAuthorized(User initiator, User target) =>
+      authorize(initiator, target) is UpdateUserEmailGranted;
+
+  @override
+  UpdateUserEmailPermission authorize(User initiator, User target) {
     final isModifyingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {
       case Role.analyst:
-        return Granted();
+        return UpdateUserEmailGranted();
       case Role.admin:
         if (!target.isAnalyst()) {
-          return Granted();
+          return UpdateUserEmailGranted();
         } else {
-          return Denied(reason: CannotUpdateEmailOnAnalyst());
+          return UpdateUserEmailDenied(reason: CannotUpdateEmailOnAnalyst());
         }
       case Role.user:
         if (isModifyingSelf) {
-          return Granted();
+          return UpdateUserEmailGranted();
         } else {
-          return Denied(reason: CanOnlyUpdateEmailOnSelf());
+          return UpdateUserEmailDenied(reason: CanOnlyUpdateEmailOnSelf());
         }
+    }
+  }
+
+  @override
+  requireAuthorization(User initiator, User target,
+      {required Function() onAuthorized}) {
+    switch (authorize(initiator, target)) {
+      case UpdateUserEmailGranted():
+        return onAuthorized();
+      case UpdateUserEmailDenied(:final reason):
+        throw ActionPolicyViolationException(reason);
     }
   }
 }
 
+sealed class UpdateUserEmailPermission {}
+
+class UpdateUserEmailGranted extends UpdateUserEmailPermission {}
+
+class UpdateUserEmailDenied extends UpdateUserEmailPermission {
+  UpdateUserEmailDenied({required this.reason});
+
+  final UpdateUserEmailDeniedReason reason;
+}
+
 sealed class UpdateUserEmailDeniedReason {}
 
-class CannotUpdateEmailOnAnalyst implements UpdateUserEmailDeniedReason {
-  @override
-  String toString() => 'Cannot update email on analyst.';
-}
+class CannotUpdateEmailOnAnalyst implements UpdateUserEmailDeniedReason {}
 
-class CanOnlyUpdateEmailOnSelf implements UpdateUserEmailDeniedReason {
-  @override
-  String toString() => 'Can only update email on self.';
-}
+class CanOnlyUpdateEmailOnSelf implements UpdateUserEmailDeniedReason {}

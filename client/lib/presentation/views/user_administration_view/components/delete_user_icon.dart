@@ -6,7 +6,6 @@ import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:domain/policies/action_policies/action_policy_permission.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,14 +19,14 @@ class DeleteUserIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final deleteUserPermission = bloc.deleteUserPermission(user);
+        final deleteUserPermission = bloc.authorizeDeleteUser(user);
 
         return ActionIcon(
           icon: Icons.delete,
-          isGreyedOut: deleteUserPermission is Denied,
+          isGreyedOut: deleteUserPermission is DeleteUserDenied,
           onPressed: () {
             switch (deleteUserPermission) {
-              case Granted():
+              case DeleteUserGranted():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -60,7 +59,7 @@ class DeleteUserIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case Denied(:final reason as DeleteUserDeniedReason):
+              case DeleteUserDenied(:final reason):
                 ActionSnackBarHelper.show(
                   message: switch (reason) {
                     CannotDeleteSelf() => 'You cannot delete yourself.',

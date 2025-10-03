@@ -1,9 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy_permission.dart';
+import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy_result.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
@@ -32,31 +31,29 @@ class UserAdministrationViewBloc
   final User _currentUser;
   final UserAdministrationService _userAdministrationService;
 
-  ActionPolicyPermission deleteUserPermission(User targetUser) =>
-      _userAdministrationService.deleteUserPolicy.evaluatePermission(
+  DeleteUserPermission authorizeDeleteUser(User targetUser) =>
+      _userAdministrationService.deleteUserPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  ActionPolicyPermission updateEmailPermission(User targetUser) =>
-      _userAdministrationService.updateUserEmailPolicy.evaluatePermission(
+  UpdateUserEmailPermission authorizeUpdateEmail(User targetUser) =>
+      _userAdministrationService.updateUserEmailPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  ActionPolicyPermission updatePasswordPermission(User targetUser) =>
-      _userAdministrationService.updateUserPasswordPolicy.evaluatePermission(
+  UpdateUserPasswordPermission authorizeUpdatePassword(User targetUser) =>
+      _userAdministrationService.updateUserPasswordPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  ValidationPolicyResult _emailValidationResult(Email email) =>
-      _userAdministrationService.emailValidationPolicy.evaluateValidity(email);
+  EmailValidationPolicyResult _validateEmail(Email email) =>
+      _userAdministrationService.emailValidationPolicy.validate(email);
 
-  ValidationPolicyResult _passwordValidationResult(Password password) =>
-      _userAdministrationService.passwordValidationPolicy.evaluateValidity(
-        password,
-      );
+  PasswordValidationPolicyResult _validatePassword(Password password) =>
+      _userAdministrationService.passwordValidationPolicy.validate(password);
 
   Future<void> _onFetchRequested(
     FetchUsersRequested event,
@@ -93,21 +90,22 @@ class UserAdministrationViewBloc
     UpdateUserEmailRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    final validationResult = _emailValidationResult(event.newEmail);
-    if (validationResult is Invalid) {
-      emitPresentation(UpdateUserEmailInvalid(reason: validationResult.reason));
-      return;
-    }
-    try {
-      await _userAdministrationService.updateUserEmail(
-        initiator: _currentUser,
-        target: event.targetUser,
-        newEmail: event.newEmail,
-      );
-      emitPresentation(UpdateUserEmailSuccess());
-      add(FetchUsersRequested());
-    } catch (e) {
-      emitPresentation(UpdateUserEmailFailure());
+    switch (_validateEmail(event.newEmail)) {
+      case EmailInvalid(:final reason):
+        emitPresentation(UpdateUserEmailInvalid(reason: reason));
+        return;
+      case EmailValid():
+        try {
+          await _userAdministrationService.updateUserEmail(
+            initiator: _currentUser,
+            target: event.targetUser,
+            newEmail: event.newEmail,
+          );
+          emitPresentation(UpdateUserEmailSuccess());
+          add(FetchUsersRequested());
+        } catch (e) {
+          emitPresentation(UpdateUserEmailFailure());
+        }
     }
   }
 
@@ -115,23 +113,22 @@ class UserAdministrationViewBloc
     UpdateUserPasswordRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    final validationResult = _passwordValidationResult(event.newPassword);
-    if (validationResult is Invalid) {
-      emitPresentation(
-        UpdateUserPasswordInvalid(reason: validationResult.reason),
-      );
-      return;
-    }
-    try {
-      await _userAdministrationService.updateUserPassword(
-        initiator: _currentUser,
-        target: event.targetUser,
-        newPassword: event.newPassword,
-      );
-      emitPresentation(UpdateUserPasswordSuccess());
-      add(FetchUsersRequested());
-    } catch (e) {
-      emitPresentation(UpdateUserPasswordFailure());
+    switch (_validatePassword(event.newPassword)) {
+      case PasswordInvalid(:final reason):
+        emitPresentation(UpdateUserPasswordInvalid(reason: reason));
+        return;
+      case PasswordValid():
+        try {
+          await _userAdministrationService.updateUserPassword(
+            initiator: _currentUser,
+            target: event.targetUser,
+            newPassword: event.newPassword,
+          );
+          emitPresentation(UpdateUserPasswordSuccess());
+          add(FetchUsersRequested());
+        } catch (e) {
+          emitPresentation(UpdateUserPasswordFailure());
+        }
     }
   }
 }
