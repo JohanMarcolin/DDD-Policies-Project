@@ -10,25 +10,25 @@ void main() {
     test('analyst can delete others but not self', () {
       expect(policy.isAuthorized(analyst, otherUser), isTrue);
       expect(policy.isAuthorized(analyst, analyst), isFalse);
-      final denied = policy.authorize(analyst, analyst);
-      expect(denied, isA<DeleteUserDenied>());
-      expect((denied as DeleteUserDenied).reason, isA<CanOnlyDeleteSelf>());
+      final result = policy.authorize(analyst, analyst);
+      expect(result, isA<Unauthorized>());
+      expect((result as Unauthorized).reason, isA<CannotDeleteSelf>());
     });
 
     test('admin can delete non-analyst, not analyst', () {
       expect(policy.isAuthorized(admin, user), isTrue);
       expect(policy.isAuthorized(admin, analyst), isFalse);
-      final denied = policy.authorize(admin, analyst);
-      expect(denied, isA<DeleteUserDenied>());
-      expect((denied as DeleteUserDenied).reason, isA<CannotDeleteAnalyst>());
+      final result = policy.authorize(admin, analyst);
+      expect(result, isA<Unauthorized>());
+      expect((result as Unauthorized).reason, isA<CannotDeleteAnalyst>());
     });
 
     test('user can only delete self', () {
       expect(policy.isAuthorized(user, user), isTrue);
       expect(policy.isAuthorized(user, otherUser), isFalse);
-      final denied = policy.authorize(user, otherUser);
-      expect(denied, isA<DeleteUserDenied>());
-      expect((denied as DeleteUserDenied).reason, isA<CanOnlyDeleteSelf>());
+      final result = policy.authorize(user, otherUser);
+      expect(result, isA<Unauthorized>());
+      expect((result as Unauthorized).reason, isA<CanOnlyDeleteSelf>());
     });
   });
 }

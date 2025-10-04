@@ -31,28 +31,28 @@ class UserAdministrationViewBloc
   final User _currentUser;
   final UserAdministrationService _userAdministrationService;
 
-  DeleteUserPermission authorizeDeleteUser(User targetUser) =>
+  ActionPolicyResult authorizeDeleteUser(User targetUser) =>
       _userAdministrationService.deleteUserPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  UpdateUserEmailPermission authorizeUpdateEmail(User targetUser) =>
+  ActionPolicyResult authorizeUpdateEmail(User targetUser) =>
       _userAdministrationService.updateUserEmailPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  UpdateUserPasswordPermission authorizeUpdatePassword(User targetUser) =>
+  ActionPolicyResult authorizeUpdatePassword(User targetUser) =>
       _userAdministrationService.updateUserPasswordPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  EmailValidationPolicyResult _validateEmail(Email email) =>
+  ValidationPolicyResult _validateEmail(Email email) =>
       _userAdministrationService.emailValidationPolicy.validate(email);
 
-  PasswordValidationPolicyResult _validatePassword(Password password) =>
+  ValidationPolicyResult _validatePassword(Password password) =>
       _userAdministrationService.passwordValidationPolicy.validate(password);
 
   Future<void> _onFetchRequested(
@@ -91,10 +91,10 @@ class UserAdministrationViewBloc
     Emitter<UserAdministrationViewState> emit,
   ) async {
     switch (_validateEmail(event.newEmail)) {
-      case EmailInvalid(:final reason):
+      case Invalid(:final reason as EmailInvalidReason):
         emitPresentation(UpdateUserEmailInvalid(reason: reason));
         return;
-      case EmailValid():
+      case Valid():
         try {
           await _userAdministrationService.updateUserEmail(
             initiator: _currentUser,
@@ -114,10 +114,10 @@ class UserAdministrationViewBloc
     Emitter<UserAdministrationViewState> emit,
   ) async {
     switch (_validatePassword(event.newPassword)) {
-      case PasswordInvalid(:final reason):
+      case Invalid(:final reason as PasswordInvalidReason):
         emitPresentation(UpdateUserPasswordInvalid(reason: reason));
         return;
-      case PasswordValid():
+      case Valid():
         try {
           await _userAdministrationService.updateUserPassword(
             initiator: _currentUser,

@@ -1,64 +1,38 @@
 part of '../action_policy.dart';
 
-final class DeleteUserPolicy extends ActionPolicy<User, User, DeleteUserPermission> {
-  const DeleteUserPolicy();
+final class DeleteUserPolicy extends ActionPolicy<User, User> {
+  const DeleteUserPolicy() : super(authorize: _authorizeDeleteUser);
 
-  @override
-  bool isAuthorized(User initiator, User target) =>
-      authorize(initiator, target) is DeleteUserGranted;
-
-  @override
-  DeleteUserPermission authorize(User initiator, User target) {
+  static ActionPolicyResult _authorizeDeleteUser(User initiator, User target) {
     final isDeletingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {
       case Role.analyst:
         if (!isDeletingSelf) {
-          return DeleteUserGranted();
+          return Authorized();
         } else {
-          return DeleteUserDenied(reason: CanOnlyDeleteSelf());
+          return Unauthorized(reason: CannotDeleteSelf());
         }
       case Role.admin:
         if (!target.isAnalyst()) {
-          return DeleteUserGranted();
+          return Authorized();
         } else {
-          return DeleteUserDenied(reason: CannotDeleteAnalyst());
+          return Unauthorized(reason: CannotDeleteAnalyst());
         }
       case Role.user:
         if (isDeletingSelf) {
-          return DeleteUserGranted();
+          return Authorized();
         } else {
-          return DeleteUserDenied(reason: CanOnlyDeleteSelf());
+          return Unauthorized(reason: CanOnlyDeleteSelf());
         }
     }
   }
-
-  @override
-  requireAuthorization(User initiator, User target,
-      {required Function() onAuthorized}) {
-    switch (authorize(initiator, target)) {
-      case DeleteUserGranted():
-        return onAuthorized();
-      case DeleteUserDenied(:final reason):
-        throw ActionPolicyViolationException(reason);
-    }
-  }
 }
 
-sealed class DeleteUserPermission {}
+sealed class DeleteUserUnauthorizedReason {}
 
-class DeleteUserGranted extends DeleteUserPermission {}
+class CannotDeleteSelf implements DeleteUserUnauthorizedReason {}
 
-class DeleteUserDenied extends DeleteUserPermission {
-  DeleteUserDenied({required this.reason});
+class CannotDeleteAnalyst implements DeleteUserUnauthorizedReason {}
 
-  final DeleteUserDeniedReason reason;
-}
-
-sealed class DeleteUserDeniedReason {}
-
-class CannotDeleteSelf implements DeleteUserDeniedReason {}
-
-class CannotDeleteAnalyst implements DeleteUserDeniedReason {}
-
-class CanOnlyDeleteSelf implements DeleteUserDeniedReason {}
+class CanOnlyDeleteSelf implements DeleteUserUnauthorizedReason {}

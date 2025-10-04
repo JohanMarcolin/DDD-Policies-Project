@@ -1,61 +1,36 @@
 part of '../action_policy.dart';
 
-final class UpdateUserPasswordPolicy
-    extends ActionPolicy<User, User, UpdateUserPasswordPermission> {
-  const UpdateUserPasswordPolicy();
+final class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
+  const UpdateUserPasswordPolicy()
+      : super(authorize: _authorizeUpdateUserPassword);
 
-  @override
-  bool isAuthorized(User initiator, User target) =>
-      authorize(initiator, target) is UpdateUserPasswordGranted;
-
-  @override
-  UpdateUserPasswordPermission authorize(User initiator, User target) {
+  static ActionPolicyResult _authorizeUpdateUserPassword(
+      User initiator, User target) {
     final isModifyingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {
       case Role.analyst:
-        return UpdateUserPasswordGranted();
+        return Authorized();
       case Role.admin:
         if (!target.isAnalyst()) {
-          return UpdateUserPasswordGranted();
+          return Authorized();
         } else {
-          return UpdateUserPasswordDenied(
-              reason: CannotUpdatePasswordOnAnalyst());
+          return Unauthorized(reason: CannotUpdatePasswordOnAnalyst());
         }
       case Role.user:
         if (isModifyingSelf) {
-          return UpdateUserPasswordGranted();
+          return Authorized();
         } else {
-          return UpdateUserPasswordDenied(
-              reason: CanOnlyUpdatePasswordOnSelf());
+          return Unauthorized(reason: CanOnlyUpdatePasswordOnSelf());
         }
     }
   }
-
-  @override
-  requireAuthorization(User initiator, User target,
-      {required Function() onAuthorized}) {
-    switch (authorize(initiator, target)) {
-      case UpdateUserPasswordGranted():
-        return onAuthorized();
-      case UpdateUserPasswordDenied(:final reason):
-        throw ActionPolicyViolationException(reason);
-    }
-  }
 }
 
-sealed class UpdateUserPasswordPermission {}
+sealed class UpdateUserPasswordUnauthorizedReason {}
 
-class UpdateUserPasswordGranted extends UpdateUserPasswordPermission {}
+class CannotUpdatePasswordOnAnalyst
+    implements UpdateUserPasswordUnauthorizedReason {}
 
-class UpdateUserPasswordDenied extends UpdateUserPasswordPermission {
-  UpdateUserPasswordDenied({required this.reason});
-
-  final UpdateUserPasswordDeniedReason reason;
-}
-
-sealed class UpdateUserPasswordDeniedReason {}
-
-class CannotUpdatePasswordOnAnalyst implements UpdateUserPasswordDeniedReason {}
-
-class CanOnlyUpdatePasswordOnSelf implements UpdateUserPasswordDeniedReason {}
+class CanOnlyUpdatePasswordOnSelf
+    implements UpdateUserPasswordUnauthorizedReason {}

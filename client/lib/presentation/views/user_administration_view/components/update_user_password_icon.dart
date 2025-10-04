@@ -21,14 +21,14 @@ class UpdateUserPasswordIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final updatePasswordPermission = bloc.authorizeUpdatePassword(user);
+        final updatePassword = bloc.authorizeUpdatePassword(user);
 
         return ActionIcon(
           icon: Icons.password,
-          isGreyedOut: updatePasswordPermission is UpdateUserPasswordDenied,
+          isGreyedOut: updatePassword is Authorized,
           onPressed: () {
-            switch (updatePasswordPermission) {
-              case UpdateUserPasswordGranted():
+            switch (updatePassword) {
+              case Authorized():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -81,9 +81,10 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case UpdateUserPasswordDenied(:final reason):
+              case Unauthorized(:final reason):
                 ActionSnackBarHelper.show(
-                  message: switch (reason) {
+                  message: switch (reason
+                      as UpdateUserPasswordUnauthorizedReason) {
                     CannotUpdatePasswordOnAnalyst() =>
                       'You cannot update the password of an analyst.',
                     CanOnlyUpdatePasswordOnSelf() =>

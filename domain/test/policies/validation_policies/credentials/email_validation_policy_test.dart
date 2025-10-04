@@ -10,15 +10,15 @@ void main() {
     test('valid email passes', () {
       final email = Email('user@example.com');
       final result = policy.validate(email);
-      expect(result, isA<EmailValid>());
+      expect(result, isA<Valid>());
       expect(policy.isValid(email), isTrue);
     });
 
     test('invalid email fails', () {
       final email = Email('invalid-email');
       final result = policy.validate(email);
-      expect(result, isA<EmailInvalid>());
-      expect((result as EmailInvalid).reason, isA<EmailInvalidFormat>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<EmailInvalidFormat>());
       expect(policy.isValid(email), isFalse);
     });
 

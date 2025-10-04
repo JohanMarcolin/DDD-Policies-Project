@@ -10,52 +10,52 @@ void main() {
     test('valid password passes', () {
       final password = Password('Abcdef1!');
       final result = policy.validate(password);
-      expect(result, isA<PasswordValid>());
+      expect(result, isA<Valid>());
       expect(policy.isValid(password), isTrue);
     });
 
     test('too short fails', () {
       final password = Password('A1!a');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
-      expect((result as PasswordInvalid).reason, isA<PasswordTooShort>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<PasswordTooShort>());
       expect(policy.isValid(password), isFalse);
     });
 
     test('too long fails', () {
       final password = Password('A' * 65 + '1!a');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
-      expect((result as PasswordInvalid).reason, isA<PasswordTooLong>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<PasswordTooLong>());
     });
 
     test('missing uppercase fails', () {
       final password = Password('abcdef1!');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
-      expect((result as PasswordInvalid).reason, isA<PasswordMissingUppercase>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<PasswordMissingUppercase>());
     });
 
     test('missing lowercase fails', () {
       final password = Password('ABCDEF1!');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
-      expect((result as PasswordInvalid).reason, isA<PasswordMissingLowercase>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<PasswordMissingLowercase>());
     });
 
     test('missing number fails', () {
       final password = Password('Abcdefg!');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
-      expect((result as PasswordInvalid).reason, isA<PasswordMissingNumber>());
+      expect(result, isA<Invalid>());
+      expect((result as Invalid).reason, isA<PasswordMissingNumber>());
     });
 
     test('missing special character fails', () {
       final password = Password('Abcdefg1');
       final result = policy.validate(password);
-      expect(result, isA<PasswordInvalid>());
+      expect(result, isA<Invalid>());
       expect(
-          (result as PasswordInvalid).reason, isA<PasswordMissingSpecialCharacter>());
+          (result as Invalid).reason, isA<PasswordMissingSpecialCharacter>());
     });
 
     test('enforce throws for invalid password', () {

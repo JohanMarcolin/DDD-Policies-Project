@@ -1,7 +1,9 @@
 part of '../validation_policy.dart';
 
-final class PasswordValidationPolicy
-    extends ValidationPolicy<Password, PasswordValidationPolicyResult> {
+final class PasswordValidationPolicy extends ValidationPolicy<Password> {
+  PasswordValidationPolicy()
+      : super(validate: _validatePassword);
+
   static const minLength = 8;
   static const maxLength = 64;
   static const includeUppercase = true;
@@ -9,45 +11,29 @@ final class PasswordValidationPolicy
   static const includeNumbers = true;
   static const includeSpecialCharacters = true;
 
-  @override
-  bool isValid(Password value) {
-    return validate(value) is PasswordValid;
-  }
-
-  @override
-  PasswordValidationPolicyResult validate(Password password) {
+  static ValidationPolicyResult _validatePassword(Password password) {
     final value = password.value;
 
     if (value.length < minLength) {
-      return PasswordInvalid(reason: PasswordTooShort());
+      return Invalid(reason: PasswordTooShort());
     }
     if (value.length > maxLength) {
-      return PasswordInvalid(reason: PasswordTooLong());
+      return Invalid(reason: PasswordTooLong());
     }
     if (includeUppercase && !value.contains(RegExp(r'[A-Z]'))) {
-      return PasswordInvalid(reason: PasswordMissingUppercase());
+      return Invalid(reason: PasswordMissingUppercase());
     }
     if (includeLowercase && !value.contains(RegExp(r'[a-z]'))) {
-      return PasswordInvalid(reason: PasswordMissingLowercase());
+      return Invalid(reason: PasswordMissingLowercase());
     }
     if (includeNumbers && !value.contains(RegExp(r'[0-9]'))) {
-      return PasswordInvalid(reason: PasswordMissingNumber());
+      return Invalid(reason: PasswordMissingNumber());
     }
     if (includeSpecialCharacters &&
         !value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-      return PasswordInvalid(reason: PasswordMissingSpecialCharacter());
+      return Invalid(reason: PasswordMissingSpecialCharacter());
     }
-    return PasswordValid();
-  }
-
-  @override
-  void enforce(Password value) {
-    switch (validate(value)) {
-      case PasswordValid():
-        return;
-      case PasswordInvalid(:final reason):
-        throw ValidationPolicyViolationException(reason);
-    }
+    return Valid();
   }
 
   Password generatePassword({
@@ -74,22 +60,11 @@ final class PasswordValidationPolicy
         List.generate(length, (_) => chars[random.nextInt(chars.length)])
             .join(),
       );
-      if (PasswordValidationPolicy().validate(candidate)
-          is PasswordValid) {
+      if (PasswordValidationPolicy().validate(candidate) is Valid) {
         return candidate;
       }
     }
   }
-}
-
-sealed class PasswordValidationPolicyResult {}
-
-class PasswordValid extends PasswordValidationPolicyResult {}
-
-class PasswordInvalid extends PasswordValidationPolicyResult {
-  PasswordInvalid({required this.reason});
-
-  final PasswordInvalidReason reason;
 }
 
 sealed class PasswordInvalidReason {}

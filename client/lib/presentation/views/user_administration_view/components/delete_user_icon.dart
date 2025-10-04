@@ -19,14 +19,14 @@ class DeleteUserIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final deleteUserPermission = bloc.authorizeDeleteUser(user);
+        final deleteUser = bloc.authorizeDeleteUser(user);
 
         return ActionIcon(
           icon: Icons.delete,
-          isGreyedOut: deleteUserPermission is DeleteUserDenied,
+          isGreyedOut: deleteUser is Unauthorized,
           onPressed: () {
-            switch (deleteUserPermission) {
-              case DeleteUserGranted():
+            switch (deleteUser) {
+              case Authorized():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -59,9 +59,9 @@ class DeleteUserIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case DeleteUserDenied(:final reason):
+              case Unauthorized(:final reason):
                 ActionSnackBarHelper.show(
-                  message: switch (reason) {
+                  message: switch (reason as DeleteUserUnauthorizedReason) {
                     CannotDeleteSelf() => 'You cannot delete yourself.',
                     CannotDeleteAnalyst() => 'You cannot delete an analyst.',
                     CanOnlyDeleteSelf() =>

@@ -20,14 +20,14 @@ class UpdateUserEmailIcon extends StatelessWidget {
     return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
       builder: (context, state) {
         final bloc = context.read<UserAdministrationViewBloc>();
-        final updateEmailPermission = bloc.authorizeUpdateEmail(user);
+        final updateEmail = bloc.authorizeUpdateEmail(user);
 
         return ActionIcon(
           icon: Icons.email,
-          isGreyedOut: updateEmailPermission is UpdateUserEmailDenied,
+          isGreyedOut: updateEmail is Authorized,
           onPressed: () {
-            switch (updateEmailPermission) {
-              case UpdateUserEmailGranted():
+            switch (updateEmail) {
+              case Authorized():
                 ActionDialogHelper.show(
                   child: BlocProvider.value(
                     value: bloc,
@@ -68,7 +68,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
                         ),
                   ),
                 );
-              case UpdateUserEmailDenied(:final reason):
+              case Unauthorized(:final reason as UpdateUserEmailUnauthorizedReason):
                 ActionSnackBarHelper.show(
                   message: switch (reason) {
                     CannotUpdateEmailOnAnalyst() =>
