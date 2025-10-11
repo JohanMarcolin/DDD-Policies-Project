@@ -60,7 +60,8 @@ void main() {
 
     test('enforce throws for invalid password', () {
       final password = Password('abc');
-      expect(() => policy.enforce(password), throwsA(isA<PolicyViolationException>()));
+      expect(() => policy.enforce(password),
+          throwsA(isA<PolicyViolationException>()));
     });
 
     test('enforce does not throw for valid password', () {
@@ -69,7 +70,8 @@ void main() {
     });
 
     test('generatePassword produces valid password', () {
-      final generated = policy.generatePassword(length: 12);
+      final policy = PasswordValidationPolicy();
+      final generated = PasswordValidationPolicy.generatePassword(length: 12);
       expect(policy.isValid(generated), isTrue);
     });
   });

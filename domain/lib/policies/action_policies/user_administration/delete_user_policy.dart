@@ -14,7 +14,7 @@ final class DeleteUserPolicy extends ActionPolicy<User, User> {
           return Unauthorized(reason: CannotDeleteSelf());
         }
       case Role.admin:
-        if (!target.isAnalyst()) {
+        if (!target.isAnalyst) {
           return Authorized();
         } else {
           return Unauthorized(reason: CannotDeleteAnalyst());

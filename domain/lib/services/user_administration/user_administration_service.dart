@@ -45,16 +45,6 @@ class UserAdministrationService {
         onAuthorized: () => user);
   }
 
-  Future<User?> viewUserByEmail(
-      {required User initiator, required Email email}) async {
-    final user = await _userRepository.getByEmail(email: email);
-
-    if (user == null) return null;
-
-    return viewUserPolicy.requireAuthorization(initiator, user,
-        onAuthorized: () => user);
-  }
-
   Future<void> deleteUser(
       {required User initiator, required User target}) async {
     return deleteUserPolicy.requireAuthorization(initiator, target,

@@ -1,4 +1,5 @@
 import 'package:domain/policies/policy_violation_exception.dart';
+import 'package:equatable/equatable.dart';
 
 import '../../entities/user.dart';
 import '../../../value_objects/role.dart';
@@ -30,7 +31,10 @@ abstract base class ActionPolicy<TInitiator, TTarget> {
   }
 }
 
-sealed class ActionPolicyResult {}
+sealed class ActionPolicyResult extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class Authorized extends ActionPolicyResult {}
 

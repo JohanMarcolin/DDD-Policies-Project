@@ -32,15 +32,15 @@ void main() {
     test('isAdmin returns true only for admin role', () {
       final admin = User(userId: id1, email: email1, role: Role.admin);
       final user = User(userId: id2, email: email2, role: Role.user);
-      expect(admin.isAdmin(), isTrue);
-      expect(user.isAdmin(), isFalse);
+      expect(admin.isAdmin, isTrue);
+      expect(user.isAdmin, isFalse);
     });
 
     test('isAnalyst returns true only for analyst role', () {
       final analyst = User(userId: id1, email: email1, role: Role.analyst);
       final user = User(userId: id2, email: email2, role: Role.user);
-      expect(analyst.isAnalyst(), isTrue);
-      expect(user.isAnalyst(), isFalse);
+      expect(analyst.isAnalyst, isTrue);
+      expect(user.isAnalyst, isFalse);
     });
   });
 }

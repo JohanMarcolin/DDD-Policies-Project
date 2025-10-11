@@ -9,7 +9,7 @@ final class ViewUserPolicy extends ActionPolicy<User, User> {
         return Authorized();
       case Role.admin:
       case Role.user:
-        if (!target.isAnalyst()) {
+        if (!target.isAnalyst) {
           return Authorized();
         } else {
           return Unauthorized(reason: CannotViewAnalyst());

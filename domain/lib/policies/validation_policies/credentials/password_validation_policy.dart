@@ -36,7 +36,7 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
     return Valid();
   }
 
-  Password generatePassword({
+  static Password generatePassword({
     int length = 10,
     bool includeUppercase = true,
     bool includeLowercase = true,

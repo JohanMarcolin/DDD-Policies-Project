@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
+
 import '../../../value_objects/email.dart';
 import '../../../value_objects/password.dart';
 import '../policy_violation_exception.dart';
@@ -23,11 +25,14 @@ abstract base class ValidationPolicy<TValue> {
   }
 }
 
-sealed class ValidationPolicyResult {}
+sealed class ValidationPolicyResult extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class Valid extends ValidationPolicyResult {}
 
-class Invalid<TReason> implements ValidationPolicyResult {
+class Invalid<TReason> extends ValidationPolicyResult {
   Invalid({required this.reason});
 
   final TReason reason;

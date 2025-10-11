@@ -18,9 +18,8 @@ class UserAdministrationViewBloc
         > {
   UserAdministrationViewBloc({
     required User currentUser,
-    required UserAdministrationService userAdministrationService,
+    required this.userAdministrationService,
   }) : _currentUser = currentUser,
-       _userAdministrationService = userAdministrationService,
        super(UserAdministrationViewInitial()) {
     on<FetchUsersRequested>(_onFetchRequested);
     on<DeleteUserRequested>(_onDeleteRequested);
@@ -29,31 +28,31 @@ class UserAdministrationViewBloc
   }
 
   final User _currentUser;
-  final UserAdministrationService _userAdministrationService;
+  final UserAdministrationService userAdministrationService;
 
   ActionPolicyResult authorizeDeleteUser(User targetUser) =>
-      _userAdministrationService.deleteUserPolicy.authorize(
+      userAdministrationService.deleteUserPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
   ActionPolicyResult authorizeUpdateEmail(User targetUser) =>
-      _userAdministrationService.updateUserEmailPolicy.authorize(
+      userAdministrationService.updateUserEmailPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
   ActionPolicyResult authorizeUpdatePassword(User targetUser) =>
-      _userAdministrationService.updateUserPasswordPolicy.authorize(
+      userAdministrationService.updateUserPasswordPolicy.authorize(
         _currentUser,
         targetUser,
       );
 
-  ValidationPolicyResult _validateEmail(Email email) =>
-      _userAdministrationService.emailValidationPolicy.validate(email);
+  ValidationPolicyResult validateEmail(Email email) =>
+      userAdministrationService.emailValidationPolicy.validate(email);
 
-  ValidationPolicyResult _validatePassword(Password password) =>
-      _userAdministrationService.passwordValidationPolicy.validate(password);
+  ValidationPolicyResult validatePassword(Password password) =>
+      userAdministrationService.passwordValidationPolicy.validate(password);
 
   Future<void> _onFetchRequested(
     FetchUsersRequested event,
@@ -61,7 +60,7 @@ class UserAdministrationViewBloc
   ) async {
     emit(UserAdministrationViewLoading());
     try {
-      final users = await _userAdministrationService.viewUsers(
+      final users = await userAdministrationService.viewUsers(
         initiator: _currentUser,
       );
       emit(UserAdministrationViewLoaded(users));
@@ -75,7 +74,7 @@ class UserAdministrationViewBloc
     Emitter<UserAdministrationViewState> emit,
   ) async {
     try {
-      await _userAdministrationService.deleteUser(
+      await userAdministrationService.deleteUser(
         initiator: _currentUser,
         target: event.targetUser,
       );
@@ -90,13 +89,13 @@ class UserAdministrationViewBloc
     UpdateUserEmailRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    switch (_validateEmail(event.newEmail)) {
+    switch (validateEmail(event.newEmail)) {
       case Invalid(:final reason as EmailInvalidReason):
         emitPresentation(UpdateUserEmailInvalid(reason: reason));
         return;
       case Valid():
         try {
-          await _userAdministrationService.updateUserEmail(
+          await userAdministrationService.updateUserEmail(
             initiator: _currentUser,
             target: event.targetUser,
             newEmail: event.newEmail,
@@ -113,13 +112,13 @@ class UserAdministrationViewBloc
     UpdateUserPasswordRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    switch (_validatePassword(event.newPassword)) {
+    switch (validatePassword(event.newPassword)) {
       case Invalid(:final reason as PasswordInvalidReason):
         emitPresentation(UpdateUserPasswordInvalid(reason: reason));
         return;
       case Valid():
         try {
-          await _userAdministrationService.updateUserPassword(
+          await userAdministrationService.updateUserPassword(
             initiator: _currentUser,
             target: event.targetUser,
             newPassword: event.newPassword,

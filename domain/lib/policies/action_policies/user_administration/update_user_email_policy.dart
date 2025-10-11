@@ -11,7 +11,7 @@ final class UpdateUserEmailPolicy extends ActionPolicy<User, User> {
       case Role.analyst:
         return Authorized();
       case Role.admin:
-        if (!target.isAnalyst()) {
+        if (!target.isAnalyst) {
           return Authorized();
         } else {
           return Unauthorized(reason: CannotUpdateEmailOnAnalyst());

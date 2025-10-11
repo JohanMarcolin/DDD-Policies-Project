@@ -34,11 +34,6 @@ void main() {
           initiator: user1, userId: user2.userId);
       expect(user, equals(user2));
     });
-    test('viewUserByEmail returns user by email', () async {
-      final user = await userAdministrationService.viewUserByEmail(
-          initiator: user1, email: user2.email);
-      expect(user, equals(user2));
-    });
     test('deleteUser removes user', () async {
       await userAdministrationService.deleteUser(
           initiator: admin, target: user2);
