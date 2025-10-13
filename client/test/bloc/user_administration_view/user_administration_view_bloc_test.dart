@@ -12,50 +12,22 @@ import 'package:mocktail/mocktail.dart';
 
 import '../utils/mock_user_credentials.dart';
 import '../utils/mock_users.dart';
+
+import '../bloc_test_context.dart';
 import 'mock_user_administration_view_bloc_factory.dart';
 
-late MockUserAdministrationViewBlocFactory mockFactory;
-late UserAdministrationViewBloc mockBloc;
-late domain.UserRepository mockRepo;
-
-late ActionPolicyResult canViewUser;
-late ActionPolicyResult canDeleteUser;
-late ActionPolicyResult canUpdateEmail;
-late ActionPolicyResult canUpdatePassword;
-
-void _setupTestContext({required User currentUser, required User targetUser}) {
-  _setupMockBloc(currentUser: currentUser);
-  _setupActionAuthorization(currentUser: currentUser, targetUser: targetUser);
-}
-
-void _setupMockBloc({required User currentUser}) {
-  mockFactory = MockUserAdministrationViewBlocFactory(currentUser: currentUser);
-  mockBloc = mockFactory.mockBloc;
-  mockRepo = mockFactory.mockServiceRepository;
-}
-
-void _setupActionAuthorization({
-  required User currentUser,
-  required User targetUser,
-}) {
-  canViewUser = mockBloc.userAdministrationService.viewUserPolicy.authorize(
-    currentUser,
-    targetUser,
-  );
-
-  canDeleteUser = mockBloc.userAdministrationService.deleteUserPolicy.authorize(
-    currentUser,
-    targetUser,
-  );
-
-  canUpdateEmail = mockBloc.userAdministrationService.updateUserEmailPolicy
-      .authorize(currentUser, targetUser);
-
-  canUpdatePassword = mockBloc
-      .userAdministrationService
-      .updateUserPasswordPolicy
-      .authorize(currentUser, targetUser);
-}
+final blocTestContext =
+    BlocTestContext<
+      User,
+      MockUserAdministrationViewBlocFactory,
+      UserAdministrationViewBloc,
+      domain.UserRepository
+    >(
+      factoryBuilder: (currentUser) =>
+          MockUserAdministrationViewBlocFactory(currentUser: currentUser),
+      getBloc: (factory) => factory.mockBloc,
+      getRepo: (factory) => factory.mockServiceRepository,
+    );
 
 void _blocTest({
   required String description,
@@ -69,10 +41,10 @@ void _blocTest({
   blocTest<UserAdministrationViewBloc, UserAdministrationViewState>(
     description,
     setUp: () {
-      _setupTestContext(currentUser: currentUser, targetUser: targetUser);
+      blocTestContext.setup(currentUser);
       stub?.call();
     },
-    build: () => mockBloc,
+    build: () => blocTestContext.bloc,
     act: act,
     expect: expect,
     verify: verify,
@@ -95,10 +67,10 @@ void _blocPresentationTest({
   >(
     description,
     setUp: () {
-      _setupTestContext(currentUser: currentUser, targetUser: targetUser);
+      blocTestContext.setup(currentUser);
       stub?.call();
     },
-    build: () => mockBloc,
+    build: () => blocTestContext.bloc,
     act: (bloc) => bloc.add(event),
     expectPresentation: expectPresentation,
     verify: verify,
@@ -110,25 +82,25 @@ const shouldNot = '{Should Not}';
 
 void main() {
   tearDown(() {
-    mockFactory.dispose();
+    blocTestContext.factory.dispose();
   });
 
   group('UserAdministrationViewBloc', () {
     for (final currentUser in mockUsers) {
       final currentUserRole = '{${currentUser.role.name}}';
 
+      blocTestContext.setup(currentUser);
+
       for (final targetUser in mockUsers) {
         final targetUserRole = '{${targetUser.role.name}}';
-
-        _setupTestContext(currentUser: currentUser, targetUser: targetUser);
 
         group('{Initialization}', () {
           _blocTest(
             description: 'should initialize with expected state',
             currentUser: currentUser,
             targetUser: targetUser,
-            verify: (mockBloc) =>
-                expect(mockBloc.state, isA<UserAdministrationViewInitial>()),
+            verify: (bloc) =>
+                expect(bloc.state, isA<UserAdministrationViewInitial>()),
           );
         });
 
@@ -144,9 +116,9 @@ void main() {
                       '$should authorize if $targetUserRole can be deleted when calling authorizeDeleteUser',
                   currentUser: currentUser,
                   targetUser: targetUser,
-                  verify: (mockBloc) {
+                  verify: (bloc) {
                     expect(
-                      mockBloc.authorizeDeleteUser(targetUser),
+                      bloc.authorizeDeleteUser(targetUser),
                       isA<ActionPolicyResult>(),
                     );
                   },
@@ -157,9 +129,9 @@ void main() {
                       '$should authorize if email of $targetUserRole can be updated when calling authorizeUpdateEmail',
                   currentUser: currentUser,
                   targetUser: targetUser,
-                  verify: (mockBloc) {
+                  verify: (bloc) {
                     expect(
-                      mockBloc.authorizeUpdateEmail(targetUser),
+                      bloc.authorizeUpdateEmail(targetUser),
                       isA<ActionPolicyResult>(),
                     );
                   },
@@ -170,9 +142,9 @@ void main() {
                       '$should authorize if password of $targetUserRole can be updated when calling authorizeUpdatePassword',
                   currentUser: currentUser,
                   targetUser: targetUser,
-                  verify: (mockBloc) {
+                  verify: (bloc) {
                     expect(
-                      mockBloc.authorizeUpdatePassword(targetUser),
+                      bloc.authorizeUpdatePassword(targetUser),
                       isA<ActionPolicyResult>(),
                     );
                   },
@@ -186,11 +158,8 @@ void main() {
                         '$should validate valid email when calling validateEmail',
                     currentUser: currentUser,
                     targetUser: targetUser,
-                    verify: (mockBloc) {
-                      expect(
-                        mockBloc.validateEmail(mockValidEmail),
-                        isA<Valid>(),
-                      );
+                    verify: (bloc) {
+                      expect(bloc.validateEmail(mockValidEmail), isA<Valid>());
                     },
                   );
 
@@ -199,9 +168,9 @@ void main() {
                         '$shouldNot validate invalid email when calling validateEmail',
                     currentUser: currentUser,
                     targetUser: targetUser,
-                    verify: (mockBloc) {
+                    verify: (bloc) {
                       expect(
-                        mockBloc.validateEmail(mockInvalidEmail),
+                        bloc.validateEmail(mockInvalidEmail),
                         isA<Invalid>(),
                       );
                     },
@@ -213,9 +182,9 @@ void main() {
                         '$should validate valid password  when calling validatePassword',
                     currentUser: currentUser,
                     targetUser: targetUser,
-                    verify: (mockBloc) {
+                    verify: (bloc) {
                       expect(
-                        mockBloc.validatePassword(mockValidPassword),
+                        bloc.validatePassword(mockValidPassword),
                         isA<Valid>(),
                       );
                     },
@@ -226,9 +195,9 @@ void main() {
                         '$shouldNot validate invalid password when calling validatePassword',
                     currentUser: currentUser,
                     targetUser: targetUser,
-                    verify: (mockBloc) {
+                    verify: (bloc) {
                       expect(
-                        mockBloc.validatePassword(mockInvalidPassword),
+                        bloc.validatePassword(mockInvalidPassword),
                         isA<Invalid>(),
                       );
                     },
@@ -238,6 +207,11 @@ void main() {
             });
             group('{Events}', () {
               group('{FetchUsersRequested Event}', () {
+                final canViewUser = blocTestContext
+                    .bloc
+                    .userAdministrationService
+                    .viewUserPolicy
+                    .authorize(currentUser, targetUser);
                 switch (canViewUser) {
                   case Authorized():
                     _blocTest(
@@ -246,15 +220,15 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.users,
+                        () => blocTestContext.repo.users,
                       ).thenAnswer((_) async => mockUsers),
                       act: (bloc) => bloc.add(FetchUsersRequested()),
                       expect: () => [
                         isA<UserAdministrationViewLoading>(),
                         isA<UserAdministrationViewLoaded>(),
                       ],
-                      verify: (mockBloc) {
-                        final state = mockBloc.state;
+                      verify: (bloc) {
+                        final state = bloc.state;
                         expect(state, isA<UserAdministrationViewLoaded>());
                         if (state is UserAdministrationViewLoaded) {
                           expect(state.users.contains(targetUser), isTrue);
@@ -268,15 +242,15 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.users,
+                        () => blocTestContext.repo.users,
                       ).thenAnswer((_) async => mockUsers),
                       act: (bloc) => bloc.add(FetchUsersRequested()),
                       expect: () => [
                         isA<UserAdministrationViewLoading>(),
                         isA<UserAdministrationViewLoaded>(),
                       ],
-                      verify: (mockBloc) {
-                        final state = mockBloc.state;
+                      verify: (bloc) {
+                        final state = bloc.state;
                         expect(state, isA<UserAdministrationViewLoaded>());
                         if (state is UserAdministrationViewLoaded) {
                           expect(state.users.contains(targetUser), isFalse);
@@ -287,6 +261,11 @@ void main() {
               });
 
               group('{DeleteUserRequested Event}', () {
+                final canDeleteUser = blocTestContext
+                    .bloc
+                    .userAdministrationService
+                    .deleteUserPolicy
+                    .authorize(currentUser, targetUser);
                 switch (canDeleteUser) {
                   case Authorized():
                     _blocPresentationTest(
@@ -295,12 +274,16 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.delete(userId: targetUser.userId),
+                        () => blocTestContext.repo.delete(
+                          userId: targetUser.userId,
+                        ),
                       ).thenAnswer((_) async {}),
                       event: DeleteUserRequested(targetUser: targetUser),
                       expectPresentation: () => [isA<DeleteUserSuccess>()],
-                      verify: (mockBloc) => verify(
-                        () => mockRepo.delete(userId: targetUser.userId),
+                      verify: (bloc) => verify(
+                        () => blocTestContext.repo.delete(
+                          userId: targetUser.userId,
+                        ),
                       ).called(1),
                     );
                   case Unauthorized():
@@ -310,18 +293,27 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.delete(userId: targetUser.userId),
+                        () => blocTestContext.repo.delete(
+                          userId: targetUser.userId,
+                        ),
                       ).thenAnswer((_) async {}),
                       event: DeleteUserRequested(targetUser: targetUser),
                       expectPresentation: () => [isA<DeleteUserFailure>()],
-                      verify: (mockBloc) => verifyNever(
-                        () => mockRepo.delete(userId: targetUser.userId),
+                      verify: (bloc) => verifyNever(
+                        () => blocTestContext.repo.delete(
+                          userId: targetUser.userId,
+                        ),
                       ),
                     );
                 }
               });
 
               group('{UpdateUserEmailRequested Event}', () {
+                final canUpdateEmail = blocTestContext
+                    .bloc
+                    .userAdministrationService
+                    .updateUserEmailPolicy
+                    .authorize(currentUser, targetUser);
                 switch (canUpdateEmail) {
                   case Authorized():
                     _blocPresentationTest(
@@ -330,7 +322,7 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.updateEmail(
+                        () => blocTestContext.repo.updateEmail(
                           userId: targetUser.userId,
                           newEmail: mockValidEmail,
                         ),
@@ -340,8 +332,8 @@ void main() {
                         newEmail: mockValidEmail,
                       ),
                       expectPresentation: () => [isA<UpdateUserEmailSuccess>()],
-                      verify: (mockBloc) => verify(
-                        () => mockRepo.updateEmail(
+                      verify: (bloc) => verify(
+                        () => blocTestContext.repo.updateEmail(
                           userId: targetUser.userId,
                           newEmail: mockValidEmail,
                         ),
@@ -353,7 +345,7 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.updateEmail(
+                        () => blocTestContext.repo.updateEmail(
                           userId: targetUser.userId,
                           newEmail: mockInvalidEmail,
                         ),
@@ -363,8 +355,8 @@ void main() {
                         newEmail: mockInvalidEmail,
                       ),
                       expectPresentation: () => [isA<UpdateUserEmailInvalid>()],
-                      verify: (mockBloc) => verifyNever(
-                        () => mockRepo.updateEmail(
+                      verify: (bloc) => verifyNever(
+                        () => blocTestContext.repo.updateEmail(
                           userId: targetUser.userId,
                           newEmail: mockInvalidEmail,
                         ),
@@ -378,7 +370,7 @@ void main() {
                         currentUser: currentUser,
                         targetUser: targetUser,
                         stub: () => when(
-                          () => mockRepo.updateEmail(
+                          () => blocTestContext.repo.updateEmail(
                             userId: targetUser.userId,
                             newEmail: newEmail,
                           ),
@@ -393,8 +385,8 @@ void main() {
                             isA<UpdateUserEmailFailure>(),
                           ),
                         ],
-                        verify: (mockBloc) => verifyNever(
-                          () => mockRepo.updateEmail(
+                        verify: (bloc) => verifyNever(
+                          () => blocTestContext.repo.updateEmail(
                             userId: targetUser.userId,
                             newEmail: newEmail,
                           ),
@@ -405,6 +397,11 @@ void main() {
               });
 
               group('{UpdateUserPasswordRequested Event}', () {
+                final canUpdatePassword = blocTestContext
+                    .bloc
+                    .userAdministrationService
+                    .updateUserPasswordPolicy
+                    .authorize(currentUser, targetUser);
                 switch (canUpdatePassword) {
                   case Authorized():
                     _blocPresentationTest(
@@ -413,7 +410,7 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.updatePassword(
+                        () => blocTestContext.repo.updatePassword(
                           userId: targetUser.userId,
                           newPassword: mockValidPassword,
                         ),
@@ -425,8 +422,8 @@ void main() {
                       expectPresentation: () => [
                         isA<UpdateUserPasswordSuccess>(),
                       ],
-                      verify: (mockBloc) => verify(
-                        () => mockRepo.updatePassword(
+                      verify: (bloc) => verify(
+                        () => blocTestContext.repo.updatePassword(
                           userId: targetUser.userId,
                           newPassword: mockValidPassword,
                         ),
@@ -438,7 +435,7 @@ void main() {
                       currentUser: currentUser,
                       targetUser: targetUser,
                       stub: () => when(
-                        () => mockRepo.updatePassword(
+                        () => blocTestContext.repo.updatePassword(
                           userId: targetUser.userId,
                           newPassword: mockInvalidPassword,
                         ),
@@ -450,8 +447,8 @@ void main() {
                       expectPresentation: () => [
                         isA<UpdateUserPasswordInvalid>(),
                       ],
-                      verify: (mockBloc) => verifyNever(
-                        () => mockRepo.updatePassword(
+                      verify: (bloc) => verifyNever(
+                        () => blocTestContext.repo.updatePassword(
                           userId: targetUser.userId,
                           newPassword: mockInvalidPassword,
                         ),
@@ -468,7 +465,7 @@ void main() {
                         currentUser: currentUser,
                         targetUser: targetUser,
                         stub: () => when(
-                          () => mockRepo.updatePassword(
+                          () => blocTestContext.repo.updatePassword(
                             userId: targetUser.userId,
                             newPassword: newPassword,
                           ),
@@ -483,8 +480,8 @@ void main() {
                             isA<UpdateUserPasswordFailure>(),
                           ),
                         ],
-                        verify: (mockBloc) => verifyNever(
-                          () => mockRepo.updatePassword(
+                        verify: (bloc) => verifyNever(
+                          () => blocTestContext.repo.updatePassword(
                             userId: targetUser.userId,
                             newPassword: newPassword,
                           ),
