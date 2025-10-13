@@ -10,10 +10,10 @@ import 'package:domain/repositories/user_repository.dart' as domain;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../utils/mock_user_credentials.dart';
-import '../utils/mock_users.dart';
+import '../../utils/mock_user_credentials.dart';
+import '../../utils/mock_users.dart';
 
-import '../bloc_test_context.dart';
+import '../../bloc_test_context.dart';
 import 'mock_user_administration_view_bloc_factory.dart';
 
 final blocTestContext =
@@ -235,6 +235,26 @@ void main() {
                         }
                       },
                     );
+                    _blocTest(
+                      description:
+                          'fetched users $should emit failure when repo throws on FetchUsersRequested',
+                      currentUser: currentUser,
+                      targetUser: targetUser,
+                      stub: () => when(
+                        () => blocTestContext.repo.users,
+                      ).thenThrow(Exception('fetch error')),
+                      act: (bloc) => bloc.add(FetchUsersRequested()),
+                      expect: () => [
+                        isA<UserAdministrationViewLoading>(),
+                        isA<UserAdministrationViewFailure>(),
+                      ],
+                      verify: (bloc) {
+                        expect(
+                          bloc.state,
+                          isA<UserAdministrationViewFailure>(),
+                        );
+                      },
+                    );
                   case Unauthorized():
                     _blocTest(
                       description:
@@ -285,6 +305,20 @@ void main() {
                           userId: targetUser.userId,
                         ),
                       ).called(1),
+                    );
+                    _blocPresentationTest(
+                      description:
+                          '$should emit failure when repo throws on DeleteUserRequested',
+                      currentUser: currentUser,
+                      targetUser: targetUser,
+                      stub: () => when(
+                        () => blocTestContext.repo.delete(
+                          userId: targetUser.userId,
+                        ),
+                      ).thenThrow(Exception('delete error')),
+                      event: DeleteUserRequested(targetUser: targetUser),
+                      expectPresentation: () => [isA<DeleteUserFailure>()],
+                      verify: (bloc) {},
                     );
                   case Unauthorized():
                     _blocPresentationTest(
@@ -338,6 +372,24 @@ void main() {
                           newEmail: mockValidEmail,
                         ),
                       ).called(1),
+                    );
+                    _blocPresentationTest(
+                      description:
+                          '$should emit failure when repo throws on UpdateUserEmailRequested',
+                      currentUser: currentUser,
+                      targetUser: targetUser,
+                      stub: () => when(
+                        () => blocTestContext.repo.updateEmail(
+                          userId: targetUser.userId,
+                          newEmail: mockValidEmail,
+                        ),
+                      ).thenThrow(Exception('update email error')),
+                      event: UpdateUserEmailRequested(
+                        targetUser: targetUser,
+                        newEmail: mockValidEmail,
+                      ),
+                      expectPresentation: () => [isA<UpdateUserEmailFailure>()],
+                      verify: (bloc) {},
                     );
                     _blocPresentationTest(
                       description:
@@ -428,6 +480,26 @@ void main() {
                           newPassword: mockValidPassword,
                         ),
                       ).called(1),
+                    );
+                    _blocPresentationTest(
+                      description:
+                          '$should emit failure when repo throws on UpdateUserPasswordRequested',
+                      currentUser: currentUser,
+                      targetUser: targetUser,
+                      stub: () => when(
+                        () => blocTestContext.repo.updatePassword(
+                          userId: targetUser.userId,
+                          newPassword: mockValidPassword,
+                        ),
+                      ).thenThrow(Exception('update password error')),
+                      event: UpdateUserPasswordRequested(
+                        targetUser: targetUser,
+                        newPassword: mockValidPassword,
+                      ),
+                      expectPresentation: () => [
+                        isA<UpdateUserPasswordFailure>(),
+                      ],
+                      verify: (bloc) {},
                     );
                     _blocPresentationTest(
                       description:
