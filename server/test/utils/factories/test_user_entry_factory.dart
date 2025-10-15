@@ -51,13 +51,10 @@ class TestUserEntryFactory {
     return [
       _getDefaultUserEntryWithPassword(role: Role.user, number: 1),
       _getDefaultUserEntryWithPassword(role: Role.user, number: 2),
-      _getDefaultUserEntryWithPassword(role: Role.user, number: 3),
       _getDefaultUserEntryWithPassword(role: Role.admin, number: 1),
       _getDefaultUserEntryWithPassword(role: Role.admin, number: 2),
-      _getDefaultUserEntryWithPassword(role: Role.admin, number: 3),
       _getDefaultUserEntryWithPassword(role: Role.analyst, number: 1),
       _getDefaultUserEntryWithPassword(role: Role.analyst, number: 2),
-      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 3),
     ];
   }
 
