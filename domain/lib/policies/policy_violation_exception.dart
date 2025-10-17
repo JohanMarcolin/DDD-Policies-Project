@@ -4,12 +4,8 @@ sealed class PolicyViolationException<TPolicyViolationReason>
 
   final TPolicyViolationReason reason;
   @override
-  String toString() => 'PolicyViolationException: reason:${reason.toString()}';
-}
-
-sealed class PolicyViolationReason {
-  @override
-  String toString() => runtimeType.toString();
+  String toString() =>
+      'PolicyViolationException: reason:${reason.runtimeType.toString()}';
 }
 
 class ActionPolicyViolationException extends PolicyViolationException {
