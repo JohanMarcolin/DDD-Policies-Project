@@ -64,8 +64,9 @@ class ServerFactory {
       passwordValidationPolicy: passwordValidationPolicy,
     );
 
-    final userService =
-        UserService(userAdministrationService: userAdministrationService);
+    final userService = UserService(
+        userRepository: inMemoryUserRepository,
+        userAdministrationService: userAdministrationService);
 
     final authController = AuthController(authService: authService);
     final userController = UserController(userService: userService);

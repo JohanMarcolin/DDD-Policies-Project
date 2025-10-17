@@ -1,3 +1,4 @@
+import 'package:domain/repositories/user_repository.dart';
 import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
@@ -11,9 +12,13 @@ import '../mappers/user_mapper.dart';
 import '../security/security_filter_chain.dart';
 
 class UserService {
-  UserService({required UserAdministrationService userAdministrationService})
-      : _userAdministrationService = userAdministrationService;
+  UserService(
+      {required UserRepository userRepository,
+      required UserAdministrationService userAdministrationService})
+      : _userRepository = userRepository,
+        _userAdministrationService = userAdministrationService;
 
+  final UserRepository _userRepository;
   final UserAdministrationService _userAdministrationService;
 
   Future<Response> getAllUsers(Request req) async {
@@ -23,12 +28,20 @@ class UserService {
   }
 
   Future<Response> getUserById(Request req) async {
-    final user = await getTargetUser(req, _userAdministrationService);
+    final userId = extractUserIdFromParams(req);
+
+    final user = await _userAdministrationService.viewUser(
+        initiator: req.currentUser, userId: userId);
+
+    if (user == null) {
+      throw NotFoundException(RefreshUserNotFound());
+    }
+
     return ok(UserMapper.toJson(user));
   }
 
   Future<Response> deleteUser(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
+    final targetUser = await getTargetUser(req, _userRepository);
 
     await _userAdministrationService.deleteUser(
       initiator: req.currentUser,
@@ -39,7 +52,7 @@ class UserService {
   }
 
   Future<Response> updateEmail(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
+    final targetUser = await getTargetUser(req, _userRepository);
 
     final body = await readJsonBody(req);
     final newEmail = body['newEmail'] as String?;
@@ -56,7 +69,7 @@ class UserService {
   }
 
   Future<Response> updatePassword(Request req) async {
-    final targetUser = await getTargetUser(req, _userAdministrationService);
+    final targetUser = await getTargetUser(req, _userRepository);
 
     final body = await readJsonBody(req);
 

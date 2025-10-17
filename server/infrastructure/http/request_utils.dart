@@ -1,20 +1,17 @@
 import 'dart:convert';
 
+import 'package:domain/repositories/user_repository.dart';
 import 'package:error_codes/error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/value_objects/id.dart';
 
 import 'package:domain/entities/user.dart';
-import 'package:domain/services/user_administration/user_administration_service.dart';
-import '../security/security_filter_chain.dart';
 import 'exceptions/request_exceptions.dart';
 
-Future<User> getTargetUser(
-    Request req, UserAdministrationService userAdministrationService) async {
+Future<User> getTargetUser(Request req, UserRepository userRepository) async {
   final userId = extractUserIdFromParams(req);
-  final user = await userAdministrationService.viewUser(
-      initiator: req.currentUser, userId: userId);
+  final user = await userRepository.get(userId: userId);
   if (user == null) {
     throw NotFoundException(RefreshUserNotFound());
   }

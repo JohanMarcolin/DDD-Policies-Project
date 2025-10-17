@@ -34,6 +34,8 @@ abstract base class ActionPolicy<TInitiator, TTarget> {
 sealed class ActionPolicyResult extends Equatable {
   @override
   List<Object?> get props => [];
+
+  bool get isAuthorized => this is Authorized;
 }
 
 class Authorized extends ActionPolicyResult {}
