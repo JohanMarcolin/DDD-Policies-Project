@@ -1,4 +1,3 @@
-import 'package:client/presentation/views/login_view/login_view_keys.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:error_codes/error_codes.dart';
@@ -9,6 +8,8 @@ import 'package:domain/value_objects/password.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 
 import 'components/login_button.dart';
+import 'components/login_email_field.dart';
+import 'components/login_password_field.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -55,26 +56,16 @@ class _LoginViewState extends State<LoginView> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: const BaseAppBar(title: 'Login', key: LoginViewKeys.appBar),
+          appBar: const BaseAppBar(title: 'Login'),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextField(
-                  key: LoginViewKeys.emailField,
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                ),
-                TextField(
-                  key: LoginViewKeys.passwordField,
-                  controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                ),
+                LoginEmailField(emailController: _emailController),
+                LoginPasswordField(passwordController: _passwordController),
                 const SizedBox(height: 20),
                 LoginButton(
-                  key: LoginViewKeys.loginButton,
                   onPressed: () {
                     BlocProvider.of<AuthBloc>(context).add(
                       AuthLoginRequested(
