@@ -41,52 +41,7 @@ class UserAdministrationApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       builder: FlutterEasyDialogs.builder(),
-      home: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is Authenticated) {
-            ActionSnackBarHelper.show(
-              message: 'Logged in as ${state.currentUser.email.value}',
-            );
-          } else if (state is Unauthenticated) {
-            ActionSnackBarHelper.show(
-              message: (() {
-                if (state.errorCode is LoginErrorCode) {
-                  return switch (state.errorCode as LoginErrorCode) {
-                    LoginMissingEmail() => 'Please enter your email.',
-                    LoginMissingPassword() => 'Please enter your password.',
-                    LoginUserNotFound() => 'Email not found.',
-                    LoginInvalidPassword() => 'Invalid password.',
-                  };
-                } else if (state.errorCode is RefreshErrorCode) {
-                  return switch (state.errorCode as RefreshErrorCode) {
-                    RefreshMissingRefreshToken() =>
-                      'Missing refresh token. Please log in again.',
-                    RefreshUserNotFound() =>
-                      'User ID not found. Please log in again.',
-                  };
-                } else {
-                  return 'Logged out successfully';
-                }
-              })(),
-            );
-          } else if (state is AuthFailure) {
-            ActionSnackBarHelper.show(
-              message: (() {
-                if (state.errorCode is LogoutErrorCode) {
-                  return switch (state.errorCode as LogoutErrorCode) {
-                    LogoutCouldNotRevokeRefreshToken() =>
-                      'Could not log out. Please try again.',
-                    LogoutMissingRefreshToken() =>
-                      'Missing refresh token. Please log in again.',
-                    LogoutMissingUser() => 'Missing user. Please log in again.',
-                  };
-                } else {
-                  return 'Authentication failure. Please try again.';
-                }
-              })(),
-            );
-          }
-        },
+      home: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is Authenticated) {
             return BlocProvider(

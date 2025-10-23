@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -8,6 +9,7 @@ import 'package:domain/services/user_administration/user_administration_service.
 import '../../test/utils/factories/test_user_entry_factory.dart';
 import '../databases/user_password_database.dart';
 import '../http/global_exception_handler.dart';
+import '../http/response_utils.dart';
 import '../repositories/in_memory_user_repository.dart';
 import '../security/password_hasher.dart';
 import '../controllers/auth_controller.dart';
@@ -79,6 +81,18 @@ class ServerFactory {
         userDatabase: userDatabase,
         userPasswordDatabase: userPasswordDatabase,
       );
+
+      router.get('/test/user-entries', (Request req) {
+        final testUserEntries = TestUserEntryFactory.defaultUserEntries
+            .map((entry) => {
+                  'userId': entry.userId.value,
+                  'email': entry.email.value,
+                  'role': entry.user.role.name,
+                  'password': entry.password.value,
+                })
+            .toList();
+        return ok(testUserEntries);
+      });
     }
 
     final pipeline = const Pipeline()
