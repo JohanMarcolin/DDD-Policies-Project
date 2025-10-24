@@ -26,32 +26,28 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is Authenticated) {
-          ActionSnackBarHelper.show(
-            message: 'Logged in as ${state.currentUser.email.value}',
-          );
-        } else if (state is Unauthenticated) {
-          ActionSnackBarHelper.show(
-            message: (() {
-              if (state.errorCode is LoginErrorCode) {
-                return switch (state.errorCode as LoginErrorCode) {
-                  LoginMissingEmail() => 'Please enter your email.',
-                  LoginMissingPassword() => 'Please enter your password.',
-                  LoginUserNotFound() => 'Email not found.',
-                  LoginInvalidPassword() => 'Invalid password.',
-                };
-              } else if (state.errorCode is RefreshErrorCode) {
-                return switch (state.errorCode as RefreshErrorCode) {
-                  RefreshMissingRefreshToken() =>
-                    'Missing refresh token. Please log in again.',
-                  RefreshUserNotFound() =>
-                    'User ID not found. Please log in again.',
-                };
-              } else {
-                return 'Logged out successfully';
-              }
-            })(),
-          );
+        switch (state) {
+          case Authenticated():
+            ActionSnackBarHelper.show(
+              message: 'Logged in as ${state.currentUser.email.value}',
+            );
+          case Unauthenticated():
+            final message = switch (state.errorCode) {
+              LoginMissingEmail() => 'Please enter your email.',
+              LoginMissingPassword() => 'Please enter your password.',
+              LoginUserNotFound() => 'Email not found.',
+              LoginInvalidPassword() => 'Invalid password.',
+              RefreshMissingRefreshToken() =>
+                'Missing refresh token. Please log in again.',
+              RefreshUserNotFound() =>
+                'User ID not found. Please log in again.',
+              _ => null,
+            };
+            if (message != null) ActionSnackBarHelper.show(message: message);
+          case AuthFailure():
+            ActionSnackBarHelper.show(
+              message: 'Authentication failed. Please try again.',
+            );
         }
       },
       builder: (context, state) {
