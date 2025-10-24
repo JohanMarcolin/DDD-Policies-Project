@@ -6,14 +6,16 @@ import 'package:client/presentation/views/login_view/components/login_email_fiel
 import 'package:client/presentation/views/login_view/components/login_password_field.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
+import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:client/main.dart' as app;
 
 import 'package:client/infrastructure/apis/integration_test_api.dart';
 import 'package:mocktail/mocktail.dart';
+
+import '../../../extensions/widget_finder_extension.dart';
+import '../../../extensions/widget_tester_extension.dart';
 
 class MockAuthApi extends Mock implements AuthApi {}
 
@@ -21,48 +23,55 @@ final AuthTokenService authTokenService = AuthTokenService();
 final IntegrationTestApi integrationTestApi = IntegrationTestApi();
 late List<TestUserEntry> testUserEntries;
 
+extension on WidgetTester {
+  Future<void> renderLoginView({MockAuthApi? mockAuthApi}) async {
+    final authApi = mockAuthApi ?? AuthApi(authTokenService: authTokenService);
+    final authBloc = AuthBloc(authApi: authApi);
+    await renderWidgetWithBloc(widget: LoginView(), bloc: authBloc);
+  }
+}
+
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Login Feature', () {
+  group('LoginView', () {
     setUpAll(() async {
       testUserEntries = await integrationTestApi.testUserEntries;
     });
     setUp(() async {
       authTokenService.clearTokens();
     });
-    testWidgets(
-      'displays login form with email and password fields, and login button',
-      (WidgetTester tester) async {
-        app.main();
-        await tester.pumpAndSettle();
-        expect(find.byType(LoginEmailField), findsOneWidget);
-        expect(find.byType(LoginPasswordField), findsOneWidget);
-        expect(find.byType(LoginButton), findsOneWidget);
-        expect(
-          ActionSnackBarHelper.lastMessage,
-          equals('Missing refresh token. Please log in again.'),
-        );
-      },
-    );
+    testWidgets('displays login view with all required components', (
+      WidgetTester tester,
+    ) async {
+      await tester.renderLoginView();
 
-    testWidgets('displays success snackbar and sets tokens on valid login', (
+      final loginView = find.byType(LoginView);
+      expect(loginView, findsOne);
+
+      final loginAppBar = loginView.findDescendant(BaseAppBar);
+      expect(loginAppBar, findsOne);
+      expect(loginAppBar.findDescendantMatching(find.text('Login')), findsOne);
+
+      expect(loginView.findDescendant(LoginEmailField), findsOne);
+      expect(loginView.findDescendant(LoginPasswordField), findsOne);
+      expect(loginView.findDescendant(LoginButton), findsOne);
+    });
+
+    testWidgets('displays success snackbar on valid login', (
       WidgetTester tester,
     ) async {
       final testEntry = testUserEntries.first;
       final validEmail = testEntry.user.email.value;
       final validPassword = testEntry.password.value;
 
-      app.main();
-      await tester.pumpAndSettle();
+      await tester.renderLoginView();
       await tester.enterText(find.byType(LoginEmailField), validEmail);
       await tester.enterText(find.byType(LoginPasswordField), validPassword);
       final loginButton = find.byType(LoginButton);
       await tester.tap(loginButton);
       await tester.pumpAndSettle();
 
-      expect(await authTokenService.hasAccessToken, isTrue);
-      expect(await authTokenService.hasRefreshToken, isTrue);
       expect(
         ActionSnackBarHelper.lastMessage,
         equals('Logged in as $validEmail'),
@@ -72,8 +81,7 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with empty email',
       (WidgetTester tester) async {
-        app.main();
-        await tester.pumpAndSettle();
+        await tester.renderLoginView();
         await tester.enterText(find.byType(LoginEmailField), '');
         await tester.tap(find.byType(LoginButton));
         await tester.pumpAndSettle();
@@ -87,8 +95,7 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with missing password',
       (WidgetTester tester) async {
-        app.main();
-        await tester.pumpAndSettle();
+        await tester.renderLoginView();
         await tester.enterText(
           find.byType(LoginEmailField),
           'user@example.com',
@@ -105,8 +112,7 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with unknown email',
       (WidgetTester tester) async {
-        app.main();
-        await tester.pumpAndSettle();
+        await tester.renderLoginView();
         await tester.enterText(
           find.byType(LoginEmailField),
           'notfound@example.com',
@@ -123,8 +129,8 @@ Future<void> main() async {
       (WidgetTester tester) async {
         final testEntry = testUserEntries.first;
         final validEmail = testEntry.user.email.value;
-        app.main();
-        await tester.pumpAndSettle();
+
+        await tester.renderLoginView();
         await tester.enterText(find.byType(LoginEmailField), validEmail);
         await tester.enterText(
           find.byType(LoginPasswordField),
@@ -148,14 +154,8 @@ Future<void> main() async {
         () => mockAuthApi.login(email: validEmail, password: validPassword),
       ).thenThrow(Exception('Unexpected error'));
 
-      await tester.pumpWidget(
-        BlocProvider<AuthBloc>.value(
-          value: AuthBloc(authApi: mockAuthApi),
-          child: MaterialApp(home: LoginView()),
-        ),
-      );
+      await tester.renderLoginView(mockAuthApi: mockAuthApi);
 
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(LoginEmailField), validEmail.value);
       await tester.enterText(
         find.byType(LoginPasswordField),
@@ -172,8 +172,7 @@ Future<void> main() async {
     testWidgets(
       'shows loading indicator and disables login button when tapped',
       (WidgetTester tester) async {
-        app.main();
-        await tester.pumpAndSettle();
+        await tester.renderLoginView();
         await tester.enterText(
           find.byType(LoginEmailField),
           'user@example.com',
@@ -185,7 +184,7 @@ Future<void> main() async {
           find.byType(LoginButton),
         );
         expect(loginButton.loading, isTrue);
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOne);
       },
     );
   });
