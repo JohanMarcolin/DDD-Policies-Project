@@ -1,8 +1,5 @@
 import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
-import 'package:client/presentation/views/login_view/components/login_button.dart';
-import 'package:client/presentation/views/login_view/components/login_email_field.dart';
-import 'package:client/presentation/views/login_view/components/login_password_field.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/base_app_bar.dart';
@@ -18,7 +15,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../test/bloc/utils/mock_user_credentials.dart';
 import '../../../../test/bloc/utils/mock_users.dart';
-import '../../../extensions/widget_finder_extension.dart';
+import '../../../utils/extensions/widget_finder_extension.dart';
 
 class MockAuthApi extends Mock implements AuthApi {}
 
@@ -62,9 +59,11 @@ Future<void> main() async {
       expect(loginAppBar, findsOne);
       expect(loginAppBar.findDescendantMatching(find.text('Login')), findsOne);
 
-      expect(loginView.findDescendant(LoginEmailField), findsOne);
-      expect(loginView.findDescendant(LoginPasswordField), findsOne);
-      expect(loginView.findDescendant(LoginButton), findsOne);
+      final loginForm = loginView.findDescendant(LoginForm);
+      expect(loginForm, findsOne);
+      expect(loginForm.findDescendant(LoginEmailField), findsOne);
+      expect(loginForm.findDescendant(LoginPasswordField), findsOne);
+      expect(loginForm.findDescendant(LoginButton), findsOne);
     });
 
     testWidgets(

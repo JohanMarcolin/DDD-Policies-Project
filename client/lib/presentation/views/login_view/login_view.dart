@@ -1,15 +1,17 @@
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/base_app_bar.dart';
+import 'package:client/presentation/widgets/button.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/password.dart';
 import 'package:error_codes/error_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:domain/value_objects/email.dart';
-import 'package:domain/value_objects/password.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 
-import 'components/login_button.dart';
-import 'components/login_email_field.dart';
-import 'components/login_password_field.dart';
+part 'components/login_form.dart';
+part 'components/login_email_field.dart';
+part 'components/login_password_field.dart';
+part 'components/login_button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -19,12 +21,9 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
+    return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
           case Authenticated():
@@ -50,33 +49,10 @@ class _LoginViewState extends State<LoginView> {
             );
         }
       },
-      builder: (context, state) {
-        return Scaffold(
-          appBar: const BaseAppBar(title: 'Login'),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LoginEmailField(emailController: _emailController),
-                LoginPasswordField(passwordController: _passwordController),
-                const SizedBox(height: 20),
-                LoginButton(
-                  onPressed: () {
-                    BlocProvider.of<AuthBloc>(context).add(
-                      AuthLoginRequested(
-                        email: Email(_emailController.text),
-                        password: Password(_passwordController.text),
-                      ),
-                    );
-                  },
-                  loading: state is AuthLoading,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      child: Scaffold(
+        appBar: const BaseAppBar(title: 'Login'),
+        body: LoginForm(),
+      ),
     );
   }
 }

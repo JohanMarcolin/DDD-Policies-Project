@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of '../login_view.dart';
 
 class LoginEmailField extends StatelessWidget {
   const LoginEmailField({super.key, required this.emailController});

@@ -1,6 +1,4 @@
-
-import 'package:client/presentation/widgets/button.dart';
-import 'package:flutter/material.dart';
+part of '../login_view.dart';
 
 class LoginButton extends StatelessWidget {
   final VoidCallback onPressed;
