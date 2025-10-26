@@ -24,6 +24,13 @@ class MockAuthApi extends Mock implements AuthApi {}
 
 late MockAuthApi mockAuthApi;
 
+final anyEmail = Email('anyEmail');
+final anyPassword = Password('anyPassword');
+final emptyEmail = Email('');
+final emptyPassword = Password('');
+final unknownEmail = Email('unknownEmail');
+final invalidPassword = Password('invalidPassword');
+
 extension on WidgetTester {
   Future<void> renderLoginView() async {
     await pumpWidget(
@@ -63,9 +70,6 @@ Future<void> main() async {
     testWidgets(
       'shows loading indicator and disables login button when tapped',
       (WidgetTester tester) async {
-        final anyEmail = Email('anyEmail');
-        final anyPassword = Password('anyPassword');
-
         when(
           () => mockAuthApi.login(email: anyEmail, password: anyPassword),
         ).thenAnswer((_) async {
@@ -74,7 +78,7 @@ Future<void> main() async {
         });
 
         await tester.renderLoginView();
-        
+
         await tester.enterText(find.byType(LoginEmailField), anyEmail.value);
         await tester.enterText(
           find.byType(LoginPasswordField),
@@ -85,6 +89,10 @@ Future<void> main() async {
         final loginButton = tester.widget<LoginButton>(
           find.byType(LoginButton),
         );
+
+        verify(
+          () => mockAuthApi.login(email: anyEmail, password: anyPassword),
+        ).called(1);
         expect(loginButton.loading, isTrue);
         expect(find.byType(CircularProgressIndicator), findsOne);
       },
@@ -111,6 +119,9 @@ Future<void> main() async {
       await tester.tap(loginButton);
       await tester.pumpAndSettle();
 
+      verify(
+        () => mockAuthApi.login(email: testEmail, password: testPassword),
+      ).called(1);
       expect(
         ActionSnackBarHelper.lastMessage,
         equals('Logged in as ${testEmail.value}'),
@@ -120,9 +131,6 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with empty email',
       (WidgetTester tester) async {
-        final emptyEmail = Email('');
-        final anyPassword = Password('anyPassword');
-
         when(
           () => mockAuthApi.login(email: emptyEmail, password: anyPassword),
         ).thenThrow(AuthApiException(LoginMissingEmail().toString()));
@@ -135,6 +143,10 @@ Future<void> main() async {
         );
         await tester.tap(find.byType(LoginButton));
         await tester.pumpAndSettle();
+
+        verify(
+          () => mockAuthApi.login(email: emptyEmail, password: anyPassword),
+        ).called(1);
         expect(
           ActionSnackBarHelper.lastMessage,
           equals('Please enter your email.'),
@@ -145,9 +157,6 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with missing password',
       (WidgetTester tester) async {
-        final anyEmail = Email('anyEmail');
-        final emptyPassword = Password('');
-
         when(
           () => mockAuthApi.login(email: anyEmail, password: emptyPassword),
         ).thenThrow(AuthApiException(LoginMissingPassword().toString()));
@@ -160,6 +169,10 @@ Future<void> main() async {
         );
         await tester.tap(find.byType(LoginButton));
         await tester.pumpAndSettle();
+
+        verify(
+          () => mockAuthApi.login(email: anyEmail, password: emptyPassword),
+        ).called(1);
         expect(
           ActionSnackBarHelper.lastMessage,
           equals('Please enter your password.'),
@@ -170,9 +183,6 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with unknown email',
       (WidgetTester tester) async {
-        final unknownEmail = Email('unknownEmail');
-        final anyPassword = Password('anyPassword');
-
         when(
           () => mockAuthApi.login(email: unknownEmail, password: anyPassword),
         ).thenThrow(AuthApiException(LoginUserNotFound().toString()));
@@ -188,6 +198,10 @@ Future<void> main() async {
         );
         await tester.tap(find.byType(LoginButton));
         await tester.pumpAndSettle();
+
+        verify(
+          () => mockAuthApi.login(email: unknownEmail, password: anyPassword),
+        ).called(1);
         expect(ActionSnackBarHelper.lastMessage, equals('Email not found.'));
       },
     );
@@ -195,9 +209,6 @@ Future<void> main() async {
     testWidgets(
       'displays error snackbar when login attempted with invalid password',
       (WidgetTester tester) async {
-        final anyEmail = Email('anyEmail');
-        final invalidPassword = Password('invalidPassword');
-
         when(
           () => mockAuthApi.login(email: anyEmail, password: invalidPassword),
         ).thenThrow(AuthApiException(LoginInvalidPassword().toString()));
@@ -210,6 +221,10 @@ Future<void> main() async {
         );
         await tester.tap(find.byType(LoginButton));
         await tester.pumpAndSettle();
+
+        verify(
+          () => mockAuthApi.login(email: anyEmail, password: invalidPassword),
+        ).called(1);
         expect(ActionSnackBarHelper.lastMessage, equals('Invalid password.'));
       },
     );
@@ -233,6 +248,10 @@ Future<void> main() async {
       );
       await tester.tap(find.byType(LoginButton));
       await tester.pumpAndSettle();
+
+      verify(
+        () => mockAuthApi.login(email: anyEmail, password: anyPassword),
+      ).called(1);
       expect(
         ActionSnackBarHelper.lastMessage,
         equals('Authentication failure. Please try again.'),
