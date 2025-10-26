@@ -1,7 +1,7 @@
+import 'package:client/presentation/views/user_administration_view/components/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'components/user_tile.dart';
 import '../../widgets/base_app_bar.dart';
 
 class UserAdministrationView extends StatelessWidget {
@@ -20,9 +20,8 @@ class UserAdministrationView extends StatelessWidget {
                 UserAdministrationViewFailure() => Center(
                   child: Text('Failure loading users'),
                 ),
-                UserAdministrationViewLoaded(:final users) => ListView.builder(
-                  itemCount: users.length,
-                  itemBuilder: (context, index) => UserTile(user: users[index]),
+                UserAdministrationViewLoaded(:final users) => UserList(
+                  users: users,
                 ),
                 _ => const SizedBox.shrink(),
               };
