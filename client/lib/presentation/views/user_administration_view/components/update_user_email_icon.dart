@@ -24,7 +24,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
 
         return ActionIcon(
           icon: Icons.email,
-          isGreyedOut: updateEmail is Authorized,
+          isGreyedOut: updateEmail is Unauthorized,
           onPressed: () {
             switch (updateEmail) {
               case Authorized():

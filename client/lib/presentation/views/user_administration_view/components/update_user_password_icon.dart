@@ -25,7 +25,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
 
         return ActionIcon(
           icon: Icons.password,
-          isGreyedOut: updatePassword is Authorized,
+          isGreyedOut: updatePassword is Unauthorized,
           onPressed: () {
             switch (updatePassword) {
               case Authorized():
