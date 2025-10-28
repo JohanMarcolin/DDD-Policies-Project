@@ -5,7 +5,6 @@ import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
-import 'package:error_codes/error_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easy_dialogs/flutter_easy_dialogs.dart';
@@ -13,7 +12,6 @@ import 'infrastructure/auth_bloc/auth_bloc.dart';
 import 'infrastructure/repositories/http_user_repository.dart';
 import 'presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
 import 'presentation/views/user_administration_view/user_administration_view.dart';
-import 'presentation/widgets/action_snack_bar_helper.dart';
 
 void main() {
   runApp(

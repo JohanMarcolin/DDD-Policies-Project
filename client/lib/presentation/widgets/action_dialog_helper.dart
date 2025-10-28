@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easy_dialogs/flutter_easy_dialogs.dart';
 
 class ActionDialogHelper {
-  static const _dialogId = 'action_dialog';
+  static Widget? currentChild;
 
-  static Future<void> show({required Widget child}) {
-    return FlutterEasyDialogs.show(
-      EasyDialog.fullScreen(
-        id: _dialogId,
-        autoHideDuration: null,
-        content: child,
-        decoration: EasyDialogDecoration.combine([
-          const EasyDialogAnimation.expansion(),
-          const EasyDialogAnimation.fade(),
-          EasyDialogAnimation.blurBackground(
-            backgroundColor: Colors.black.withValues(alpha: 0.5),
-            amount: 0,
-          ),
-        ]),
+  static Future<void> show({
+    required BuildContext context,
+    required Widget child,
+  }) {
+    currentChild = child;
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        child: child,
+        insetPadding: EdgeInsets.all(24),
+        backgroundColor: Colors.transparent,
       ),
     );
   }
 
-  static Future<void> hide() {
-    return FlutterEasyDialogs.hide(id: _dialogId);
+  static Future<void> hide(BuildContext context) {
+    currentChild = null;
+    Navigator.of(context, rootNavigator: true).pop();
+    return Future.value();
   }
 }

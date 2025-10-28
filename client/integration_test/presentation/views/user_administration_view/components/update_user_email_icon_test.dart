@@ -4,6 +4,8 @@ import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
 import 'package:client/presentation/views/user_administration_view/components/update_user_email_icon.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
+import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
+import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
@@ -86,7 +88,7 @@ Future<void> main() async {
               targetUser,
             );
             testWidgets(
-              'should display ${canUpdateEmail.isAuthorized ? 'solid' : 'greyed out'} action icon',
+              'should ${canUpdateEmail.isAuthorized ? 'solid' : 'greyed out'} action icon',
               (WidgetTester tester) async {
                 await tester.renderUpdateUserEmailIcon(
                   currentUser: currentUser,
@@ -105,6 +107,49 @@ Future<void> main() async {
                     expect(actionIconWidget.isGreyedOut, isFalse);
                   case Unauthorized():
                     expect(actionIconWidget.isGreyedOut, isTrue);
+                }
+              },
+            );
+
+            testWidgets(
+              '${canUpdateEmail.isAuthorized ? 'shows dialog for authorized' : 'shows snackbar for unauthorized'} when icon is tapped',
+              (WidgetTester tester) async {
+                await tester.renderUpdateUserEmailIcon(
+                  currentUser: currentUser,
+                  targetUser: targetUser,
+                );
+
+                final updateEmailIcon = find.byType(UpdateUserEmailIcon);
+                final actionIcon = updateEmailIcon.findDescendant(ActionIcon);
+                expect(actionIcon, findsOne);
+
+                await tester.tap(actionIcon);
+                await tester.pumpAndSettle();
+                final updateEmailDialog = find.byWidgetPredicate(
+                  (widget) =>
+                      widget is ConfirmInputDialog &&
+                      widget.title == 'Update Email',
+                );
+
+                switch (canUpdateEmail) {
+                  case Authorized():
+                    expect(updateEmailDialog, findsOne);
+                  case Unauthorized(
+                    :final reason as UpdateUserEmailUnauthorizedReason,
+                  ):
+                    expect(updateEmailDialog, findsNothing);
+                    switch (reason) {
+                      case CannotUpdateEmailOnAnalyst():
+                        expect(
+                          ActionSnackBarHelper.lastMessage,
+                          'You cannot update the email of an analyst.',
+                        );
+                      case CanOnlyUpdateEmailOnSelf():
+                        expect(
+                          ActionSnackBarHelper.lastMessage,
+                          'You can only update your own email.',
+                        );
+                    }
                 }
               },
             );

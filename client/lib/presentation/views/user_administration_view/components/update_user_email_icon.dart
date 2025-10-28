@@ -29,6 +29,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
             switch (updateEmail) {
               case Authorized():
                 ActionDialogHelper.show(
+                  context: context,
                   child: BlocProvider.value(
                     value: bloc,
                     child:
@@ -49,13 +50,13 @@ class UpdateUserEmailIcon extends StatelessWidget {
                               },
                             );
                             if (event is UpdateUserEmailSuccess) {
-                              await ActionDialogHelper.hide();
+                              await ActionDialogHelper.hide(context);
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Update Email',
                             label: 'New Email',
-                            onCancel: () async => await ActionDialogHelper.hide(),
+                            onCancel: () async => await ActionDialogHelper.hide(context),
                             onConfirm: (value) {
                               bloc.add(
                                 UpdateUserEmailRequested(

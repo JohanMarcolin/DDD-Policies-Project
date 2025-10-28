@@ -28,6 +28,7 @@ class DeleteUserIcon extends StatelessWidget {
             switch (deleteUser) {
               case Authorized():
                 ActionDialogHelper.show(
+                  context: context,
                   child: BlocProvider.value(
                     value: bloc,
                     child:
@@ -45,13 +46,13 @@ class DeleteUserIcon extends StatelessWidget {
                               },
                             );
                             if (event is DeleteUserSuccess) {
-                              ActionDialogHelper.hide();
+                              ActionDialogHelper.hide(context);
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Delete User',
                             label: 'Are you sure you want to delete this user?',
-                            onCancel: () => ActionDialogHelper.hide(),
+                            onCancel: () => ActionDialogHelper.hide(context),
                             onConfirm: (value) {
                               bloc.add(DeleteUserRequested(targetUser: user));
                             },

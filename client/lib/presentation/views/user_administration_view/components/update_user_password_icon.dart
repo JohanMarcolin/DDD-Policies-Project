@@ -30,6 +30,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
             switch (updatePassword) {
               case Authorized():
                 ActionDialogHelper.show(
+                  context: context,
                   child: BlocProvider.value(
                     value: bloc,
                     child:
@@ -61,14 +62,14 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                               },
                             );
                             if (event is UpdateUserPasswordSuccess) {
-                              ActionDialogHelper.hide();
+                              ActionDialogHelper.hide(context);
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Update Password',
                             label: 'New Password',
                             isTextObscured: true,
-                            onCancel: () => ActionDialogHelper.hide(),
+                            onCancel: () => ActionDialogHelper.hide(context),
                             onConfirm: (value) {
                               bloc.add(
                                 UpdateUserPasswordRequested(
