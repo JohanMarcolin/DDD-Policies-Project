@@ -2,10 +2,9 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/views/user_administration_view/components/update_user_email_icon.dart';
+import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
-import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
@@ -17,8 +16,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../../../test/bloc/utils/mock_users.dart';
-import '../../../../utils/extensions/widget_finder_extension.dart';
+import '../../../../../../test/bloc/utils/mock_users.dart';
+import '../../../../../utils/extensions/widget_finder_extension.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 
@@ -125,10 +124,8 @@ Future<void> main() async {
 
                 await tester.tap(actionIcon);
                 await tester.pumpAndSettle();
-                final updateEmailDialog = find.byWidgetPredicate(
-                  (widget) =>
-                      widget is ConfirmInputDialog &&
-                      widget.title == 'Update Email',
+                final updateEmailDialog = find.byType(
+                  UpdateUserEmailDialogChild,
                 );
 
                 switch (canUpdateEmail) {

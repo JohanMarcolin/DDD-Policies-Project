@@ -1,6 +1,4 @@
-import 'package:client/presentation/views/user_administration_view/components/user_tile.dart';
-import 'package:domain/entities/user.dart';
-import 'package:flutter/material.dart';
+part of '../user_administration_view.dart';
 
 class UserList extends StatelessWidget {
   const UserList({required this.users, super.key});

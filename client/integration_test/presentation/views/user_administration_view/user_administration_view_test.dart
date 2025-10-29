@@ -2,7 +2,6 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/views/user_administration_view/components/user_list.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:domain/entities/user.dart';

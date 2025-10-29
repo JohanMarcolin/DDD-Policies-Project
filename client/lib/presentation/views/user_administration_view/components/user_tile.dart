@@ -1,8 +1,4 @@
-import 'package:client/presentation/views/user_administration_view/components/delete_user_icon.dart';
-import 'package:client/presentation/views/user_administration_view/components/update_user_email_icon.dart';
-import 'package:client/presentation/views/user_administration_view/components/update_user_password_icon.dart';
-import 'package:domain/entities/user.dart';
-import 'package:flutter/material.dart';
+part of '../user_administration_view.dart';
 
 class UserTile extends StatelessWidget {
   const UserTile({super.key, required this.user});

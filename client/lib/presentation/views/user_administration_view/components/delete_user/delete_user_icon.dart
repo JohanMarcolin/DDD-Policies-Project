@@ -1,13 +1,4 @@
-import 'package:bloc_presentation/bloc_presentation.dart';
-import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
-import 'package:client/presentation/widgets/action_dialog_helper.dart';
-import 'package:client/presentation/widgets/action_icon.dart';
-import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
-import 'package:client/presentation/widgets/confirm_input_dialog.dart';
-import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+part of '../../user_administration_view.dart';
 
 class DeleteUserIcon extends StatelessWidget {
   const DeleteUserIcon({super.key, required this.user});
