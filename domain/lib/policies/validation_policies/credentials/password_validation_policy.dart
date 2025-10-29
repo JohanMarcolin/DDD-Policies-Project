@@ -1,8 +1,7 @@
 part of '../validation_policy.dart';
 
 final class PasswordValidationPolicy extends ValidationPolicy<Password> {
-  PasswordValidationPolicy()
-      : super(validate: _validatePassword);
+  PasswordValidationPolicy() : super(validate: _validatePassword);
 
   static const minLength = 8;
   static const maxLength = 64;
@@ -67,7 +66,10 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
   }
 }
 
-sealed class PasswordInvalidReason {}
+sealed class PasswordInvalidReason {
+  @override
+  String toString() => runtimeType.toString();
+}
 
 class PasswordTooShort implements PasswordInvalidReason {}
 
