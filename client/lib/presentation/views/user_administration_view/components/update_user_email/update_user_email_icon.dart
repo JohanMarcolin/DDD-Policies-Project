@@ -7,80 +7,37 @@ class UpdateUserEmailIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
-      builder: (context, state) {
-        final updateEmail = context
-            .read<UserAdministrationViewBloc>()
-            .authorizeUpdateEmail(user);
+    final bloc = context.read<UserAdministrationViewBloc>();
+    final updateEmail = bloc.authorizeUpdateEmail(user);
 
-        return ActionIcon(
-          icon: Icons.email,
-          isGreyedOut: updateEmail is Unauthorized,
-          onPressed: () {
-            switch (updateEmail) {
-              case Authorized():
-                _showUpdateDialog(context);
-              case Unauthorized(
-                :final reason as UpdateUserEmailUnauthorizedReason,
-              ):
-                _showUpdateDeniedSnackBar(context, reason);
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _showUpdateDialog(BuildContext context) {
-    ActionDialogHelper.show(
-      context: context,
-      child: BlocProvider.value(
-        value: context.read<UserAdministrationViewBloc>(),
-        child: _buildUpdateDialogContent(context),
-      ),
-    );
-  }
-
-  Widget _buildUpdateDialogContent(BuildContext context) {
-    return BlocPresentationListener<
-      UserAdministrationViewBloc,
-      UserAdministrationViewEvent
+    return UserActionIcon<
+      UpdateUserEmailSuccess,
+      UpdateUserEmailUnauthorizedReason
     >(
-      listener: (_, event) async => _handleUpdateDialogEvent(context, event),
-      child: UpdateUserEmailDialogChild(
-        onCancel: () async => await ActionDialogHelper.hide(context),
-        onConfirm: (value) {
-          context.read<UserAdministrationViewBloc>().add(
-            UpdateUserEmailRequested(targetUser: user, newEmail: Email(value)),
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _handleUpdateDialogEvent(
-    BuildContext context,
-    UserAdministrationViewEvent event,
-  ) async {
-    ActionSnackBarHelper.show(
-      message: switch (event) {
+      icon: Icons.email,
+      isActionAuthorized: updateEmail is Authorized,
+      dialogChildBuilder: (context, {required closeDialog}) =>
+          UpdateUserEmailDialogChild(
+            onCancel: () async => await closeDialog(context),
+            onConfirm: (value) {
+              bloc.add(
+                UpdateUserEmailRequested(
+                  targetUser: user,
+                  newEmail: Email(value),
+                ),
+              );
+            },
+          ),
+      eventMessageMapper: (event) => switch (event) {
         UpdateUserEmailInvalid() => 'Invalid email format',
         UpdateUserEmailFailure() => 'Failed to update email',
         UpdateUserEmailSuccess() => 'Email updated successfully',
         _ => '',
       },
-    );
-    if (event is UpdateUserEmailSuccess) {
-      await ActionDialogHelper.hide(context);
-    }
-  }
-
-  Future<void> _showUpdateDeniedSnackBar(
-    BuildContext context,
-    UpdateUserEmailUnauthorizedReason reason,
-  ) async {
-    ActionSnackBarHelper.show(
-      message: switch (reason) {
+      unauthorizedReason: updateEmail is Unauthorized
+          ? updateEmail.reason as UpdateUserEmailUnauthorizedReason
+          : null,
+      unauthorizedMessageMapper: (reason) => switch (reason) {
         CannotUpdateEmailOnAnalyst() =>
           'You cannot update the email of an analyst.',
         CanOnlyUpdateEmailOnSelf() => 'You can only update your own email.',

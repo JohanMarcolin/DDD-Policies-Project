@@ -19,7 +19,7 @@ class ActionDialogHelper {
     );
   }
 
-  static Future<void> hide(BuildContext context) {
+  static Future<void> close(BuildContext context) {
     currentChild = null;
     Navigator.of(context, rootNavigator: true).pop();
     return Future.value();

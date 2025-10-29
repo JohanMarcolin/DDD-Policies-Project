@@ -17,6 +17,7 @@ part 'components/delete_user/delete_user_icon.dart';
 part 'components/update_user_email/update_user_email_icon.dart';
 part 'components/update_user_email/update_user_email_dialog_child.dart';
 part 'components/update_user_password/update_user_password_icon.dart';
+part 'components/user_action_icon.dart';
 part 'components/user_list.dart';
 part 'components/user_tile.dart';
 
@@ -29,7 +30,10 @@ class UserAdministrationView extends StatelessWidget {
       child: Scaffold(
         appBar: const BaseAppBar(title: 'User Administration'),
         body:
-            BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
+            BlocBuilder<
+              UserAdministrationViewBloc,
+              UserAdministrationViewState
+            >(
               builder: (context, state) {
                 return switch (state) {
                   UserAdministrationViewLoading() => const Center(

@@ -51,14 +51,14 @@ class UpdateUserPasswordIcon extends StatelessWidget {
                               },
                             );
                             if (event is UpdateUserPasswordSuccess) {
-                              ActionDialogHelper.hide(context);
+                              ActionDialogHelper.close(context);
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Update Password',
                             label: 'New Password',
                             isTextObscured: true,
-                            onCancel: () => ActionDialogHelper.hide(context),
+                            onCancel: () => ActionDialogHelper.close(context),
                             onConfirm: (value) {
                               bloc.add(
                                 UpdateUserPasswordRequested(

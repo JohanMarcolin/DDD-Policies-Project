@@ -37,13 +37,13 @@ class DeleteUserIcon extends StatelessWidget {
                               },
                             );
                             if (event is DeleteUserSuccess) {
-                              ActionDialogHelper.hide(context);
+                              ActionDialogHelper.close(context);
                             }
                           },
                           child: ConfirmInputDialog(
                             title: 'Delete User',
                             label: 'Are you sure you want to delete this user?',
-                            onCancel: () => ActionDialogHelper.hide(context),
+                            onCancel: () => ActionDialogHelper.close(context),
                             onConfirm: (value) {
                               bloc.add(DeleteUserRequested(targetUser: user));
                             },
