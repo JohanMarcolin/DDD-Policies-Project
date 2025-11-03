@@ -21,9 +21,9 @@ extension on WidgetTester {
     required User currentUser,
     required User targetUser,
   }) async {
-    return withUserAdministrationStubs(
+    return renderWidgetWithBlocStubs(
       testWidget: UpdateUserEmailIcon(user: targetUser),
-      interactingUser: currentUser,
+      currentUser: currentUser,
       mockUserRepository: mockUserRepository,
     );
   }

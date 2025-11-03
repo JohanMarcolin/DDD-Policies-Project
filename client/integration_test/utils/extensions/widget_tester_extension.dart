@@ -12,48 +12,71 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../test/bloc/utils/mock_users.dart' show mockUser;
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 extension WidgetTesterExtension on WidgetTester {
-  static late UserAdministrationViewBloc stubbedBloc;
+  static late MockUserRepository repository;
+  static late UserAdministrationViewBloc bloc;
 
-  Future<void> withUserAdministrationStubs({
+  Future<void> renderWidgetWithBlocStubs({
     required Widget testWidget,
-    required User interactingUser,
-    required MockUserRepository mockUserRepository,
+    User? currentUser,
+    MockUserRepository? mockUserRepository,
   }) async {
-    stubbedBloc = UserAdministrationViewBloc(
-      currentUser: interactingUser,
-      userAdministrationService: UserAdministrationService(
-        userRepository: mockUserRepository,
-        viewUserPolicy: ViewUserPolicy(),
-        updateUserEmailPolicy: UpdateUserEmailPolicy(),
-        updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
-        deleteUserPolicy: DeleteUserPolicy(),
-        emailValidationPolicy: EmailValidationPolicy(),
-        passwordValidationPolicy: PasswordValidationPolicy(),
-      ),
+    final user = currentUser ?? mockUser;
+    repository = mockUserRepository ?? MockUserRepository();
+
+    final stubbedUserAdministrationService =
+        _getStubbedUserAdministrationService(repository);
+
+    bloc = _getStubbedUserAdministrationViewBloc(
+      user,
+      stubbedUserAdministrationService,
+    );
+
+    final authBloc = AuthBloc(
+      authApi: AuthApi(authTokenService: AuthTokenService()),
     );
 
     await pumpWidget(
       BlocProvider<UserAdministrationViewBloc>.value(
-        value: stubbedBloc,
+        value: bloc,
         child: MaterialApp(
           home: MultiBlocProvider(
             providers: [
-              BlocProvider<AuthBloc>.value(
-                value: AuthBloc(
-                  authApi: AuthApi(authTokenService: AuthTokenService()),
-                ),
-              ),
-              BlocProvider<UserAdministrationViewBloc>.value(
-                value: stubbedBloc,
-              ),
+              BlocProvider<AuthBloc>.value(value: authBloc),
+              BlocProvider<UserAdministrationViewBloc>.value(value: bloc),
             ],
             child: Material(child: testWidget),
           ),
         ),
       ),
+    );
+  }
+
+  UserAdministrationViewBloc _getStubbedUserAdministrationViewBloc(
+    User currentUser,
+    UserAdministrationService stubbedUserAdministrationService,
+  ) {
+    return UserAdministrationViewBloc(
+      currentUser: currentUser,
+      userAdministrationService: stubbedUserAdministrationService,
+    );
+  }
+
+  UserAdministrationService _getStubbedUserAdministrationService(
+    MockUserRepository mockUserRepository,
+  ) {
+    return UserAdministrationService(
+      userRepository: mockUserRepository,
+      viewUserPolicy: ViewUserPolicy(),
+      updateUserEmailPolicy: UpdateUserEmailPolicy(),
+      updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
+      deleteUserPolicy: DeleteUserPolicy(),
+      emailValidationPolicy: EmailValidationPolicy(),
+      passwordValidationPolicy: PasswordValidationPolicy(),
     );
   }
 }
