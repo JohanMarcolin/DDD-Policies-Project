@@ -17,8 +17,9 @@ import '../../../test/bloc/utils/mock_users.dart' show mockUser;
 class MockUserRepository extends Mock implements UserRepository {}
 
 extension WidgetTesterExtension on WidgetTester {
-  static late MockUserRepository repository;
-  static late UserAdministrationViewBloc bloc;
+  static late UserAdministrationViewBloc _blocWithStubs;
+
+  UserAdministrationViewBloc get blocWithStubs => _blocWithStubs;
 
   Future<void> renderWidgetWithBlocStubs({
     required Widget testWidget,
@@ -26,12 +27,12 @@ extension WidgetTesterExtension on WidgetTester {
     MockUserRepository? mockUserRepository,
   }) async {
     final user = currentUser ?? mockUser;
-    repository = mockUserRepository ?? MockUserRepository();
+    final repository = mockUserRepository ?? MockUserRepository();
 
     final stubbedUserAdministrationService =
         _getStubbedUserAdministrationService(repository);
 
-    bloc = _getStubbedUserAdministrationViewBloc(
+    _blocWithStubs = _getStubbedUserAdministrationViewBloc(
       user,
       stubbedUserAdministrationService,
     );
@@ -42,12 +43,12 @@ extension WidgetTesterExtension on WidgetTester {
 
     await pumpWidget(
       BlocProvider<UserAdministrationViewBloc>.value(
-        value: bloc,
+        value:  _blocWithStubs,
         child: MaterialApp(
           home: MultiBlocProvider(
             providers: [
               BlocProvider<AuthBloc>.value(value: authBloc),
-              BlocProvider<UserAdministrationViewBloc>.value(value: bloc),
+              BlocProvider<UserAdministrationViewBloc>.value(value: _blocWithStubs),
             ],
             child: Material(child: testWidget),
           ),

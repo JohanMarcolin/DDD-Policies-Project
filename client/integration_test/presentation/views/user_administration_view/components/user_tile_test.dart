@@ -6,6 +6,7 @@ import 'package:integration_test/integration_test.dart';
 import '../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../utils/extensions/widget_finder_extension.dart';
 import '../../../../utils/extensions/widget_tester_extension.dart';
+import '../../../../utils/user_pair_test_runner.dart';
 
 extension on WidgetTester {
   Future<void> renderUserTile({
@@ -19,23 +20,21 @@ extension on WidgetTester {
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  group('UserTile', () {
-    testWidgets('displays user tile with all required components', (
-      WidgetTester tester,
-    ) async {
-      await tester.renderUserTile(
-        currentUser: mockUser,
-        targetUser: otherMockUser,
-      );
-
-      final userTile = find.byType(UserTile);
-      expect(userTile, findsOne);
-
-      expect(find.text(otherMockUser.role.name), findsOne);
-      expect(find.text(otherMockUser.email.value), findsOne);
-      expect(userTile.findDescendant(UpdateUserEmailIcon), findsOne);
-      expect(userTile.findDescendant(UpdateUserPasswordIcon), findsOne);
-      expect(userTile.findDescendant(DeleteUserIcon), findsOne);
-    });
-  });
+  UserPairTestRunner.testAllUserPairCases(
+    users: mockUsers,
+    onUserPairCase: (actor, subject) {
+      testWidgets('displays user tile with all required components', (
+        WidgetTester tester,
+      ) async {
+        await tester.renderUserTile(currentUser: actor, targetUser: subject);
+        final userTile = find.byType(UserTile);
+        expect(userTile, findsOne);
+        expect(find.text(subject.role.name), findsOne);
+        expect(find.text(subject.email.value), findsOne);
+        expect(userTile.findDescendant(UpdateUserEmailIcon), findsOne);
+        expect(userTile.findDescendant(UpdateUserPasswordIcon), findsOne);
+        expect(userTile.findDescendant(DeleteUserIcon), findsOne);
+      });
+    },
+  );
 }

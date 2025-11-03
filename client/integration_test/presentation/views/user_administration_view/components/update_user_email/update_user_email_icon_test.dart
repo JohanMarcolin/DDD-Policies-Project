@@ -10,7 +10,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../../../test/bloc/utils/mock_user_credentials.dart';
 import '../../../../../../test/bloc/utils/mock_users.dart';
-import '../../../../../utils/user_action_policy_test_runner.dart';
+import '../../../../../utils/user_pair_test_runner.dart';
 import '../../../../../utils/extensions/widget_finder_extension.dart';
 import '../../../../../utils/extensions/widget_tester_extension.dart';
 
@@ -36,10 +36,10 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserActionPolicyTestRunner.runAllTestCases(
-    actionPolicy: UpdateUserEmailPolicy(),
+  UserPairTestRunner.testAllUserPolicyCases(
+    policy: UpdateUserEmailPolicy(),
     users: mockUsers,
-    onActionAuthorized: (currentUser, targetUser) {
+    onAuthorized: (currentUser, targetUser) {
       testWidgets('shows solid action icon', (WidgetTester tester) async {
         await tester.renderUpdateUserEmailIcon(
           currentUser: currentUser,
@@ -160,7 +160,7 @@ Future<void> main() async {
         },
       );
     },
-    onActionUnauthorized: (currentUser, targetUser, reason) {
+    onUnauthorized: (currentUser, targetUser, reason) {
       testWidgets('should show greyed out action icon', (
         WidgetTester tester,
       ) async {
