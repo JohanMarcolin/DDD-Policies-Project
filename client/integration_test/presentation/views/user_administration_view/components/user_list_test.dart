@@ -18,7 +18,7 @@ Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
-    users = mockUsers;
+    users = allMockUserPairs;
   });
 
   group('userList', () {

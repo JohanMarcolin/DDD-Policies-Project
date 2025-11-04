@@ -21,7 +21,7 @@ extension on WidgetTester {
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   UserPairTestRunner.testAllUserPairCases(
-    users: mockUsers,
+    users: allMockUserPairs,
     onUserPairCase: (actor, subject) {
       testWidgets('displays user tile with all required components', (
         WidgetTester tester,

@@ -42,9 +42,6 @@ void _blocTest({
   );
 }
 
-const should = '{Should}';
-const shouldNot = '{Should Not}';
-
 void main() {
   group('AuthBloc', () {
     group('{Initialization}', () {
@@ -58,7 +55,7 @@ void main() {
       group('{AuthLoginRequested}', () {
         _blocTest(
           description:
-              '$should emit AuthLoading and Authenticated on successful login',
+              'should emit AuthLoading and Authenticated on successful login',
           stub: () => when(
             () => blocTestContext.mockApi.login(
               email: mockValidEmail,
@@ -83,7 +80,7 @@ void main() {
         );
 
         _blocTest(
-          description: '$shouldNot authenticate on invalid credentials',
+          description: 'should not authenticate on invalid credentials',
           stub: () => when(
             () => blocTestContext.mockApi.login(
               email: mockInvalidEmail,
@@ -111,7 +108,7 @@ void main() {
       group('{AuthRefreshRequested}', () {
         _blocTest(
           description:
-              '$should emit AuthLoading and Authenticated on successful refresh',
+              'should emit AuthLoading and Authenticated on successful refresh',
           stub: () => when(
             () => blocTestContext.mockApi.refreshAccessToken(),
           ).thenAnswer((_) async => mockUser),
@@ -128,7 +125,7 @@ void main() {
         );
 
         _blocTest(
-          description: '$shouldNot authenticate on refresh failure',
+          description: 'should not authenticate on refresh failure',
           stub: () => when(
             () => blocTestContext.mockApi.refreshAccessToken(),
           ).thenThrow(AuthApiException('TOKEN_EXPIRED')),
@@ -148,7 +145,7 @@ void main() {
       group('{AuthLogoutRequested}', () {
         _blocTest(
           description:
-              '$should emit AuthLoading and Unauthenticated on successful logout',
+              'should emit AuthLoading and Unauthenticated on successful logout',
           stub: () => when(
             () => blocTestContext.mockApi.logout(),
           ).thenAnswer((_) async {}),
@@ -158,7 +155,7 @@ void main() {
         );
 
         _blocTest(
-          description: '$shouldNot emit Unauthenticated on logout failure',
+          description: 'should not emit Unauthenticated on logout failure',
           stub: () => when(
             () => blocTestContext.mockApi.logout(),
           ).thenThrow(Exception('Logout failed')),

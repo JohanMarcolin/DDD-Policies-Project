@@ -96,7 +96,7 @@ Future<void> main() async {
     testWidgets('shows user list when users are fetched successfully', (
       WidgetTester tester,
     ) async {
-      when(() => mockUserRepository.users).thenAnswer((_) async => mockUsers);
+      when(() => mockUserRepository.users).thenAnswer((_) async => allMockUserPairs);
 
       await tester.renderUserAdministrationView();
 

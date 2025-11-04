@@ -38,7 +38,7 @@ Future<void> main() async {
 
   UserPairTestRunner.testAllUserPolicyCases(
     policy: UpdateUserEmailPolicy(),
-    users: mockUsers,
+    users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {
       testWidgets('shows solid action icon', (WidgetTester tester) async {
         await tester.renderUpdateUserEmailIcon(

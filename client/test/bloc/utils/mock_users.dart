@@ -34,7 +34,9 @@ final otherMockAnalyst = Analyst(
   email: Email('analyst_email_2@example.com'),
 );
 
-final mockUsers = [
+final mockUserPair = [mockUser, otherMockUser];
+
+final allMockUserPairs = [
   mockUser,
   otherMockUser,
   mockAdmin,
