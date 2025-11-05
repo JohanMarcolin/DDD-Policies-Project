@@ -130,35 +130,37 @@ Future<void> main() async {
         },
       );
 
-      testWidgets(
-        'confirm with invalid email shows error snackbar and keeps dialog open',
-        (WidgetTester tester) async {
-          await tester.renderUpdateUserEmailIcon(
-            currentUser: currentUser,
-            targetUser: targetUser,
-          );
+      for (final invalidEmail in mockInvalidEmails) {
+        testWidgets(
+          'confirm with invalid email "${invalidEmail.value}" shows error snackbar and keeps dialog open',
+          (WidgetTester tester) async {
+            await tester.renderUpdateUserEmailIcon(
+              currentUser: currentUser,
+              targetUser: targetUser,
+            );
 
-          final actionIcon = find.byType(ActionIcon);
-          await tester.tap(actionIcon);
-          await tester.pumpAndSettle();
-          expect(find.byType(UpdateUserEmailDialogChild), findsOne);
-          final emailField = find.byType(TextField);
-          await tester.enterText(emailField, mockInvalidEmail.value);
-          final confirmButton = find.text('Confirm');
-          await tester.tap(confirmButton);
-          await tester.pumpAndSettle();
-          expect(find.byType(UpdateUserEmailDialogChild), findsOne);
+            final actionIcon = find.byType(ActionIcon);
+            await tester.tap(actionIcon);
+            await tester.pumpAndSettle();
+            expect(find.byType(UpdateUserEmailDialogChild), findsOne);
+            final emailField = find.byType(TextField);
+            await tester.enterText(emailField, invalidEmail.value);
+            final confirmButton = find.text('Confirm');
+            await tester.tap(confirmButton);
+            await tester.pumpAndSettle();
+            expect(find.byType(UpdateUserEmailDialogChild), findsOne);
 
-          verifyNever(
-            () => mockUserRepository.updateEmail(
-              userId: targetUser.userId,
-              newEmail: mockInvalidEmail,
-            ),
-          );
+            verifyNever(
+              () => mockUserRepository.updateEmail(
+                userId: targetUser.userId,
+                newEmail: invalidEmail,
+              ),
+            );
 
-          expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
-        },
-      );
+            expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
+          },
+        );
+      }
     },
     onUnauthorized: (currentUser, targetUser, reason) {
       testWidgets('should show greyed out action icon', (

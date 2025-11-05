@@ -84,13 +84,13 @@ void main() {
           stub: () => when(
             () => blocTestContext.mockApi.login(
               email: mockInvalidEmail,
-              password: mockInvalidPassword,
+              password: mockTooShortPassword,
             ),
           ).thenThrow(AuthApiException('INVALID_CREDENTIALS')),
           act: (bloc) => bloc.add(
             AuthLoginRequested(
               email: mockInvalidEmail,
-              password: mockInvalidPassword,
+              password: mockTooShortPassword,
             ),
           ),
           expect: () => [

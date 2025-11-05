@@ -194,7 +194,7 @@ void main() {
                 targetUser: targetUser,
                 verify: (bloc) {
                   expect(
-                    bloc.validatePassword(mockInvalidPassword),
+                    bloc.validatePassword(mockTooShortPassword),
                     isA<Invalid>(),
                   );
                 },
@@ -484,18 +484,18 @@ void main() {
               stub: () => when(
                 () => blocTestContext.repo.updatePassword(
                   userId: targetUser.userId,
-                  newPassword: mockInvalidPassword,
+                  newPassword: mockTooShortPassword,
                 ),
               ).thenAnswer((_) async {}),
               event: UpdateUserPasswordRequested(
                 targetUser: targetUser,
-                newPassword: mockInvalidPassword,
+                newPassword: mockTooShortPassword,
               ),
               expectPresentation: () => [isA<UpdateUserPasswordInvalid>()],
               verify: (bloc) => verifyNever(
                 () => blocTestContext.repo.updatePassword(
                   userId: targetUser.userId,
-                  newPassword: mockInvalidPassword,
+                  newPassword: mockTooShortPassword,
                 ),
               ),
             );
@@ -503,7 +503,7 @@ void main() {
           onUnauthorized: (currentUser, targetUser, _) {
             for (final newPassword in [
               mockValidPassword,
-              mockInvalidPassword,
+              mockTooShortPassword,
             ]) {
               _blocPresentationTest(
                 description:

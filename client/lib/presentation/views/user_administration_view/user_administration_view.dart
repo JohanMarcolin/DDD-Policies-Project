@@ -17,6 +17,7 @@ part 'components/delete_user/delete_user_icon.dart';
 part 'components/update_user_email/update_user_email_icon.dart';
 part 'components/update_user_email/update_user_email_dialog_child.dart';
 part 'components/update_user_password/update_user_password_icon.dart';
+part 'components/update_user_password/update_user_password_dialog_child.dart';
 part 'components/user_action_icon.dart';
 part 'components/user_list.dart';
 part 'components/user_tile.dart';
