@@ -73,6 +73,16 @@ Future<void> main() async {
 
         final updateEmailDialogChild = find.byType(UpdateUserEmailDialogChild);
         expect(updateEmailDialogChild, findsOne);
+
+        final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
+
+        final expectedTitle = isUserUpdatingSelf
+            ? 'Update Your Email'
+            : 'Update User Email';
+        expect(find.text(expectedTitle), findsOne);
+
+        final expectedLabel = 'New Email';
+        expect(find.text(expectedLabel), findsOne);
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {

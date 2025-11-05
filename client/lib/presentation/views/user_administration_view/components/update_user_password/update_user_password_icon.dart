@@ -18,6 +18,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
       isActionAuthorized: updatePassword is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) =>
           UpdateUserPasswordDialogChild(
+            isUserUpdatingSelf: bloc.isAdministratingSelf(user),
             onCancel: () async => await closeDialog(context),
             onConfirm: (value) {
               bloc.add(

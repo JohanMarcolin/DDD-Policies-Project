@@ -71,6 +71,18 @@ Future<void> main() async {
 
         final deleteUserDialogChild = find.byType(DeleteUserDialogChild);
         expect(deleteUserDialogChild, findsOne);
+
+        final isUserDeletingSelf = currentUser.isSameAs(targetUser);
+
+        final expectedTitle = isUserDeletingSelf
+            ? 'Delete Your Account'
+            : 'Delete User Account';
+        expect(find.text(expectedTitle), findsOne);
+
+        final expectedLabel = isUserDeletingSelf
+            ? 'Are you sure you want to delete your own account?'
+            : 'Are you sure you want to delete this user?';
+        expect(find.text(expectedLabel), findsOne);
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {

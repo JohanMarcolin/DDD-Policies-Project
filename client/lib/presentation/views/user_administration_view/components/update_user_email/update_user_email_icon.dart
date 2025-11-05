@@ -18,6 +18,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
       isActionAuthorized: updateEmail is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) =>
           UpdateUserEmailDialogChild(
+            isUserUpdatingSelf: bloc.isAdministratingSelf(user),
             onCancel: () async => await closeDialog(context),
             onConfirm: (value) {
               bloc.add(

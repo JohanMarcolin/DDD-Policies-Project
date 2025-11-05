@@ -75,6 +75,16 @@ Future<void> main() async {
           UpdateUserPasswordDialogChild,
         );
         expect(updatePasswordDialogChild, findsOne);
+
+        final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
+
+        final expectedTitle = isUserUpdatingSelf
+            ? 'Update Your Password'
+            : 'Update User Password';
+        expect(find.text(expectedTitle), findsOne);
+
+        final expectedLabel = 'New Password';
+        expect(find.text(expectedLabel), findsOne);
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {

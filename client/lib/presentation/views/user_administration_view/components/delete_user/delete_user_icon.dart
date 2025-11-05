@@ -15,6 +15,7 @@ class DeleteUserIcon extends StatelessWidget {
       isActionAuthorized: deleteUser is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) =>
           DeleteUserDialogChild(
+            isUserDeletingSelf: bloc.isAdministratingSelf(user),
             onCancel: () async => await closeDialog(context),
             onConfirm: () {
               bloc.add(DeleteUserRequested(targetUser: user));

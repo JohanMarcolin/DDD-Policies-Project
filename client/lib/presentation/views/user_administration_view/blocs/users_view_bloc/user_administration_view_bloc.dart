@@ -30,6 +30,9 @@ class UserAdministrationViewBloc
   final User _currentUser;
   final UserAdministrationService userAdministrationService;
 
+  bool isAdministratingSelf(User targetUser) =>
+      _currentUser.isSameAs(targetUser);
+
   ActionPolicyResult authorizeDeleteUser(User targetUser) =>
       userAdministrationService.deleteUserPolicy.authorize(
         _currentUser,

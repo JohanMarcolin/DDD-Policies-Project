@@ -102,6 +102,25 @@ void main() {
     group('{Public Methods}', () {
       group('{Authorization Methods}', () {
         UserPairTestRunner.testAllUserPairCases(
+          users: [mockUser, otherMockUser],
+          onUserPairCase: (currentUser, targetUser) {
+            _blocTest(
+              description: 'should check if user is administrating self',
+              currentUser: currentUser,
+              targetUser: targetUser,
+              verify: (bloc) {
+                expect(
+                  bloc.isAdministratingSelf(targetUser),
+                  equals(currentUser.isSameAs(targetUser)),
+                );
+              },
+            );
+          },
+        );
+      });
+
+      group('{Authorization Methods}', () {
+        UserPairTestRunner.testAllUserPairCases(
           users: [mockUser, mockAdmin, mockAnalyst],
           onUserPairCase: (currentUser, targetUser) {
             final targetUserRole = targetUser.role.name;
