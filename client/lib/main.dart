@@ -2,6 +2,7 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
+import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
@@ -14,13 +15,15 @@ import 'presentation/views/user_administration_view/blocs/users_view_bloc/user_a
 import 'presentation/views/user_administration_view/user_administration_view.dart';
 
 void main() {
+  AuthBloc setupAuthBloc() =>
+      AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()));
+
+  final authBloc = setupAuthBloc();
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) =>
-              AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()))
-                ..add(AuthRefreshRequested()),
+          create: (_) => authBloc..add(AuthRefreshRequested()),
         ),
       ],
       child: const UserAdministrationApp(),
@@ -42,30 +45,40 @@ class UserAdministrationApp extends StatelessWidget {
       home: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is Authenticated) {
+            final userAdministrationViewBloc = _setupUserAdministrationViewBloc(
+              state.currentUser,
+            );
             return BlocProvider(
-              create: (_) => UserAdministrationViewBloc(
-                currentUser: state.currentUser,
-                userAdministrationService: UserAdministrationService(
-                  userRepository: HttpUserRepository(
-                    userApi: UserApi(
-                      authApi: AuthApi(authTokenService: AuthTokenService()),
-                      authTokenService: AuthTokenService(),
-                    ),
-                  ),
-                  viewUserPolicy: ViewUserPolicy(),
-                  updateUserEmailPolicy: UpdateUserEmailPolicy(),
-                  updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
-                  deleteUserPolicy: DeleteUserPolicy(),
-                  emailValidationPolicy: EmailValidationPolicy(),
-                  passwordValidationPolicy: PasswordValidationPolicy(),
-                ),
-              )..add(FetchUsersRequested()),
+              create: (_) =>
+                  userAdministrationViewBloc..add(FetchUsersRequested()),
               child: const UserAdministrationView(),
             );
           }
-          
+
           return const LoginView();
         },
+      ),
+    );
+  }
+
+  UserAdministrationViewBloc _setupUserAdministrationViewBloc(
+    User currentUser,
+  ) {
+    return UserAdministrationViewBloc(
+      currentUser: currentUser,
+      userAdministrationService: UserAdministrationService(
+        userRepository: HttpUserRepository(
+          userApi: UserApi(
+            authApi: AuthApi(authTokenService: AuthTokenService()),
+            authTokenService: AuthTokenService(),
+          ),
+        ),
+        viewUserPolicy: ViewUserPolicy(),
+        updateUserEmailPolicy: UpdateUserEmailPolicy(),
+        updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
+        deleteUserPolicy: DeleteUserPolicy(),
+        emailValidationPolicy: EmailValidationPolicy(),
+        passwordValidationPolicy: PasswordValidationPolicy(),
       ),
     );
   }
