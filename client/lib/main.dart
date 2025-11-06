@@ -63,11 +63,7 @@ class UserAdministrationApp extends StatelessWidget {
               child: const UserAdministrationView(),
             );
           }
-          if (state is UserAdministrationViewLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
+          
           return const LoginView();
         },
       ),
