@@ -1,4 +1,5 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
+import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/widgets/action_dialog_helper.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
@@ -12,7 +13,6 @@ import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/users_view_bloc/user_administration_view_bloc.dart';
-import '../../widgets/base_app_bar.dart';
 
 part 'components/update_user_email/update_user_email_icon.dart';
 part 'components/update_user_email/update_user_email_dialog_child.dart';
@@ -21,6 +21,7 @@ part 'components/update_user_password/update_user_password_dialog_child.dart';
 part 'components/delete_user/delete_user_icon.dart';
 part 'components/delete_user/delete_user_dialog_child.dart';
 part 'components/user_action_icon.dart';
+part 'components/user_administration_app_bar.dart';
 part 'components/user_list.dart';
 part 'components/user_tile.dart';
 
@@ -31,7 +32,7 @@ class UserAdministrationView extends StatelessWidget {
     return BlocProvider.value(
       value: context.read<UserAdministrationViewBloc>(),
       child: Scaffold(
-        appBar: const BaseAppBar(title: 'User Administration'),
+        appBar: const UserAdministrationAppBar(),
         body:
             BlocBuilder<
               UserAdministrationViewBloc,

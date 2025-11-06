@@ -1,6 +1,5 @@
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
-import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:domain/entities/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,7 +39,7 @@ Future<void> main() async {
         expect(userAdministrationView, findsOne);
 
         final userAdministrationAppBar = userAdministrationView.findDescendant(
-          BaseAppBar,
+          UserAdministrationAppBar,
         );
         expect(userAdministrationAppBar, findsOne);
         expect(

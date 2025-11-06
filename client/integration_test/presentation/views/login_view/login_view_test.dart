@@ -2,7 +2,6 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
-import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:error_codes/error_codes.dart';
@@ -55,7 +54,7 @@ Future<void> main() async {
       final loginView = find.byType(LoginView);
       expect(loginView, findsOne);
 
-      final loginAppBar = loginView.findDescendant(BaseAppBar);
+      final loginAppBar = loginView.findDescendant(LoginAppBar);
       expect(loginAppBar, findsOne);
       expect(loginAppBar.findDescendantMatching(find.text('Login')), findsOne);
 
@@ -253,7 +252,7 @@ Future<void> main() async {
       ).called(1);
       expect(
         ActionSnackBarHelper.lastMessage,
-        equals('Authentication failure. Please try again.'),
+        equals('Authentication failed. Please try again.'),
       );
     });
   });

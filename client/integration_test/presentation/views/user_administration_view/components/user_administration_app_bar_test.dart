@@ -1,24 +1,25 @@
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
+import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
-import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../test/bloc/utils/mock_users.dart';
-import '../../utils/extensions/widget_finder_extension.dart';
-import '../../utils/extensions/widget_tester_extension.dart';
+import '../../../../../test/bloc/utils/mock_users.dart';
+import '../../../../utils/extensions/widget_finder_extension.dart';
+import '../../../../utils/extensions/widget_tester_extension.dart';
 
 late MockAuthApi mockAuthApi;
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderBaseAppBar() async => await renderWidgetWithBlocStubs(
-    testWidget: BaseAppBar(title: 'Base App Bar'),
-    mockAuthApi: mockAuthApi,
-    mockUserRepository: mockUserRepository,
-  );
+  Future<void> renderUserAdministrationAppBar() async =>
+      await renderWidgetWithBlocStubs(
+        testWidget: UserAdministrationAppBar(),
+        mockAuthApi: mockAuthApi,
+        mockUserRepository: mockUserRepository,
+      );
 }
 
 Future<void> main() async {
@@ -32,12 +33,14 @@ Future<void> main() async {
     testWidgets('displays app bar with all required static components', (
       WidgetTester tester,
     ) async {
-      await tester.renderBaseAppBar();
+      await tester.renderUserAdministrationAppBar();
 
-      final baseAppBar = find.byType(BaseAppBar);
-      expect(baseAppBar, findsOne);
+      final userAdministrationAppBar = find.byType(UserAdministrationAppBar);
+      expect(userAdministrationAppBar, findsOne);
       expect(
-        baseAppBar.findDescendantMatching(find.text('Base App Bar')),
+        userAdministrationAppBar.findDescendantMatching(
+          find.text('User Administration'),
+        ),
         findsOne,
       );
     });
@@ -45,7 +48,7 @@ Future<void> main() async {
     testWidgets('does not show logout icon when unauthenticated', (
       WidgetTester tester,
     ) async {
-      await tester.renderBaseAppBar();
+      await tester.renderUserAdministrationAppBar();
 
       tester.authBlocWithStubs.add(AuthRefreshRequested());
 
@@ -64,14 +67,14 @@ Future<void> main() async {
 
         when(() => mockAuthApi.logout()).thenAnswer((_) async {});
 
-        await tester.renderBaseAppBar();
+        await tester.renderUserAdministrationAppBar();
 
         tester.authBlocWithStubs.add(AuthRefreshRequested());
 
         await tester.pumpAndSettle();
 
         final logoutIcon = find.byIcon(Icons.logout);
-        expect(logoutIcon, findsOneWidget);
+        expect(logoutIcon, findsOne);
         await tester.tap(logoutIcon);
 
         verify(() => mockAuthApi.logout()).called(1);
@@ -89,21 +92,21 @@ Future<void> main() async {
         throw Exception('Logout failed');
       });
 
-      await tester.renderBaseAppBar();
+      await tester.renderUserAdministrationAppBar();
 
       tester.authBlocWithStubs.add(AuthRefreshRequested());
 
       await tester.pumpAndSettle();
 
       final logoutIcon = find.byIcon(Icons.logout);
-      expect(logoutIcon, findsOneWidget);
+      expect(logoutIcon, findsOne);
       await tester.tap(logoutIcon);
 
       verify(() => mockAuthApi.logout()).called(1);
 
       expect(
         ActionSnackBarHelper.lastMessage,
-        'Authentication failure. Please try again.',
+        'Logout failed. Please log in again or try again later.',
       );
     });
   });

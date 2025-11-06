@@ -1,5 +1,4 @@
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
-import 'package:client/presentation/widgets/base_app_bar.dart';
 import 'package:client/presentation/widgets/button.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 
+part 'components/login_app_bar.dart';
 part 'components/login_form.dart';
 part 'components/login_email_field.dart';
 part 'components/login_password_field.dart';
@@ -49,10 +49,7 @@ class _LoginViewState extends State<LoginView> {
             );
         }
       },
-      child: Scaffold(
-        appBar: const BaseAppBar(title: 'Login'),
-        body: LoginForm(),
-      ),
+      child: Scaffold(appBar: const LoginAppBar(), body: LoginForm()),
     );
   }
 }
