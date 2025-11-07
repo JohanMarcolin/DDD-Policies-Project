@@ -10,6 +10,7 @@ Middleware globalExceptionHandler() {
       try {
         return await innerHandler(request);
       } catch (e) {
+        print(e);
         return switch (e) {
           BadRequestException(:final errorCode) => badRequest(errorCode),
           MalformedAuthorizationHeaderException(:final errorCode) =>

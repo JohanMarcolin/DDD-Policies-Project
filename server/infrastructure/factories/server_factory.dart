@@ -7,6 +7,7 @@ import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import '../../test/utils/factories/test_user_entry_factory.dart';
+import '../controllers/test_controller.dart';
 import '../databases/user_password_database.dart';
 import '../http/global_exception_handler.dart';
 import '../http/response_utils.dart';
@@ -19,6 +20,7 @@ import '../databases/user_database.dart';
 import '../security/token_service.dart';
 import '../controllers/user_controller.dart';
 import '../security/security_filter_chain.dart';
+import '../services/test_service.dart';
 import '../services/user_service.dart';
 
 class ServerFactory {
@@ -82,17 +84,16 @@ class ServerFactory {
         userPasswordDatabase: userPasswordDatabase,
       );
 
-      router.get('/test/user-entries', (Request req) {
-        final testUserEntries = TestUserEntryFactory.defaultUserEntries
-            .map((entry) => {
-                  'userId': entry.userId.value,
-                  'email': entry.email.value,
-                  'role': entry.user.role.name,
-                  'password': entry.password.value,
-                })
-            .toList();
-        return ok(testUserEntries);
-      });
+      final testService = TestService(
+        userDatabase: userDatabase,
+        userPasswordDatabase: userPasswordDatabase,
+      );
+
+      final testController = TestController(
+        testService: testService,
+      );
+
+      router.mount('/test/', testController.handler);
     }
 
     final pipeline = const Pipeline()

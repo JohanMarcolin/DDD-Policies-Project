@@ -1,17 +1,21 @@
 class HttpApiResponse<TData> {
   final bool isSuccess;
-  final TData data;
+  final TData? data;
   final String? errorCode;
   final String? policyViolationDetails;
 
   HttpApiResponse({
     required this.isSuccess,
-    required this.data,
-    required this.errorCode,
-    required this.policyViolationDetails,
+    this.data,
+    this.errorCode,
+    this.policyViolationDetails,
   });
 
   factory HttpApiResponse.fromMap(Map<String, dynamic> map) {
+    if (map.isEmpty) {
+      return HttpApiResponse(isSuccess: true);
+    }
+
     final isSuccess = map['isSuccess'] == true;
     final hasData = isSuccess && map.containsKey('data');
     final hasErrorCode = !isSuccess && map.containsKey('errorCode');
@@ -39,8 +43,9 @@ class HttpApiResponse<TData> {
     buffer.write('isSuccess: $isSuccess');
     if (data != null) buffer.write(', data: $data');
     if (errorCode != null) buffer.write(', errorCode: $errorCode');
-    if (policyViolationDetails != null)
+    if (policyViolationDetails != null) {
       buffer.write(', policyViolationDetails: $policyViolationDetails');
+    }
     buffer.write(')');
     return buffer.toString();
   }
