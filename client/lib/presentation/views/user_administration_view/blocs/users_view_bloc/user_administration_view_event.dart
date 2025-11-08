@@ -19,6 +19,8 @@ class DeleteUserRequested extends DeleteUserEvent {
 
 class DeleteUserSuccess extends DeleteUserEvent {}
 
+class DeleteSelfSuccess extends DeleteUserEvent {}
+
 class DeleteUserFailure extends DeleteUserEvent {}
 
 sealed class UpdateUserEmailEvent extends UserAdministrationViewEvent {}

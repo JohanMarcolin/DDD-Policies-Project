@@ -9,7 +9,7 @@ void main() {
   final testEntries = TestUserEntryFactory.defaultUserEntries;
 
   setUpAll(() async {
-    await TestServerFactory.start();
+    await TestServerFactory.start(includeDefaultUsers: true);
   });
 
   tearDownAll(() async {

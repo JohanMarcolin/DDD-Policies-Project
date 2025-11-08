@@ -23,10 +23,14 @@ import '../services/user_service.dart';
 
 class ServerFactory {
   ServerFactory(
-      {this.host = '0.0.0.0', required this.port, this.isTest = false});
+      {this.host = '0.0.0.0',
+      required this.port,
+      this.enableTestRoutes = false,
+      this.includeDefaultUsers = false});
   final String host;
   final int port;
-  final bool isTest;
+  final bool enableTestRoutes;
+  final bool includeDefaultUsers;
   HttpServer? _server;
   late String baseUrl;
 
@@ -76,12 +80,7 @@ class ServerFactory {
     router.mount('/auth/', authController.handler);
     router.mount('/user/', userController.handler);
 
-    if (isTest) {
-      TestUserEntryFactory.setupDefaultUsers(
-        userDatabase: userDatabase,
-        userPasswordDatabase: userPasswordDatabase,
-      );
-
+    if (enableTestRoutes) {
       final testService = TestService(
         userDatabase: userDatabase,
         userPasswordDatabase: userPasswordDatabase,
@@ -92,6 +91,13 @@ class ServerFactory {
       );
 
       router.mount('/test/', testController.handler);
+    }
+
+    if (includeDefaultUsers) {
+      TestUserEntryFactory.setupDefaultUsers(
+        userDatabase: userDatabase,
+        userPasswordDatabase: userPasswordDatabase,
+      );
     }
 
     final pipeline = const Pipeline()

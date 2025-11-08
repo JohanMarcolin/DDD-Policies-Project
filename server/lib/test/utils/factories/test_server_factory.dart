@@ -6,9 +6,13 @@ class TestServerFactory {
   static ServerFactory? _serverFactory;
   static HttpServer? _server;
 
-  static Future<void> start() async {
+  static Future<void> start(
+      {bool enableTestRoutes = false, bool includeDefaultUsers = false}) async {
     final randomPort = 0;
-    _serverFactory = ServerFactory(port: randomPort, isTest: true);
+    _serverFactory = ServerFactory(
+        port: randomPort,
+        enableTestRoutes: enableTestRoutes,
+        includeDefaultUsers: includeDefaultUsers);
     _server = await _serverFactory!.start();
   }
 

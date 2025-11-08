@@ -77,11 +77,16 @@ class UserAdministrationViewBloc
     Emitter<UserAdministrationViewState> emit,
   ) async {
     try {
+      final isDeletingSelf = isAdministratingSelf(event.targetUser);
       await userAdministrationService.deleteUser(
         initiator: _currentUser,
         target: event.targetUser,
       );
-      emitPresentation(DeleteUserSuccess());
+      if (isDeletingSelf) {
+        emitPresentation(DeleteSelfSuccess());
+      } else {
+        emitPresentation(DeleteUserSuccess());
+      }
       add(FetchUsersRequested());
     } catch (e) {
       emitPresentation(DeleteUserFailure());

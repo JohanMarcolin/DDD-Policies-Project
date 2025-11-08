@@ -32,7 +32,7 @@ void main() {
           late String accessToken;
 
           setUp(() async {
-            await TestServerFactory.start();
+            await TestServerFactory.start(includeDefaultUsers: true);
             accessToken = await getToken(initiator);
           });
 

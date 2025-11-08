@@ -6,10 +6,34 @@ import 'package:domain/value_objects/role.dart';
 import 'package:error_codes/error_codes.dart';
 
 class TestApi extends HttpApi {
-  TestApi();
+  Future<List<TestUserEntry>> createAllUserPairs() async {
+    return await callPost<List<TestUserEntry>>(
+      endpoint: '/test/create-all-user-pairs',
+      map: (response) {
+        if (response.isSuccess) {
+          return (response.data as List)
+              .map((e) => TestUserEntry.fromJson(e))
+              .toList();
+        }
+        throw TestApiException(response.errorCode!);
+      },
+    );
+  }
 
-  Future<TestUserEntry> getTestUserEntry() async {
-    return await callGet<TestUserEntry>(
+  Future<void> deleteAllTestUsers() async {
+    await callDelete<void>(
+      endpoint: '/test/delete-all-users',
+      map: (response) {
+        if (response.isSuccess) {
+          return;
+        }
+        throw TestApiException(response.errorCode!);
+      },
+    );
+  }
+
+  Future<TestUserEntry> createTestUserEntry() async {
+    return await callPost<TestUserEntry>(
       endpoint: '/test/create-user',
       map: (response) {
         if (response.isSuccess) {
@@ -24,9 +48,10 @@ class TestApi extends HttpApi {
     await callDelete<void>(
       endpoint: '/test/delete/${userId.value}',
       map: (response) {
-        print(response);
-
-        return;
+        if (response.isSuccess) {
+          return;
+        }
+        throw TestApiException(response.errorCode!);
       },
     );
   }
