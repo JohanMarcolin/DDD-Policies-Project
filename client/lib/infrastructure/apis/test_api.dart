@@ -6,6 +6,8 @@ import 'package:domain/value_objects/role.dart';
 import 'package:error_codes/error_codes.dart';
 
 class TestApi extends HttpApi {
+  TestApi();
+
   Future<TestUserEntry> getTestUserEntry() async {
     return await callGet<TestUserEntry>(
       endpoint: '/test/create-user',

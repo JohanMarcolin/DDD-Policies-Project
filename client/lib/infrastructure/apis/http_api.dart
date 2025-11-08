@@ -9,7 +9,9 @@ class _UnauthorizedException implements Exception {}
 abstract class HttpApi {
   const HttpApi();
 
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static String _baseUrl = 'http://10.0.2.2:8080';
+
+  static set baseUrl(String url) => _baseUrl = url;
 
   Future<T> callGet<T>({
     required String endpoint,
@@ -144,7 +146,7 @@ abstract class HttpApi {
   }
 
   Uri _buildUri(String endpoint) {
-    return Uri.parse('$baseUrl$endpoint');
+    return Uri.parse('$_baseUrl$endpoint');
   }
 
   Map<String, String> _buildAuthHeaders(String accessToken) {

@@ -1,3 +1,4 @@
+import 'package:client/infrastructure/apis/http_api.dart';
 import 'package:client/infrastructure/apis/test_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
@@ -7,14 +8,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:client/main.dart' as app;
+import 'package:server/test/utils/factories/test_server_factory.dart';
 
-TestApi testApi = TestApi();
-AuthTokenService authTokenService = AuthTokenService();
-
+late TestApi testApi;
+late AuthTokenService authTokenService;
 late TestUserEntry testUserEntry;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    await TestServerFactory.start();
+    HttpApi.baseUrl = TestServerFactory.baseUrl;
+    testApi = TestApi();
+    authTokenService = AuthTokenService();
+  });
 
   setUp(() async {
     await authTokenService.clearTokens();
@@ -24,6 +32,10 @@ void main() {
   tearDown(() async {
     await testApi.deleteTestUserEntry(userId: testUserEntry.userId);
     await authTokenService.clearTokens();
+  });
+
+  tearDownAll(() async {
+    await TestServerFactory.stop();
   });
 
   group('User Lifecycle E2E', () {
