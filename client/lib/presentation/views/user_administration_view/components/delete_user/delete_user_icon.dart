@@ -19,7 +19,7 @@ class DeleteUserIcon extends StatelessWidget {
           context.read<AuthBloc>().add(AuthRevokeAuthentication());
         }
       },
-      child: UserActionIcon<DeleteUserSuccess, DeleteUserUnauthorizedReason>(
+      child: UserActionIcon<DeleteUserUnauthorizedReason>(
         icon: Icons.delete,
         isActionAuthorized: deleteUser is Authorized,
         dialogChildBuilder: (context, {required closeDialog}) =>
@@ -30,6 +30,8 @@ class DeleteUserIcon extends StatelessWidget {
                 bloc.add(DeleteUserRequested(targetUser: user));
               },
             ),
+        closeDialogOnEvent: (event) =>
+            event is DeleteUserSuccess || event is DeleteSelfSuccess,
         eventMessageMapper: (event) => switch (event) {
           DeleteUserFailure() => 'Failed to delete user',
           DeleteUserSuccess() => 'User deleted successfully',

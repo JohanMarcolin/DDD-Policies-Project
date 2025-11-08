@@ -10,10 +10,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
     final bloc = context.read<UserAdministrationViewBloc>();
     final updateEmail = bloc.authorizeUpdateEmail(user);
 
-    return UserActionIcon<
-      UpdateUserEmailSuccess,
-      UpdateUserEmailUnauthorizedReason
-    >(
+    return UserActionIcon<UpdateUserEmailUnauthorizedReason>(
       icon: Icons.email,
       isActionAuthorized: updateEmail is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) =>
@@ -29,6 +26,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
               );
             },
           ),
+      closeDialogOnEvent: (event) => event is UpdateUserEmailSuccess,
       eventMessageMapper: (event) => switch (event) {
         UpdateUserEmailInvalid() => 'Invalid email format',
         UpdateUserEmailFailure() => 'Failed to update email',

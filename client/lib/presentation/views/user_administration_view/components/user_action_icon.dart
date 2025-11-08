@@ -9,13 +9,13 @@ typedef DialogChildBuilder =
     });
 typedef OnConfirmCallback = void Function(BuildContext context, String value);
 
-class UserActionIcon<TActionSuccessEvent, TActionUnauthorizedReason>
-    extends StatelessWidget {
+class UserActionIcon<TActionUnauthorizedReason> extends StatelessWidget {
   const UserActionIcon({
     super.key,
     required this.icon,
     required this.isActionAuthorized,
     required this.dialogChildBuilder,
+    required this.closeDialogOnEvent,
     required this.eventMessageMapper,
     required this.unauthorizedReason,
     required this.unauthorizedMessageMapper,
@@ -24,6 +24,7 @@ class UserActionIcon<TActionSuccessEvent, TActionUnauthorizedReason>
   final IconData icon;
   final bool isActionAuthorized;
   final DialogChildBuilder dialogChildBuilder;
+  final bool Function(UserAdministrationViewEvent event)? closeDialogOnEvent;
   final EventMessageMapper<UserAdministrationViewEvent> eventMessageMapper;
   final TActionUnauthorizedReason? unauthorizedReason;
   final UnauthorizedMessageMapper<TActionUnauthorizedReason>
@@ -54,7 +55,12 @@ class UserActionIcon<TActionSuccessEvent, TActionUnauthorizedReason>
               UserAdministrationViewBloc,
               UserAdministrationViewEvent
             >(
-              listener: (_, event) async => _handleDialogEvent(context, event),
+              listener: (_, event) async {
+                _showAuthorizedActionSnackBar(context, event);
+                if (closeDialogOnEvent?.call(event) == true) {
+                  await ActionDialogHelper.close(context);
+                }
+              },
               child: dialogChildBuilder(
                 context,
                 closeDialog: (_) async =>
@@ -65,14 +71,10 @@ class UserActionIcon<TActionSuccessEvent, TActionUnauthorizedReason>
     );
   }
 
-  Future<void> _handleDialogEvent(
+  Future<void> _showAuthorizedActionSnackBar(
     BuildContext context,
     UserAdministrationViewEvent event,
   ) async {
-    if (event is TActionSuccessEvent) {
-      await ActionDialogHelper.close(context);
-    }
-
     final message = eventMessageMapper(event);
     if (message.isNotEmpty) {
       ActionSnackBarHelper.show(message: message);

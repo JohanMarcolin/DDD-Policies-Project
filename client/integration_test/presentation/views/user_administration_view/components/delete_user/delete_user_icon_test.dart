@@ -125,7 +125,11 @@ Future<void> main() async {
           verify(
             () => mockUserRepository.delete(userId: targetUser.userId),
           ).called(1);
-          expect(ActionSnackBarHelper.lastMessage, 'User deleted successfully');
+
+          final expectedMessage = currentUser.isSameAs(targetUser)
+              ? 'You have deleted your account'
+              : 'User deleted successfully';
+          expect(ActionSnackBarHelper.lastMessage, expectedMessage);
         },
       );
     },

@@ -10,10 +10,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
     final bloc = context.read<UserAdministrationViewBloc>();
     final updatePassword = bloc.authorizeUpdatePassword(user);
 
-    return UserActionIcon<
-      UpdateUserPasswordSuccess,
-      UpdateUserPasswordUnauthorizedReason
-    >(
+    return UserActionIcon<UpdateUserPasswordUnauthorizedReason>(
       icon: Icons.password,
       isActionAuthorized: updatePassword is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) =>
@@ -29,6 +26,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
               );
             },
           ),
+      closeDialogOnEvent: (event) => event is UpdateUserPasswordSuccess,
       eventMessageMapper: (event) => switch (event) {
         UpdateUserPasswordInvalid() => switch (event.reason) {
           PasswordTooShort() => 'Password is too short',
