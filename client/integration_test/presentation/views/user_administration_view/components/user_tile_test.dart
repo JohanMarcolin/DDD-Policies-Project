@@ -6,7 +6,7 @@ import 'package:integration_test/integration_test.dart';
 import '../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../utils/extensions/widget_finder_extension.dart';
 import '../../../../utils/extensions/widget_tester_extension.dart';
-import '../../../../utils/user_pair_test_runner.dart';
+import '../../../../utils/user_test_runner.dart';
 
 extension on WidgetTester {
   Future<void> renderUserTile({
@@ -20,7 +20,7 @@ extension on WidgetTester {
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  UserPairTestRunner.testAllUserPairCases(
+  UserTestRunner.testUserPairs(
     users: allMockUserPairs,
     onUserPairCase: (actor, subject) {
       testWidgets('displays user tile with all required components', (

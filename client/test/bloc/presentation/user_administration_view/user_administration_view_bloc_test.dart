@@ -10,7 +10,7 @@ import 'package:domain/repositories/user_repository.dart' as domain;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../../integration_test/utils/user_pair_test_runner.dart';
+import '../../../../integration_test/utils/user_test_runner.dart';
 import '../../utils/mock_user_credentials.dart';
 import '../../utils/mock_users.dart';
 
@@ -85,7 +85,7 @@ void main() {
 
   group('UserAdministrationViewBloc', () {
     group('{Initialization}', () {
-      UserPairTestRunner.testAllUserPairCases(
+      UserTestRunner.testUserPairs(
         users: allMockUserPairs,
         onUserPairCase: (currentUser, targetUser) {
           _blocTest(
@@ -101,7 +101,7 @@ void main() {
 
     group('{Public Methods}', () {
       group('{Authorization Methods}', () {
-        UserPairTestRunner.testAllUserPairCases(
+        UserTestRunner.testUserPairs(
           users: [mockUser, otherMockUser],
           onUserPairCase: (currentUser, targetUser) {
             _blocTest(
@@ -120,7 +120,7 @@ void main() {
       });
 
       group('{Authorization Methods}', () {
-        UserPairTestRunner.testAllUserPairCases(
+        UserTestRunner.testUserPairs(
           users: [mockUser, mockAdmin, mockAnalyst],
           onUserPairCase: (currentUser, targetUser) {
             final targetUserRole = targetUser.role.name;
@@ -168,7 +168,7 @@ void main() {
       });
 
       group('{Validation Methods}', () {
-        UserPairTestRunner.testAllUserPairCases(
+        UserTestRunner.testUserPairs(
           users: allMockUserPairs,
           onUserPairCase: (currentUser, targetUser) {
             group('{Email Validation}', () {
@@ -225,7 +225,7 @@ void main() {
     });
     group('{Events}', () {
       group('{FetchUsersRequested Event}', () {
-        UserPairTestRunner.testAllUserPolicyCases(
+        UserTestRunner.testUserPolicy(
           policy: ViewUserPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -294,7 +294,7 @@ void main() {
         );
       });
       group('{DeleteUserRequested Event}', () {
-        UserPairTestRunner.testAllUserPolicyCases(
+        UserTestRunner.testUserPolicy(
           policy: DeleteUserPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -345,7 +345,7 @@ void main() {
       });
 
       group('{UpdateUserEmailRequested Event}', () {
-        UserPairTestRunner.testAllUserPolicyCases(
+        UserTestRunner.testUserPolicy(
           policy: UpdateUserEmailPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -450,7 +450,7 @@ void main() {
       });
 
       group('{UpdateUserPasswordRequested Event}', () {
-        UserPairTestRunner.testAllUserPolicyCases(
+        UserTestRunner.testUserPolicy(
           policy: UpdateUserPasswordPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {

@@ -1,18 +1,18 @@
 import 'package:client/infrastructure/apis/http_api.dart';
-import 'package:domain/value_objects/email.dart';
+import 'package:client/infrastructure/mappers/user_mapper.dart';
+import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:domain/value_objects/role.dart';
 import 'package:error_codes/error_codes.dart';
 
 class TestApi extends HttpApi {
-  Future<List<TestUserEntry>> createAllUserPairs() async {
-    return await callPost<List<TestUserEntry>>(
+  Future<List<UserEntry>> createAllUserPairs() async {
+    return await callPost<List<UserEntry>>(
       endpoint: '/test/create-all-user-pairs',
       map: (response) {
         if (response.isSuccess) {
           return (response.data as List)
-              .map((e) => TestUserEntry.fromJson(e))
+              .map((e) => UserEntry.fromJson(e))
               .toList();
         }
         throw TestApiException(response.errorCode!);
@@ -32,19 +32,19 @@ class TestApi extends HttpApi {
     );
   }
 
-  Future<TestUserEntry> createTestUserEntry() async {
-    return await callPost<TestUserEntry>(
+  Future<UserEntry> createUserEntry() async {
+    return await callPost<UserEntry>(
       endpoint: '/test/create-user',
       map: (response) {
         if (response.isSuccess) {
-          return TestUserEntry.fromJson(response.data);
+          return UserEntry.fromJson(response.data);
         }
         throw TestApiException(response.errorCode!);
       },
     );
   }
 
-  Future<void> deleteTestUserEntry({required UserId userId}) async {
+  Future<void> deleteUserEntry({required UserId userId}) async {
     await callDelete<void>(
       endpoint: '/test/delete/${userId.value}',
       map: (response) {
@@ -63,24 +63,15 @@ class TestApiException implements Exception {
     : errorCode = errorCodeFromString(errorCode);
 }
 
-class TestUserEntry {
-  final UserId userId;
-  final Email email;
-  final Role role;
+class UserEntry {
+  final User user;
   final Password password;
 
-  TestUserEntry({
-    required this.userId,
-    required this.email,
-    required this.role,
-    required this.password,
-  });
+  UserEntry({required this.user, required this.password});
 
-  factory TestUserEntry.fromJson(Map<String, dynamic> json) {
-    return TestUserEntry(
-      userId: UserId(json['userId']),
-      email: Email(json['email']),
-      role: Role.values.firstWhere((role) => role.name == json['role']),
+  factory UserEntry.fromJson(Map<String, dynamic> json) {
+    return UserEntry(
+      user: UserMapper.toDomainUser(json),
       password: Password(json['password']),
     );
   }

@@ -94,7 +94,7 @@ class ServerFactory {
     }
 
     if (includeDefaultUsers) {
-      TestUserEntryFactory.setupDefaultUsers(
+      UserEntryFactory.setupDefaultUsers(
         userDatabase: userDatabase,
         userPasswordDatabase: userPasswordDatabase,
       );

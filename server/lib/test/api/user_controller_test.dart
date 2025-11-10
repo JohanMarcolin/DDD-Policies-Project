@@ -13,10 +13,10 @@ import '../utils/factories/test_user_entry_factory.dart';
 import 'utils/test_token_utils.dart';
 
 void main() {
-  final userEntries = TestUserEntryFactory.defaultUserEntries;
+  final userEntries = UserEntryFactory.defaultUserEntries;
 
-  Future<String> getToken(TestUserEntry entry) async =>
-      await getAccessToken(testUserEntry: entry);
+  Future<String> getToken(UserEntry entry) async =>
+      await getAccessToken(userEntry: entry);
 
   group('User Controller', () {
     for (final initiator in userEntries) {

@@ -8,7 +8,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../../../test/bloc/utils/mock_users.dart';
-import '../../../../../utils/user_pair_test_runner.dart';
+import '../../../../../utils/user_test_runner.dart';
 import '../../../../../utils/extensions/widget_finder_extension.dart';
 import '../../../../../utils/extensions/widget_tester_extension.dart';
 
@@ -34,7 +34,7 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserPairTestRunner.testAllUserPolicyCases(
+  UserTestRunner.testUserPolicy(
     policy: DeleteUserPolicy(),
     users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {

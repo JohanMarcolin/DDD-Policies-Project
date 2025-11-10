@@ -6,8 +6,8 @@ import 'package:domain/value_objects/role.dart';
 import '../../../infrastructure/databases/user_database.dart';
 import '../../../infrastructure/databases/user_password_database.dart';
 
-class TestUserEntry {
-  const TestUserEntry({required this.user, required this.password});
+class UserEntry {
+  const UserEntry({required this.user, required this.password});
 
   final User user;
   final Password password;
@@ -16,7 +16,7 @@ class TestUserEntry {
   Email get email => user.email;
 }
 
-class TestUserEntryFactory {
+class UserEntryFactory {
   static User user1 = _createUser(
     userId: UserId('1'),
     email: Email('user1@example.com'),
@@ -35,7 +35,7 @@ class TestUserEntryFactory {
     role: Role.analyst,
   );
 
-  static List<TestUserEntry> get defaultUserEntries => _getDefaultUserEntries();
+  static List<UserEntry> get defaultUserEntries => _getDefaultUserEntries();
 
   static void setupDefaultUsers({
     required UserDatabase userDatabase,
@@ -47,7 +47,7 @@ class TestUserEntryFactory {
     }
   }
 
-  static List<TestUserEntry> _getDefaultUserEntries() {
+  static List<UserEntry> _getDefaultUserEntries() {
     return [
       _getDefaultUserEntryWithPassword(role: Role.user, number: 1),
       _getDefaultUserEntryWithPassword(role: Role.user, number: 2),
@@ -58,10 +58,10 @@ class TestUserEntryFactory {
     ];
   }
 
-  static TestUserEntry _getDefaultUserEntryWithPassword(
+  static UserEntry _getDefaultUserEntryWithPassword(
       {required Role role, required int number}) {
     final roleName = role.name;
-    return TestUserEntry(
+    return UserEntry(
       user: User(
         userId: UserId('$roleName$number'),
         email: Email('$roleName$number'),

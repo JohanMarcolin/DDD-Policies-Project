@@ -31,6 +31,7 @@ class TestService {
 
   Future<Response> createAllUserPairs(Request req) async {
     var userPairs = [];
+
     for (var role in Role.values) {
       final user = _createRandomUser(role: role);
       final password = PasswordValidationPolicy.generatePassword();
@@ -56,7 +57,7 @@ class TestService {
 
   User _createRandomUser({Role role = Role.user}) {
     final userId = UserId.generate();
-    final email = Email('${role.name}${Uuid().v4().substring(0, 4)}@test.com');
+    final email = Email('${role.name}_${Uuid().v4().substring(0, 4)}@test.com');
 
     return User(email: email, userId: userId, role: role);
   }
