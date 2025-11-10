@@ -120,6 +120,32 @@ void main() {
         logger.i('Email update successful for $userRole');
 
         await tester.logout();
+
+        final oldEmail = email;
+
+        await tester.login(email: oldEmail, password: password);
+
+        expect(
+          find.byType(UserAdministrationView),
+          findsNothing,
+          reason:
+              'Login with old email should fail after email update for $userRole',
+        );
+
+        logger.i('Old email login failed as expected for $userRole');
+
+        await tester.login(email: newEmail, password: password);
+
+        expect(
+          find.byType(UserAdministrationView),
+          findsOne,
+          reason:
+              'Login with new email should succeed after email update for $userRole',
+        );
+
+        logger.i('New email login successful for $userRole');
+
+        await tester.logout();
       }
     });
   });
