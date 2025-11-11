@@ -36,53 +36,102 @@ void main() {
       await TestServerFactory.stop();
     });
 
-    final policy = UpdateUserEmailPolicy();
+    final canViewUserPolicy = ViewUserPolicy();
+    final updateUserEmailPolicy = UpdateUserEmailPolicy();
 
     for (final initiatorRole in Role.values) {
-      testWidgets('initiator: ${initiatorRole.name} can update self', (
+      testWidgets('${initiatorRole.name} updating email on self lifecycle', (
         WidgetTester tester,
       ) async {
         final initiatorEntry = await testApi.createUserEntry(
           role: initiatorRole,
         );
-        final canUpdateEmailOfSelf = policy.authorize(
+
+        final viewSelf = canViewUserPolicy.authorize(
           initiatorEntry.user,
           initiatorEntry.user,
         );
-        if (canUpdateEmailOfSelf is Authorized) {
-          await _testSuccessfulEmailUpdate(
-            tester: tester,
-            initiatorEntry: initiatorEntry,
-            targetEntry: initiatorEntry,
-          );
-        } else if (canUpdateEmailOfSelf is Unauthorized) {
-          logger.i(
-            '[AUTH] ${initiatorEntry.role.name} (${initiatorEntry.email.value}) NOT authorized to update self. Reason: ${canUpdateEmailOfSelf.reason.toString()}',
-          );
+        switch (viewSelf) {
+          case Authorized():
+            await _onViewUserAuthorized(
+              tester: tester,
+              initiatorEntry: initiatorEntry,
+              targetEntry: initiatorEntry,
+            );
+          case Unauthorized():
+            await _onViewUserUnauthorized(
+              tester: tester,
+              initiatorEntry: initiatorEntry,
+              targetEntry: initiatorEntry,
+            );
+            return;
+        }
+
+        final updateEmailOnSelf = updateUserEmailPolicy.authorize(
+          initiatorEntry.user,
+          initiatorEntry.user,
+        );
+        switch (updateEmailOnSelf) {
+          case Authorized():
+            await _onUpdateUserEmailAuthorized(
+              tester: tester,
+              initiatorEntry: initiatorEntry,
+              targetEntry: initiatorEntry,
+            );
+          case Unauthorized():
+            await _onUpdateUserEmailUnauthorized(
+              tester: tester,
+              initiatorEntry: initiatorEntry,
+              targetEntry: initiatorEntry,
+            );
         }
       });
       for (final targetRole in Role.values) {
         testWidgets(
-          'initiator: ${initiatorRole.name} can update target: ${targetRole.name}',
+          '${initiatorRole.name} updating email on ${targetRole.name} lifecycle',
           (WidgetTester tester) async {
             final initiatorEntry = await testApi.createUserEntry(
               role: initiatorRole,
             );
             final targetEntry = await testApi.createUserEntry(role: targetRole);
-            final canUpdateEmailOfTarget = policy.authorize(
+
+            final viewTarget = canViewUserPolicy.authorize(
               initiatorEntry.user,
               targetEntry.user,
             );
-            if (canUpdateEmailOfTarget is Authorized) {
-              await _testSuccessfulEmailUpdate(
-                tester: tester,
-                initiatorEntry: initiatorEntry,
-                targetEntry: targetEntry,
-              );
-            } else if (canUpdateEmailOfTarget is Unauthorized) {
-              logger.i(
-                '[AUTH] ${initiatorEntry.role.name} (${initiatorEntry.email.value}) NOT authorized to update ${targetEntry.role.name} (${targetEntry.email.value}). Reason: ${canUpdateEmailOfTarget.reason.toString()}',
-              );
+            switch (viewTarget) {
+              case Authorized():
+                await _onViewUserAuthorized(
+                  tester: tester,
+                  initiatorEntry: initiatorEntry,
+                  targetEntry: targetEntry,
+                );
+              case Unauthorized():
+                await _onViewUserUnauthorized(
+                  tester: tester,
+                  initiatorEntry: initiatorEntry,
+                  targetEntry: targetEntry,
+                );
+                return;
+            }
+
+            final updateEmailOfTarget = updateUserEmailPolicy.authorize(
+              initiatorEntry.user,
+              targetEntry.user,
+            );
+            switch (updateEmailOfTarget) {
+              case Authorized():
+                await _onUpdateUserEmailAuthorized(
+                  tester: tester,
+                  initiatorEntry: initiatorEntry,
+                  targetEntry: targetEntry,
+                );
+              case Unauthorized():
+                await _onUpdateUserEmailUnauthorized(
+                  tester: tester,
+                  initiatorEntry: initiatorEntry,
+                  targetEntry: targetEntry,
+                );
             }
           },
         );
@@ -91,26 +140,13 @@ void main() {
   });
 }
 
-Future<void> _testSuccessfulEmailUpdate({
+Future<void> _onViewUserAuthorized({
   required WidgetTester tester,
   required UserEntry initiatorEntry,
   required UserEntry targetEntry,
 }) async {
-  final initiatorUserRole = initiatorEntry.user.role.name;
-  final initiatorEmail = initiatorEntry.user.email;
-  final initiatorPassword = initiatorEntry.password;
-
   var targetUserId = targetEntry.user.userId;
   var targetUserRole = targetEntry.user.role.name;
-  var targetEmail = targetEntry.user.email;
-  var targetPassword = targetEntry.password;
-
-  final isUpdatingEmailOnSelf = initiatorEntry.user.isSameAs(targetEntry.user);
-
-  final updateType = isUpdatingEmailOnSelf ? 'self' : 'other';
-  logger.i(
-    '[AUTH] $initiatorUserRole ($initiatorEmail) authorized to update $updateType: $targetUserRole ($targetEmail)',
-  );
 
   await tester.startApp();
 
@@ -126,7 +162,58 @@ Future<void> _testSuccessfulEmailUpdate({
     reason: 'UserTile should be found for $targetUserRole target',
   );
 
-  // Before update, expect the old email
+  await tester.logout();
+}
+
+Future<void> _onViewUserUnauthorized({
+  required WidgetTester tester,
+  required UserEntry initiatorEntry,
+  required UserEntry targetEntry,
+}) async {
+  var targetUserId = targetEntry.user.userId;
+  var targetUserRole = targetEntry.user.role.name;
+
+  await tester.startApp();
+
+  await tester.login(
+    email: initiatorEntry.email,
+    password: initiatorEntry.password,
+  );
+
+  final targetUserTile = tester.findUserTileByUserId(targetUserId);
+  expect(
+    targetUserTile,
+    findsNothing,
+    reason: 'UserTile should not be found for $targetUserRole target',
+  );
+
+  await tester.logout();
+}
+
+Future<void> _onUpdateUserEmailAuthorized({
+  required WidgetTester tester,
+  required UserEntry initiatorEntry,
+  required UserEntry targetEntry,
+}) async {
+  var targetUserId = targetEntry.user.userId;
+  var targetUserRole = targetEntry.user.role.name;
+  var targetEmail = targetEntry.user.email;
+  var targetPassword = targetEntry.password;
+
+  await tester.startApp();
+
+  await tester.login(
+    email: initiatorEntry.email,
+    password: initiatorEntry.password,
+  );
+
+  final targetUserTile = tester.findUserTileByUserId(targetUserId);
+  expect(
+    targetUserTile,
+    findsOne,
+    reason: 'UserTile should be found for $targetUserRole target',
+  );
+
   final targetUserTileWidget = tester.widget<UserTile>(targetUserTile);
   expect(
     targetUserTileWidget.user.email,
@@ -178,9 +265,6 @@ Future<void> _testSuccessfulEmailUpdate({
   await tester.tap(confirmButton);
   await tester.pumpAndSettle();
 
-  // Ensure UI is settled before searching for updated user tile
-  await tester.pumpAndSettle();
-
   final updatedTargetUserTile = tester.findUserTileByUserId(targetUserId);
   final updatedTargetUserTileWidget = tester.widget<UserTile>(
     updatedTargetUserTile,
@@ -191,15 +275,9 @@ Future<void> _testSuccessfulEmailUpdate({
     reason: 'Target UserTile should show correct email after update',
   );
 
-  logger.i(
-    '[RESULT] Email updated: $targetUserRole ($targetEmail) -> ${newTargetEmail.value}',
-  );
-
   await tester.logout();
 
   final oldTargetEmail = targetEmail;
-
-  logger.i('[LOGIN-OLD] Attempt login with old email: $oldTargetEmail');
 
   await tester.login(email: oldTargetEmail, password: targetPassword);
 
@@ -210,12 +288,6 @@ Future<void> _testSuccessfulEmailUpdate({
         'Login with old target email should fail after email update for $targetUserRole',
   );
 
-  logger.i(
-    '[LOGIN-OLD] Expected failure for $targetUserRole ($oldTargetEmail)',
-  );
-
-  logger.i('[LOGIN-NEW] Attempt login with new email: ${newTargetEmail.value}');
-
   await tester.login(email: newTargetEmail, password: targetPassword);
 
   expect(
@@ -225,8 +297,45 @@ Future<void> _testSuccessfulEmailUpdate({
         'Login with new email should succeed after email update for $targetUserRole',
   );
 
-  logger.i('[LOGIN-NEW] Success for $targetUserRole (${newTargetEmail.value})');
+  await tester.logout();
+}
+
+Future<void> _onUpdateUserEmailUnauthorized({
+  required WidgetTester tester,
+  required UserEntry initiatorEntry,
+  required UserEntry targetEntry,
+}) async {
+  var targetUserId = targetEntry.user.userId;
+  var targetUserRole = targetEntry.user.role.name;
+
+  await tester.startApp();
+
+  await tester.login(
+    email: initiatorEntry.email,
+    password: initiatorEntry.password,
+  );
+
+  final targetUserTile = tester.findUserTileByUserId(targetUserId);
+  expect(
+    targetUserTile,
+    findsOne,
+    reason: 'UserTile should be found for $targetUserRole target',
+  );
+
+  final updateEmailIcon = find.descendant(
+    of: targetUserTile,
+    matching: find.byType(UpdateUserEmailIcon),
+  );
+
+  await tester.tap(updateEmailIcon);
+  await tester.pumpAndSettle();
+
+  final emailUpdateDialogChild = find.byType(UpdateUserEmailDialogChild);
+  expect(
+    emailUpdateDialogChild,
+    findsNothing,
+    reason: 'Email update dialog should not be shown',
+  );
 
   await tester.logout();
-  logger.i('[LOGOUT] $targetUserRole (${newTargetEmail.value})');
 }
