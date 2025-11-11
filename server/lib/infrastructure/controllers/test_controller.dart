@@ -7,7 +7,7 @@ class TestController {
       : _testService = testService {
     _testRouter.post('/create-all-user-pairs', _createAllUserPairs);
     _testRouter.delete('/delete-all-users', _deleteAllUsers);
-    _testRouter.post('/create-user', _createUser);
+    _testRouter.post('/create-user/<roleName>', _createUser);
     _testRouter.delete('/delete/<userId>', _deleteUser);
   }
 

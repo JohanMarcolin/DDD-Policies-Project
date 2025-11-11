@@ -1,8 +1,10 @@
 import 'package:client/infrastructure/apis/http_api.dart';
 import 'package:client/infrastructure/mappers/user_mapper.dart';
 import 'package:domain/entities/user.dart';
+import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
+import 'package:domain/value_objects/role.dart';
 import 'package:error_codes/error_codes.dart';
 
 class TestApi extends HttpApi {
@@ -32,9 +34,9 @@ class TestApi extends HttpApi {
     );
   }
 
-  Future<UserEntry> createUserEntry() async {
+  Future<UserEntry> createUserEntry({required Role role}) async {
     return await callPost<UserEntry>(
-      endpoint: '/test/create-user',
+      endpoint: '/test/create-user/${role.name}',
       map: (response) {
         if (response.isSuccess) {
           return UserEntry.fromJson(response.data);
@@ -75,4 +77,8 @@ class UserEntry {
       password: Password(json['password']),
     );
   }
+  
+  UserId get userId => user.userId;
+  Email get email => user.email;
+  Role get role => user.role;
 }

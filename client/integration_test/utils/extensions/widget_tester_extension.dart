@@ -9,6 +9,7 @@ import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -104,6 +105,12 @@ extension WidgetTesterLoginExtension on WidgetTester {
 }
 
 extension WidgetTesterTileFinderExtension on WidgetTester {
+  Finder findUserTileByUserId(UserId userId) {
+    return find.byWidgetPredicate(
+      (widget) => widget is UserTile && widget.user.userId == userId,
+    );
+  }
+
   Finder findUserTileByEmail(Email email) {
     return find.byWidgetPredicate(
       (widget) => widget is UserTile && widget.user.email.value == email.value,

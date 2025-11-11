@@ -9,6 +9,8 @@ final class PayloadMissingRequestBody extends PayloadErrorCode {}
 
 final class PayloadMissingUserId extends PayloadErrorCode {}
 
+final class PayloadMissingRole extends PayloadErrorCode {}
+
 final class UpdateUserEmailMissingNewEmail extends PayloadErrorCode {}
 
 final class PayloadMissingUserPassword extends PayloadErrorCode {}
@@ -91,6 +93,8 @@ ErrorCode errorCodeFromString(String errorCode) {
       return PayloadMissingRequestBody();
     case 'PayloadMissingUserId':
       return PayloadMissingUserId();
+    case 'PayloadMissingRole':
+      return PayloadMissingRole();
     case 'UpdateUserEmailMissingNewEmail':
       return UpdateUserEmailMissingNewEmail();
     case 'PayloadMissingUserPassword':
