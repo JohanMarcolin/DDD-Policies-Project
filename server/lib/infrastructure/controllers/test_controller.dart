@@ -5,10 +5,9 @@ import '../services/test_service.dart';
 class TestController {
   TestController({required TestService testService})
       : _testService = testService {
-    _testRouter.post('/create-all-user-pairs', _createAllUserPairs);
-    _testRouter.delete('/delete-all-users', _deleteAllUsers);
-    _testRouter.post('/create-user/<roleName>', _createUser);
-    _testRouter.delete('/delete/<userId>', _deleteUser);
+    _testRouter.post('/create-all-user-fixtures', _createAllUserFixtures);
+    _testRouter.delete('/delete-all-user-fixtures', _deleteAllUserFixtures);
+    _testRouter.post('/create-user-fixture/<roleName>', _createUserFixture);
   }
 
   final TestService _testService;
@@ -16,19 +15,15 @@ class TestController {
 
   Handler get handler => _testRouter.call;
 
-  Future<Response> _createAllUserPairs(Request req) async {
-    return await _testService.createAllUserPairs(req);
+  Future<Response> _createAllUserFixtures(Request req) async {
+    return await _testService.createAllUserFixtures(req);
   }
 
-  Future<Response> _deleteAllUsers(Request req) async {
-    return await _testService.deleteAllUsers(req);
+  Future<Response> _deleteAllUserFixtures(Request req) async {
+    return await _testService.deleteAllUserFixtures(req);
   }
 
-  Future<Response> _createUser(Request req) async {
-    return await _testService.createUser(req);
-  }
-
-  Future<Response> _deleteUser(Request req) async {
-    return await _testService.deleteUser(req);
+  Future<Response> _createUserFixture(Request req) async {
+    return await _testService.createUserFixture(req);
   }
 }

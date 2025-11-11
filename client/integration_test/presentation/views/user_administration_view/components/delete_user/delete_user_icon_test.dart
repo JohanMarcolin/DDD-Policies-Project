@@ -34,7 +34,7 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserTestRunner.testUserPolicy(
+  UserTestRunner.userTestFixturePolicy(
     policy: DeleteUserPolicy(),
     users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {

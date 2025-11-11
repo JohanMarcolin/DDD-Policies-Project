@@ -5,7 +5,7 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/role.dart';
 
-class TestUserFactory {
+class UserTestFixtureFactory {
   static final User user1 = _createUser(
     email: Email('user1@test.com'),
   );

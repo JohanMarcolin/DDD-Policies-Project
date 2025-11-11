@@ -1,6 +1,4 @@
-import 'package:client/infrastructure/apis/http_api.dart';
 import 'package:client/infrastructure/apis/test_api.dart';
-import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
@@ -9,128 +7,112 @@ import 'package:domain/value_objects/role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:logger/logger.dart';
-import 'package:server/test/utils/factories/test_server_factory.dart';
 
 import '../utils/extensions/widget_tester_extension.dart';
-
-final logger = Logger();
-
-late TestApi testApi;
-late AuthTokenService authTokenService;
+import '../utils/test_server_fixture.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Update User Email Lifecycle', () {
-    setUp(() async {
-      await TestServerFactory.start(enableTestRoutes: true);
-      HttpApi.baseUrl = TestServerFactory.baseUrl;
-      testApi = TestApi();
-      authTokenService = AuthTokenService();
-    });
-
-    tearDown(() async {
-      await testApi.deleteAllTestUsers();
-      await authTokenService.clearTokens();
-      await TestServerFactory.stop();
-    });
+  group('Update User Email Scenario', () {
+    setUp(() async => await TestServerFixture.setup());
+    tearDown(() async => await TestServerFixture.teardown());
 
     final canViewUserPolicy = ViewUserPolicy();
     final updateUserEmailPolicy = UpdateUserEmailPolicy();
 
-    for (final initiatorRole in Role.values) {
-      testWidgets('${initiatorRole.name} updating email on self lifecycle', (
+    for (final role in Role.values) {
+      testWidgets('${role.name} updating email on self scenario', (
         WidgetTester tester,
       ) async {
-        final initiatorEntry = await testApi.createUserEntry(
-          role: initiatorRole,
-        );
+        final initiator = await TestServerFixture.createUserFixture(role: role);
 
         final viewSelf = canViewUserPolicy.authorize(
-          initiatorEntry.user,
-          initiatorEntry.user,
+          initiator.user,
+          initiator.user,
         );
         switch (viewSelf) {
           case Authorized():
             await _onViewUserAuthorized(
               tester: tester,
-              initiatorEntry: initiatorEntry,
-              targetEntry: initiatorEntry,
+              initiator: initiator,
+              target: initiator,
             );
           case Unauthorized():
             await _onViewUserUnauthorized(
               tester: tester,
-              initiatorEntry: initiatorEntry,
-              targetEntry: initiatorEntry,
+              initiator: initiator,
+              target: initiator,
             );
             return;
         }
 
         final updateEmailOnSelf = updateUserEmailPolicy.authorize(
-          initiatorEntry.user,
-          initiatorEntry.user,
+          initiator.user,
+          initiator.user,
         );
         switch (updateEmailOnSelf) {
           case Authorized():
             await _onUpdateUserEmailAuthorized(
               tester: tester,
-              initiatorEntry: initiatorEntry,
-              targetEntry: initiatorEntry,
+              initiator: initiator,
+              target: initiator,
             );
           case Unauthorized():
             await _onUpdateUserEmailUnauthorized(
               tester: tester,
-              initiatorEntry: initiatorEntry,
-              targetEntry: initiatorEntry,
+              initiator: initiator,
+              target: initiator,
             );
         }
       });
       for (final targetRole in Role.values) {
         testWidgets(
-          '${initiatorRole.name} updating email on ${targetRole.name} lifecycle',
+          '${role.name} updating email on ${targetRole.name} scenario',
           (WidgetTester tester) async {
-            final initiatorEntry = await testApi.createUserEntry(
-              role: initiatorRole,
+            final initiator = await TestServerFixture.createUserFixture(
+              role: role,
             );
-            final targetEntry = await testApi.createUserEntry(role: targetRole);
+            final target = await TestServerFixture.createUserFixture(
+              role: targetRole,
+            );
 
             final viewTarget = canViewUserPolicy.authorize(
-              initiatorEntry.user,
-              targetEntry.user,
+              initiator.user,
+              target.user,
             );
             switch (viewTarget) {
               case Authorized():
                 await _onViewUserAuthorized(
                   tester: tester,
-                  initiatorEntry: initiatorEntry,
-                  targetEntry: targetEntry,
+                  initiator: initiator,
+                  target: target,
                 );
               case Unauthorized():
                 await _onViewUserUnauthorized(
                   tester: tester,
-                  initiatorEntry: initiatorEntry,
-                  targetEntry: targetEntry,
+                  initiator: initiator,
+                  target: target,
                 );
                 return;
             }
 
             final updateEmailOfTarget = updateUserEmailPolicy.authorize(
-              initiatorEntry.user,
-              targetEntry.user,
+              initiator.user,
+              target.user,
             );
             switch (updateEmailOfTarget) {
               case Authorized():
                 await _onUpdateUserEmailAuthorized(
                   tester: tester,
-                  initiatorEntry: initiatorEntry,
-                  targetEntry: targetEntry,
+                  initiator: initiator,
+                  target: target,
                 );
               case Unauthorized():
                 await _onUpdateUserEmailUnauthorized(
                   tester: tester,
-                  initiatorEntry: initiatorEntry,
-                  targetEntry: targetEntry,
+                  initiator: initiator,
+                  target: target,
                 );
             }
           },
@@ -142,18 +124,15 @@ void main() {
 
 Future<void> _onViewUserAuthorized({
   required WidgetTester tester,
-  required UserEntry initiatorEntry,
-  required UserEntry targetEntry,
+  required UserTestFixture initiator,
+  required UserTestFixture target,
 }) async {
-  var targetUserId = targetEntry.user.userId;
-  var targetUserRole = targetEntry.user.role.name;
+  var targetUserId = target.user.userId;
+  var targetUserRole = target.user.role.name;
 
   await tester.startApp();
 
-  await tester.login(
-    email: initiatorEntry.email,
-    password: initiatorEntry.password,
-  );
+  await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
   expect(
@@ -167,18 +146,15 @@ Future<void> _onViewUserAuthorized({
 
 Future<void> _onViewUserUnauthorized({
   required WidgetTester tester,
-  required UserEntry initiatorEntry,
-  required UserEntry targetEntry,
+  required UserTestFixture initiator,
+  required UserTestFixture target,
 }) async {
-  var targetUserId = targetEntry.user.userId;
-  var targetUserRole = targetEntry.user.role.name;
+  var targetUserId = target.user.userId;
+  var targetUserRole = target.user.role.name;
 
   await tester.startApp();
 
-  await tester.login(
-    email: initiatorEntry.email,
-    password: initiatorEntry.password,
-  );
+  await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
   expect(
@@ -192,20 +168,17 @@ Future<void> _onViewUserUnauthorized({
 
 Future<void> _onUpdateUserEmailAuthorized({
   required WidgetTester tester,
-  required UserEntry initiatorEntry,
-  required UserEntry targetEntry,
+  required UserTestFixture initiator,
+  required UserTestFixture target,
 }) async {
-  var targetUserId = targetEntry.user.userId;
-  var targetUserRole = targetEntry.user.role.name;
-  var targetEmail = targetEntry.user.email;
-  var targetPassword = targetEntry.password;
+  var targetUserId = target.user.userId;
+  var targetUserRole = target.user.role.name;
+  var targetEmail = target.user.email;
+  var targetPassword = target.password;
 
   await tester.startApp();
 
-  await tester.login(
-    email: initiatorEntry.email,
-    password: initiatorEntry.password,
-  );
+  await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
   expect(
@@ -252,15 +225,11 @@ Future<void> _onUpdateUserEmailAuthorized({
     matching: find.byType(TextField),
   );
 
-  final newTargetEmail = Email(
-    'new_${targetEntry.user.userId.value}@example.com',
-  );
+  final newTargetEmail = Email('new_${target.user.userId.value}@example.com');
 
   await tester.enterText(emailField, newTargetEmail.value);
 
   final confirmButton = tester.findConfirmButton();
-
-  logger.i('[UI] Confirming email update for $targetUserRole ($targetEmail)');
 
   await tester.tap(confirmButton);
   await tester.pumpAndSettle();
@@ -302,18 +271,15 @@ Future<void> _onUpdateUserEmailAuthorized({
 
 Future<void> _onUpdateUserEmailUnauthorized({
   required WidgetTester tester,
-  required UserEntry initiatorEntry,
-  required UserEntry targetEntry,
+  required UserTestFixture initiator,
+  required UserTestFixture target,
 }) async {
-  var targetUserId = targetEntry.user.userId;
-  var targetUserRole = targetEntry.user.role.name;
+  var targetUserId = target.user.userId;
+  var targetUserRole = target.user.role.name;
 
   await tester.startApp();
 
-  await tester.login(
-    email: initiatorEntry.email,
-    password: initiatorEntry.password,
-  );
+  await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
   expect(

@@ -8,13 +8,13 @@ import 'package:domain/value_objects/role.dart';
 import 'package:error_codes/error_codes.dart';
 
 class TestApi extends HttpApi {
-  Future<List<UserEntry>> createAllUserPairs() async {
-    return await callPost<List<UserEntry>>(
-      endpoint: '/test/create-all-user-pairs',
+  Future<List<UserTestFixture>> createAllUserFixtures() async {
+    return await callPost<List<UserTestFixture>>(
+      endpoint: '/test/create-all-user-fixtures',
       map: (response) {
         if (response.isSuccess) {
           return (response.data as List)
-              .map((e) => UserEntry.fromJson(e))
+              .map((e) => UserTestFixture.fromJson(e))
               .toList();
         }
         throw TestApiException(response.errorCode!);
@@ -22,9 +22,9 @@ class TestApi extends HttpApi {
     );
   }
 
-  Future<void> deleteAllTestUsers() async {
+  Future<void> deleteAllUserFixtures() async {
     await callDelete<void>(
-      endpoint: '/test/delete-all-users',
+      endpoint: '/test/delete-all-user-fixtures',
       map: (response) {
         if (response.isSuccess) {
           return;
@@ -34,24 +34,12 @@ class TestApi extends HttpApi {
     );
   }
 
-  Future<UserEntry> createUserEntry({required Role role}) async {
-    return await callPost<UserEntry>(
-      endpoint: '/test/create-user/${role.name}',
+  Future<UserTestFixture> createUserFixture({required Role role}) async {
+    return await callPost<UserTestFixture>(
+      endpoint: '/test/create-user-fixture/${role.name}',
       map: (response) {
         if (response.isSuccess) {
-          return UserEntry.fromJson(response.data);
-        }
-        throw TestApiException(response.errorCode!);
-      },
-    );
-  }
-
-  Future<void> deleteUserEntry({required UserId userId}) async {
-    await callDelete<void>(
-      endpoint: '/test/delete/${userId.value}',
-      map: (response) {
-        if (response.isSuccess) {
-          return;
+          return UserTestFixture.fromJson(response.data);
         }
         throw TestApiException(response.errorCode!);
       },
@@ -65,19 +53,19 @@ class TestApiException implements Exception {
     : errorCode = errorCodeFromString(errorCode);
 }
 
-class UserEntry {
+class UserTestFixture {
   final User user;
   final Password password;
 
-  UserEntry({required this.user, required this.password});
+  UserTestFixture({required this.user, required this.password});
 
-  factory UserEntry.fromJson(Map<String, dynamic> json) {
-    return UserEntry(
+  factory UserTestFixture.fromJson(Map<String, dynamic> json) {
+    return UserTestFixture(
       user: UserMapper.toDomainUser(json),
       password: Password(json['password']),
     );
   }
-  
+
   UserId get userId => user.userId;
   Email get email => user.email;
   Role get role => user.role;

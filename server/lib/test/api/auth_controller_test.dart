@@ -6,7 +6,7 @@ import '../utils/factories/test_server_factory.dart';
 import '../utils/factories/test_user_entry_factory.dart';
 
 void main() {
-  final testEntries = UserEntryFactory.defaultUserEntries;
+  final testEntries = UserTestFixtureFactory.defaultUserTestFixtures;
 
   setUpAll(() async {
     await TestServerFactory.start(includeDefaultUsers: true);

@@ -20,7 +20,7 @@ extension on WidgetTester {
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  UserTestRunner.testUserPairs(
+  UserTestRunner.userTestFixturePairs(
     users: allMockUserPairs,
     onUserPairCase: (actor, subject) {
       testWidgets('displays user tile with all required components', (

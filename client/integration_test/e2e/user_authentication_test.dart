@@ -7,93 +7,63 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:server/test/utils/factories/test_server_factory.dart';
-import 'package:logger/logger.dart';
 
 import '../utils/extensions/widget_finder_extension.dart';
 import '../utils/extensions/widget_tester_extension.dart';
-
-final logger = Logger();
-
-late TestApi testApi;
-late AuthTokenService authTokenService;
-late List<UserEntry> userEntries;
+import '../utils/test_server_fixture.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('User Authentication Lifecycle', () {
-    setUpAll(() async {
-      await TestServerFactory.start(enableTestRoutes: true);
-      HttpApi.baseUrl = TestServerFactory.baseUrl;
-      testApi = TestApi();
-      authTokenService = AuthTokenService();
-      userEntries = await testApi.createAllUserPairs();
-    });
+    setUpAll(() async => await TestServerFixture.setup());
 
-    tearDownAll(() async {
-      await testApi.deleteAllTestUsers();
-      await TestServerFactory.stop();
-      await authTokenService.clearTokens();
-    });
+    tearDownAll(() async => await TestServerFixture.teardown());
 
     testWidgets('should login, persist session, and logout successfully', (
       WidgetTester tester,
     ) async {
-      for (final entry in userEntries) {
-        final userRole = entry.user.role.name;
-        final email = entry.user.email;
-        final password = entry.password;
-
-        logger.i('Logging in as $userRole');
+      for (final user in await TestServerFixture.createAllUserFixtures()) {
+        final roleName = user.role.name;
 
         await tester.startApp();
-        await tester.login(email: email, password: password);
+        await tester.login(email: user.email, password: user.password);
         final userAdministrationView = find.byType(UserAdministrationView);
 
         expect(
           userAdministrationView,
           findsOne,
           reason:
-              'Should show UserAdministrationView after successful login for $userRole',
+              'Should show UserAdministrationView after successful login for $roleName',
         );
         expect(
           userAdministrationView.findDescendant(UserList),
           findsOne,
           reason:
-              'Should show UserList in UserAdministrationView for $userRole',
+              'Should show UserList in UserAdministrationView for $roleName',
         );
-
-        logger.i('Login successful for $userRole');
-
-        logger.i('Persisting session for $userRole');
 
         await tester.startApp();
         expect(
           find.byType(LoginView),
           findsNothing,
           reason:
-              'LoginView should not be shown after app restart for $userRole',
+              'LoginView should not be shown after app restart for $roleName',
         );
         expect(
           find.byType(UserAdministrationView),
           findsOne,
           reason:
-              'Should show UserAdministrationView directly after app restart for $userRole',
+              'Should show UserAdministrationView directly after app restart for $roleName',
         );
-
-        logger.i('Session persisted successfully for $userRole');
-
-        logger.i('Logging out as $userRole');
 
         await tester.tap(find.byIcon(Icons.logout));
         await tester.pumpAndSettle();
         expect(
           find.byType(LoginView),
           findsOne,
-          reason: 'Should show LoginView after logout for $userRole',
+          reason: 'Should show LoginView after logout for $roleName',
         );
-
-        logger.i('Logged out successfully as $userRole');
       }
     });
   });

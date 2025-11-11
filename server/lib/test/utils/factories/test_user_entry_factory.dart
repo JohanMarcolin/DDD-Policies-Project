@@ -6,8 +6,8 @@ import 'package:domain/value_objects/role.dart';
 import '../../../infrastructure/databases/user_database.dart';
 import '../../../infrastructure/databases/user_password_database.dart';
 
-class UserEntry {
-  const UserEntry({required this.user, required this.password});
+class UserTestFixture {
+  const UserTestFixture({required this.user, required this.password});
 
   final User user;
   final Password password;
@@ -16,7 +16,7 @@ class UserEntry {
   Email get email => user.email;
 }
 
-class UserEntryFactory {
+class UserTestFixtureFactory {
   static User user1 = _createUser(
     userId: UserId('1'),
     email: Email('user1@example.com'),
@@ -35,33 +35,34 @@ class UserEntryFactory {
     role: Role.analyst,
   );
 
-  static List<UserEntry> get defaultUserEntries => _getDefaultUserEntries();
+  static List<UserTestFixture> get defaultUserTestFixtures =>
+      _getDefaultUserTestFixtures();
 
   static void setupDefaultUsers({
     required UserDatabase userDatabase,
     required UserPasswordDatabase userPasswordDatabase,
   }) {
-    for (final entry in defaultUserEntries) {
+    for (final entry in defaultUserTestFixtures) {
       userDatabase.put(entry.userId, entry.user);
       userPasswordDatabase.put(entry.userId, entry.password);
     }
   }
 
-  static List<UserEntry> _getDefaultUserEntries() {
+  static List<UserTestFixture> _getDefaultUserTestFixtures() {
     return [
-      _getDefaultUserEntryWithPassword(role: Role.user, number: 1),
-      _getDefaultUserEntryWithPassword(role: Role.user, number: 2),
-      _getDefaultUserEntryWithPassword(role: Role.admin, number: 1),
-      _getDefaultUserEntryWithPassword(role: Role.admin, number: 2),
-      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 1),
-      _getDefaultUserEntryWithPassword(role: Role.analyst, number: 2),
+      _getDefaultUserTestFixtureWithPassword(role: Role.user, number: 1),
+      _getDefaultUserTestFixtureWithPassword(role: Role.user, number: 2),
+      _getDefaultUserTestFixtureWithPassword(role: Role.admin, number: 1),
+      _getDefaultUserTestFixtureWithPassword(role: Role.admin, number: 2),
+      _getDefaultUserTestFixtureWithPassword(role: Role.analyst, number: 1),
+      _getDefaultUserTestFixtureWithPassword(role: Role.analyst, number: 2),
     ];
   }
 
-  static UserEntry _getDefaultUserEntryWithPassword(
+  static UserTestFixture _getDefaultUserTestFixtureWithPassword(
       {required Role role, required int number}) {
     final roleName = role.name;
-    return UserEntry(
+    return UserTestFixture(
       user: User(
         userId: UserId('$roleName$number'),
         email: Email('$roleName$number'),

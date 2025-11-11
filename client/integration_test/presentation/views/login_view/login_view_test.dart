@@ -99,13 +99,13 @@ Future<void> main() async {
     testWidgets('displays success snackbar on valid login', (
       WidgetTester tester,
     ) async {
-      final testUser = mockUser;
+      final userTestFixture = mockUser;
       final testEmail = mockUser.email;
       final testPassword = mockValidPassword;
 
       when(
         () => mockAuthApi.login(email: testEmail, password: testPassword),
-      ).thenAnswer((_) async => testUser);
+      ).thenAnswer((_) async => userTestFixture);
 
       await tester.renderLoginView();
       await tester.enterText(find.byType(LoginEmailField), testEmail.value);

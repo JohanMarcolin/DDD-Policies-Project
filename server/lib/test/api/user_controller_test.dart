@@ -13,16 +13,16 @@ import '../utils/factories/test_user_entry_factory.dart';
 import 'utils/test_token_utils.dart';
 
 void main() {
-  final userEntries = UserEntryFactory.defaultUserEntries;
+  final userTestFixtures = UserTestFixtureFactory.defaultUserTestFixtures;
 
-  Future<String> getToken(UserEntry entry) async =>
-      await getAccessToken(userEntry: entry);
+  Future<String> getToken(UserTestFixture entry) async =>
+      await getAccessToken(userTestFixture: entry);
 
   group('User Controller', () {
-    for (final initiator in userEntries) {
+    for (final initiator in userTestFixtures) {
       final initiatorUserRole = '{${initiator.user.role.name}}';
 
-      for (final target in userEntries) {
+      for (final target in userTestFixtures) {
         final targetUserRole = '{${target.user.role.name}}';
 
         group(

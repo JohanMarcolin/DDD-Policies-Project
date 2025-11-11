@@ -1,17 +1,17 @@
-import 'package:client/infrastructure/apis/test_api.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:server/test/utils/factories/test_user_entry_factory.dart';
 
 class UserTestRunner {
-  static Future<void> testUserPairs({
+  static Future<void> userTestFixturePairs({
     required List<User> users,
     required void Function(User actor, User subject) onUserPairCase,
   }) async {
     _forEachUserPair(users: users, testCallback: onUserPairCase);
   }
 
-  static Future<void> testUserPolicy({
+  static Future<void> userTestFixturePolicy({
     required ActionPolicy<User, User> policy,
     required List<User> users,
     required void Function(User actor, User subject) onAuthorized,
@@ -54,25 +54,27 @@ class UserTestRunner {
     }
   }
 
-  static Future<void> userEntryPairs({
-    required List<UserEntry> userEntries,
-    required void Function(UserEntry actor, UserEntry subject)
-    onUserEntryPairCase,
+  static Future<void> testUserTestFixturePairs({
+    required List<UserTestFixture> userTestFixtures,
+    required void Function(UserTestFixture actor, UserTestFixture subject)
+    onUserTestFixturePairCase,
   }) async {
-    _forEachUserEntryPair(
-      userEntries: userEntries,
-      testCallback: onUserEntryPairCase,
+    _forEachUserTestFixturePair(
+      userTestFixtures: userTestFixtures,
+      testCallback: onUserTestFixturePairCase,
     );
   }
 
-  static Future<void> testUserEntryPolicy({
+  static Future<void> testUserTestFixturePolicy({
     required ActionPolicy<User, User> policy,
-    required List<UserEntry> userEntries,
-    required void Function(UserEntry actor, UserEntry subject) onAuthorized,
-    required void Function(UserEntry actor, UserEntry subject) onUnauthorized,
+    required List<UserTestFixture> userTestFixtures,
+    required void Function(UserTestFixture actor, UserTestFixture subject)
+    onAuthorized,
+    required void Function(UserTestFixture actor, UserTestFixture subject)
+    onUnauthorized,
   }) async {
-    _forEachUserEntryPair(
-      userEntries: userEntries,
+    _forEachUserTestFixturePair(
+      userTestFixtures: userTestFixtures,
       testCallback: (actor, subject) {
         final result = policy.authorize(actor.user, subject.user);
         switch (result) {
@@ -89,12 +91,13 @@ class UserTestRunner {
     );
   }
 
-  static void _forEachUserEntryPair({
-    required List<UserEntry> userEntries,
-    required void Function(UserEntry actor, UserEntry subject) testCallback,
+  static void _forEachUserTestFixturePair({
+    required List<UserTestFixture> userTestFixtures,
+    required void Function(UserTestFixture actor, UserTestFixture subject)
+    testCallback,
   }) {
-    for (final actor in userEntries) {
-      for (final subject in userEntries) {
+    for (final actor in userTestFixtures) {
+      for (final subject in userTestFixtures) {
         group(
           actor.user.isSameAs(subject.user)
               ? '${actor.user.role.name} acting on self'
