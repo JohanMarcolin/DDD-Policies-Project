@@ -1,12 +1,8 @@
-import 'package:client/infrastructure/apis/http_api.dart';
-import 'package:client/infrastructure/apis/test_api.dart';
-import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:server/test/utils/factories/test_server_factory.dart';
 
 import '../utils/extensions/widget_finder_extension.dart';
 import '../utils/extensions/widget_tester_extension.dart';
@@ -15,7 +11,7 @@ import '../utils/test_server_fixture.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('User Authentication Lifecycle', () {
+  group('User Authentication Scenario', () {
     setUpAll(() async => await TestServerFixture.setup());
 
     tearDownAll(() async => await TestServerFixture.teardown());

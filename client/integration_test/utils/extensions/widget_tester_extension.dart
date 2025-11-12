@@ -1,4 +1,5 @@
 import 'package:client/infrastructure/apis/auth_api.dart';
+import 'package:client/infrastructure/apis/test_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
@@ -115,6 +116,50 @@ extension WidgetTesterTileFinderExtension on WidgetTester {
     return find.byWidgetPredicate(
       (widget) => widget is UserTile && widget.user.email.value == email.value,
     );
+  }
+
+  Future<void> assertUserTileIsVisible({
+    required UserTestFixture initiator,
+    required UserTestFixture target,
+  }) async {
+    await _assertUserTileVisibility(
+      initiator: initiator,
+      target: target,
+      shouldBeVisible: true,
+    );
+  }
+
+  Future<void> assertUserTileIsNotVisible({
+    required UserTestFixture initiator,
+    required UserTestFixture target,
+  }) async {
+    await _assertUserTileVisibility(
+      initiator: initiator,
+      target: target,
+      shouldBeVisible: false,
+    );
+  }
+
+  Future<void> _assertUserTileVisibility({
+    required UserTestFixture initiator,
+    required UserTestFixture target,
+    required bool shouldBeVisible,
+  }) async {
+    var targetUserId = target.user.userId;
+    var targetUserRole = target.user.role.name;
+
+    await startApp();
+    await login(email: initiator.email, password: initiator.password);
+
+    final targetUserTile = findUserTileByUserId(targetUserId);
+    expect(
+      targetUserTile,
+      shouldBeVisible ? findsOne : findsNothing,
+      reason:
+          'UserTile ${shouldBeVisible ? "should" : "should not"} be found for $targetUserRole target',
+    );
+
+    await logout();
   }
 }
 

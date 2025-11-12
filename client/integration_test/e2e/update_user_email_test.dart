@@ -18,7 +18,7 @@ void main() {
     setUp(() async => await TestServerFixture.setup());
     tearDown(() async => await TestServerFixture.teardown());
 
-    final canViewUserPolicy = ViewUserPolicy();
+    final viewUserPolicy = ViewUserPolicy();
     final updateUserEmailPolicy = UpdateUserEmailPolicy();
 
     for (final role in Role.values) {
@@ -27,20 +27,18 @@ void main() {
       ) async {
         final initiator = await TestServerFixture.createUserFixture(role: role);
 
-        final viewSelf = canViewUserPolicy.authorize(
+        final viewSelf = viewUserPolicy.authorize(
           initiator.user,
           initiator.user,
         );
         switch (viewSelf) {
           case Authorized():
-            await _onViewUserAuthorized(
-              tester: tester,
+            await tester.assertUserTileIsVisible(
               initiator: initiator,
               target: initiator,
             );
           case Unauthorized():
-            await _onViewUserUnauthorized(
-              tester: tester,
+            await tester.assertUserTileIsNotVisible(
               initiator: initiator,
               target: initiator,
             );
@@ -53,13 +51,13 @@ void main() {
         );
         switch (updateEmailOnSelf) {
           case Authorized():
-            await _onUpdateUserEmailAuthorized(
+            await _assertUpdateEmailSucceeds(
               tester: tester,
               initiator: initiator,
               target: initiator,
             );
           case Unauthorized():
-            await _onUpdateUserEmailUnauthorized(
+            await _assertUpdateEmailBlocked(
               tester: tester,
               initiator: initiator,
               target: initiator,
@@ -77,20 +75,18 @@ void main() {
               role: targetRole,
             );
 
-            final viewTarget = canViewUserPolicy.authorize(
+            final viewTarget = viewUserPolicy.authorize(
               initiator.user,
               target.user,
             );
             switch (viewTarget) {
               case Authorized():
-                await _onViewUserAuthorized(
-                  tester: tester,
+                await tester.assertUserTileIsVisible(
                   initiator: initiator,
                   target: target,
                 );
               case Unauthorized():
-                await _onViewUserUnauthorized(
-                  tester: tester,
+                await tester.assertUserTileIsNotVisible(
                   initiator: initiator,
                   target: target,
                 );
@@ -103,13 +99,13 @@ void main() {
             );
             switch (updateEmailOfTarget) {
               case Authorized():
-                await _onUpdateUserEmailAuthorized(
+                await _assertUpdateEmailSucceeds(
                   tester: tester,
                   initiator: initiator,
                   target: target,
                 );
               case Unauthorized():
-                await _onUpdateUserEmailUnauthorized(
+                await _assertUpdateEmailBlocked(
                   tester: tester,
                   initiator: initiator,
                   target: target,
@@ -122,51 +118,7 @@ void main() {
   });
 }
 
-Future<void> _onViewUserAuthorized({
-  required WidgetTester tester,
-  required UserTestFixture initiator,
-  required UserTestFixture target,
-}) async {
-  var targetUserId = target.user.userId;
-  var targetUserRole = target.user.role.name;
-
-  await tester.startApp();
-
-  await tester.login(email: initiator.email, password: initiator.password);
-
-  final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(
-    targetUserTile,
-    findsOne,
-    reason: 'UserTile should be found for $targetUserRole target',
-  );
-
-  await tester.logout();
-}
-
-Future<void> _onViewUserUnauthorized({
-  required WidgetTester tester,
-  required UserTestFixture initiator,
-  required UserTestFixture target,
-}) async {
-  var targetUserId = target.user.userId;
-  var targetUserRole = target.user.role.name;
-
-  await tester.startApp();
-
-  await tester.login(email: initiator.email, password: initiator.password);
-
-  final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(
-    targetUserTile,
-    findsNothing,
-    reason: 'UserTile should not be found for $targetUserRole target',
-  );
-
-  await tester.logout();
-}
-
-Future<void> _onUpdateUserEmailAuthorized({
+Future<void> _assertUpdateEmailSucceeds({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
@@ -269,7 +221,7 @@ Future<void> _onUpdateUserEmailAuthorized({
   await tester.logout();
 }
 
-Future<void> _onUpdateUserEmailUnauthorized({
+Future<void> _assertUpdateEmailBlocked({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
