@@ -12,6 +12,9 @@ import 'package:integration_test/integration_test.dart';
 import '../utils/extensions/widget_tester_extension.dart';
 import '../utils/test_server_fixture.dart';
 
+/// Entry point for Update User Password integration tests.
+///
+/// Covers all scenarios for updating password on self and other users based on the [ViewUserPolicy] and [UpdateUserPasswordPolicy].
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -23,97 +26,48 @@ void main() {
     final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
 
     for (final role in Role.values) {
-      testWidgets('${role.name} updating password on self scenario', (
-        WidgetTester tester,
-      ) async {
-        final initiator = await TestServerFixture.createUserFixture(role: role);
+      testWidgets('${role.name} updating password on self scenario', (WidgetTester tester) async {
+        final self = await TestServerFixture.createUserFixture(role: role);
 
-        final viewSelf = viewUserPolicy.authorize(
-          initiator.user,
-          initiator.user,
-        );
+        final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
           case Authorized():
-            await tester.assertUserTileIsVisible(
-              initiator: initiator,
-              target: initiator,
-            );
+            await tester.assertUserTileIsVisible(initiator: self, target: self);
           case Unauthorized():
-            await tester.assertUserTileIsNotVisible(
-              initiator: initiator,
-              target: initiator,
-            );
+            await tester.assertUserTileIsNotVisible(initiator: self, target: self);
             return;
         }
 
-        final updatePasswordOnSelf = updateUserPasswordPolicy.authorize(
-          initiator.user,
-          initiator.user,
-        );
+        final updatePasswordOnSelf = updateUserPasswordPolicy.authorize(self.user, self.user);
         switch (updatePasswordOnSelf) {
           case Authorized():
-            await _assertUpdatePasswordSucceeds(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertUpdatePasswordSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertUpdatePasswordBlocked(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertUpdatePasswordBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets(
-          '${role.name} updating password on ${targetRole.name} scenario',
-          (WidgetTester tester) async {
-            final initiator = await TestServerFixture.createUserFixture(
-              role: role,
-            );
-            final target = await TestServerFixture.createUserFixture(
-              role: targetRole,
-            );
+        testWidgets('${role.name} updating password on ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await TestServerFixture.createUserFixture(role: role);
+          final target = await TestServerFixture.createUserFixture(role: targetRole);
 
-            final viewTarget = viewUserPolicy.authorize(
-              initiator.user,
-              target.user,
-            );
-            switch (viewTarget) {
-              case Authorized():
-                await tester.assertUserTileIsVisible(
-                  initiator: initiator,
-                  target: target,
-                );
-              case Unauthorized():
-                await tester.assertUserTileIsNotVisible(
-                  initiator: initiator,
-                  target: target,
-                );
-                return;
-            }
+          final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
+          switch (viewTarget) {
+            case Authorized():
+              await tester.assertUserTileIsVisible(initiator: initiator, target: target);
+            case Unauthorized():
+              await tester.assertUserTileIsNotVisible(initiator: initiator, target: target);
+              return;
+          }
 
-            final updatePasswordOfTarget = updateUserPasswordPolicy.authorize(
-              initiator.user,
-              target.user,
-            );
-            switch (updatePasswordOfTarget) {
-              case Authorized():
-                await _assertUpdatePasswordSucceeds(
-                  tester: tester,
-                  initiator: initiator,
-                  target: target,
-                );
-              case Unauthorized():
-                await _assertUpdatePasswordBlocked(
-                  tester: tester,
-                  initiator: initiator,
-                  target: target,
-                );
-            }
-          },
-        );
+          final updatePasswordOfTarget = updateUserPasswordPolicy.authorize(initiator.user, target.user);
+          switch (updatePasswordOfTarget) {
+            case Authorized():
+              await _assertUpdatePasswordSucceeds(tester: tester, initiator: initiator, target: target);
+            case Unauthorized():
+              await _assertUpdatePasswordBlocked(tester: tester, initiator: initiator, target: target);
+          }
+        });
       }
     }
   });
@@ -131,42 +85,21 @@ Future<void> _assertUpdatePasswordSucceeds({
   await tester.login(email: initiator.user.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(target.user.userId);
-  expect(
-    targetUserTile,
-    findsOne,
-    reason: 'UserTile should be found for $targetUserRole target',
-  );
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
 
-  final updatePasswordIcon = find.descendant(
-    of: targetUserTile,
-    matching: find.byType(UpdateUserPasswordIcon),
-  );
+  final updatePasswordIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserPasswordIcon));
 
   await tester.tap(updatePasswordIcon);
   await tester.pumpAndSettle();
 
   final passwordUpdateDialogChild = find.byType(UpdateUserPasswordDialogChild);
-  expect(
-    passwordUpdateDialogChild,
-    findsOne,
-    reason: 'Password update dialog should be shown',
-  );
+  expect(passwordUpdateDialogChild, findsOne, reason: 'Password update dialog should be shown');
 
-  final confirmInputDialog = find.descendant(
-    of: passwordUpdateDialogChild,
-    matching: find.byType(ConfirmInputDialog),
-  );
+  final confirmInputDialog = find.descendant(of: passwordUpdateDialogChild, matching: find.byType(ConfirmInputDialog));
 
-  expect(
-    confirmInputDialog,
-    findsOne,
-    reason: 'Confirm input dialog should be shown',
-  );
+  expect(confirmInputDialog, findsOne, reason: 'Confirm input dialog should be shown');
 
-  final passwordField = find.descendant(
-    of: confirmInputDialog,
-    matching: find.byType(TextField),
-  );
+  final passwordField = find.descendant(of: confirmInputDialog, matching: find.byType(TextField));
 
   final newPassword = PasswordValidationPolicy.generatePassword();
 
@@ -177,19 +110,11 @@ Future<void> _assertUpdatePasswordSucceeds({
   await tester.tap(confirmButton);
   await tester.pumpAndSettle();
 
-  expect(
-    confirmInputDialog,
-    findsNothing,
-    reason: 'Dialog should close after password update',
-  );
+  expect(confirmInputDialog, findsNothing, reason: 'Dialog should close after password update');
 
   await tester.logout();
 
-  expect(
-    find.byType(LoginView),
-    findsOne,
-    reason: 'Should show LoginView after logout',
-  );
+  expect(find.byType(LoginView), findsOne, reason: 'Should show LoginView after logout');
 
   await tester.login(email: target.user.email, password: target.password);
 
@@ -201,11 +126,7 @@ Future<void> _assertUpdatePasswordSucceeds({
 
   await tester.login(email: target.user.email, password: newPassword);
 
-  expect(
-    find.byType(UserAdministrationView),
-    findsOne,
-    reason: 'Login should succeed with new password',
-  );
+  expect(find.byType(UserAdministrationView), findsOne, reason: 'Login should succeed with new password');
 }
 
 Future<void> _assertUpdatePasswordBlocked({
@@ -221,26 +142,15 @@ Future<void> _assertUpdatePasswordBlocked({
   await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(
-    targetUserTile,
-    findsOne,
-    reason: 'UserTile should be found for $targetUserRole target',
-  );
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
 
-  final updatePasswordIcon = find.descendant(
-    of: targetUserTile,
-    matching: find.byType(UpdateUserPasswordIcon),
-  );
+  final updatePasswordIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserPasswordIcon));
 
   await tester.tap(updatePasswordIcon);
   await tester.pumpAndSettle();
 
   final passwordUpdateDialogChild = find.byType(UpdateUserPasswordDialogChild);
-  expect(
-    passwordUpdateDialogChild,
-    findsNothing,
-    reason: 'Password update dialog should not be shown',
-  );
+  expect(passwordUpdateDialogChild, findsNothing, reason: 'Password update dialog should not be shown');
 
   await tester.logout();
 }

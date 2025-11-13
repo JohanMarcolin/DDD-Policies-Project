@@ -11,6 +11,9 @@ import 'package:integration_test/integration_test.dart';
 import '../utils/extensions/widget_tester_extension.dart';
 import '../utils/test_server_fixture.dart';
 
+/// Entry point for Update User Email integration tests.
+///
+/// Covers all scenarios for updating email on self and other users based on the [ViewUserPolicy] and [UpdateUserEmailPolicy].
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -22,97 +25,48 @@ void main() {
     final updateUserEmailPolicy = UpdateUserEmailPolicy();
 
     for (final role in Role.values) {
-      testWidgets('${role.name} updating email on self scenario', (
-        WidgetTester tester,
-      ) async {
-        final initiator = await TestServerFixture.createUserFixture(role: role);
+      testWidgets('${role.name} updating email on self scenario', (WidgetTester tester) async {
+        final self = await TestServerFixture.createUserFixture(role: role);
 
-        final viewSelf = viewUserPolicy.authorize(
-          initiator.user,
-          initiator.user,
-        );
+        final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
           case Authorized():
-            await tester.assertUserTileIsVisible(
-              initiator: initiator,
-              target: initiator,
-            );
+            await tester.assertUserTileIsVisible(initiator: self, target: self);
           case Unauthorized():
-            await tester.assertUserTileIsNotVisible(
-              initiator: initiator,
-              target: initiator,
-            );
+            await tester.assertUserTileIsNotVisible(initiator: self, target: self);
             return;
         }
 
-        final updateEmailOnSelf = updateUserEmailPolicy.authorize(
-          initiator.user,
-          initiator.user,
-        );
+        final updateEmailOnSelf = updateUserEmailPolicy.authorize(self.user, self.user);
         switch (updateEmailOnSelf) {
           case Authorized():
-            await _assertUpdateEmailSucceeds(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertUpdateEmailSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertUpdateEmailBlocked(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertUpdateEmailBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets(
-          '${role.name} updating email on ${targetRole.name} scenario',
-          (WidgetTester tester) async {
-            final initiator = await TestServerFixture.createUserFixture(
-              role: role,
-            );
-            final target = await TestServerFixture.createUserFixture(
-              role: targetRole,
-            );
+        testWidgets('${role.name} updating email on ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await TestServerFixture.createUserFixture(role: role);
+          final target = await TestServerFixture.createUserFixture(role: targetRole);
 
-            final viewTarget = viewUserPolicy.authorize(
-              initiator.user,
-              target.user,
-            );
-            switch (viewTarget) {
-              case Authorized():
-                await tester.assertUserTileIsVisible(
-                  initiator: initiator,
-                  target: target,
-                );
-              case Unauthorized():
-                await tester.assertUserTileIsNotVisible(
-                  initiator: initiator,
-                  target: target,
-                );
-                return;
-            }
+          final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
+          switch (viewTarget) {
+            case Authorized():
+              await tester.assertUserTileIsVisible(initiator: initiator, target: target);
+            case Unauthorized():
+              await tester.assertUserTileIsNotVisible(initiator: initiator, target: target);
+              return;
+          }
 
-            final updateEmailOfTarget = updateUserEmailPolicy.authorize(
-              initiator.user,
-              target.user,
-            );
-            switch (updateEmailOfTarget) {
-              case Authorized():
-                await _assertUpdateEmailSucceeds(
-                  tester: tester,
-                  initiator: initiator,
-                  target: target,
-                );
-              case Unauthorized():
-                await _assertUpdateEmailBlocked(
-                  tester: tester,
-                  initiator: initiator,
-                  target: target,
-                );
-            }
-          },
-        );
+          final updateEmailOfTarget = updateUserEmailPolicy.authorize(initiator.user, target.user);
+          switch (updateEmailOfTarget) {
+            case Authorized():
+              await _assertUpdateEmailSucceeds(tester: tester, initiator: initiator, target: target);
+            case Unauthorized():
+              await _assertUpdateEmailBlocked(tester: tester, initiator: initiator, target: target);
+          }
+        });
       }
     }
   });
@@ -133,11 +87,7 @@ Future<void> _assertUpdateEmailSucceeds({
   await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(
-    targetUserTile,
-    findsOne,
-    reason: 'UserTile should be found for $targetUserRole target',
-  );
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
 
   final targetUserTileWidget = tester.widget<UserTile>(targetUserTile);
   expect(
@@ -146,36 +96,19 @@ Future<void> _assertUpdateEmailSucceeds({
     reason: 'Target UserTile should show correct email before update',
   );
 
-  final updateEmailIcon = find.descendant(
-    of: targetUserTile,
-    matching: find.byType(UpdateUserEmailIcon),
-  );
+  final updateEmailIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserEmailIcon));
 
   await tester.tap(updateEmailIcon);
   await tester.pumpAndSettle();
 
   final emailUpdateDialogChild = find.byType(UpdateUserEmailDialogChild);
-  expect(
-    emailUpdateDialogChild,
-    findsOne,
-    reason: 'Email update dialog should be shown',
-  );
+  expect(emailUpdateDialogChild, findsOne, reason: 'Email update dialog should be shown');
 
-  final confirmInputDialog = find.descendant(
-    of: emailUpdateDialogChild,
-    matching: find.byType(ConfirmInputDialog),
-  );
+  final confirmInputDialog = find.descendant(of: emailUpdateDialogChild, matching: find.byType(ConfirmInputDialog));
 
-  expect(
-    confirmInputDialog,
-    findsOne,
-    reason: 'Confirm input dialog should be shown',
-  );
+  expect(confirmInputDialog, findsOne, reason: 'Confirm input dialog should be shown');
 
-  final emailField = find.descendant(
-    of: confirmInputDialog,
-    matching: find.byType(TextField),
-  );
+  final emailField = find.descendant(of: confirmInputDialog, matching: find.byType(TextField));
 
   final newTargetEmail = Email('new_${target.user.userId.value}@example.com');
 
@@ -187,9 +120,7 @@ Future<void> _assertUpdateEmailSucceeds({
   await tester.pumpAndSettle();
 
   final updatedTargetUserTile = tester.findUserTileByUserId(targetUserId);
-  final updatedTargetUserTileWidget = tester.widget<UserTile>(
-    updatedTargetUserTile,
-  );
+  final updatedTargetUserTileWidget = tester.widget<UserTile>(updatedTargetUserTile);
   expect(
     updatedTargetUserTileWidget.user.email,
     equals(newTargetEmail),
@@ -205,8 +136,7 @@ Future<void> _assertUpdateEmailSucceeds({
   expect(
     find.byType(UserAdministrationView),
     findsNothing,
-    reason:
-        'Login with old target email should fail after email update for $targetUserRole',
+    reason: 'Login with old target email should fail after email update for $targetUserRole',
   );
 
   await tester.login(email: newTargetEmail, password: targetPassword);
@@ -214,8 +144,7 @@ Future<void> _assertUpdateEmailSucceeds({
   expect(
     find.byType(UserAdministrationView),
     findsOne,
-    reason:
-        'Login with new email should succeed after email update for $targetUserRole',
+    reason: 'Login with new email should succeed after email update for $targetUserRole',
   );
 
   await tester.logout();
@@ -234,26 +163,15 @@ Future<void> _assertUpdateEmailBlocked({
   await tester.login(email: initiator.email, password: initiator.password);
 
   final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(
-    targetUserTile,
-    findsOne,
-    reason: 'UserTile should be found for $targetUserRole target',
-  );
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
 
-  final updateEmailIcon = find.descendant(
-    of: targetUserTile,
-    matching: find.byType(UpdateUserEmailIcon),
-  );
+  final updateEmailIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserEmailIcon));
 
   await tester.tap(updateEmailIcon);
   await tester.pumpAndSettle();
 
   final emailUpdateDialogChild = find.byType(UpdateUserEmailDialogChild);
-  expect(
-    emailUpdateDialogChild,
-    findsNothing,
-    reason: 'Email update dialog should not be shown',
-  );
+  expect(emailUpdateDialogChild, findsNothing, reason: 'Email update dialog should not be shown');
 
   await tester.logout();
 }

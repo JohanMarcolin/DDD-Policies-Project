@@ -9,6 +9,9 @@ import '../utils/extensions/widget_finder_extension.dart';
 import '../utils/extensions/widget_tester_extension.dart';
 import '../utils/test_server_fixture.dart';
 
+/// Entry point for View User integration tests.
+///
+/// Covers all scenarios for viewing self and other users based on the [ViewUserPolicy].
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -19,58 +22,28 @@ void main() {
     final viewUserPolicy = ViewUserPolicy();
 
     for (final role in Role.values) {
-      testWidgets('${role.name} viewing self scenario', (
-        WidgetTester tester,
-      ) async {
-        final initiator = await TestServerFixture.createUserFixture(role: role);
+      testWidgets('${role.name} viewing self scenario', (WidgetTester tester) async {
+        final self = await TestServerFixture.createUserFixture(role: role);
 
-        final viewSelf = viewUserPolicy.authorize(
-          initiator.user,
-          initiator.user,
-        );
+        final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
           case Authorized():
-            await _assertViewUserSucceeds(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertViewUserSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertViewUserBlocked(
-              tester: tester,
-              initiator: initiator,
-              target: initiator,
-            );
+            await _assertViewUserBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets('${role.name} viewing ${targetRole.name} scenario', (
-          WidgetTester tester,
-        ) async {
-          final initiator = await TestServerFixture.createUserFixture(
-            role: role,
-          );
-          final target = await TestServerFixture.createUserFixture(
-            role: targetRole,
-          );
+        testWidgets('${role.name} viewing ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await TestServerFixture.createUserFixture(role: role);
+          final target = await TestServerFixture.createUserFixture(role: targetRole);
 
-          final viewTarget = viewUserPolicy.authorize(
-            initiator.user,
-            target.user,
-          );
+          final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
           switch (viewTarget) {
             case Authorized():
-              await _assertViewUserSucceeds(
-                tester: tester,
-                initiator: initiator,
-                target: target,
-              );
+              await _assertViewUserSucceeds(tester: tester, initiator: initiator, target: target);
             case Unauthorized():
-              await _assertViewUserBlocked(
-                tester: tester,
-                initiator: initiator,
-                target: target,
-              );
+              await _assertViewUserBlocked(tester: tester, initiator: initiator, target: target);
           }
         });
       }
@@ -83,12 +56,7 @@ Future<void> _assertViewUserSucceeds({
   required UserTestFixture initiator,
   required UserTestFixture target,
 }) async {
-  await _assertViewUser(
-    tester: tester,
-    initiator: initiator,
-    target: target,
-    shouldFind: true,
-  );
+  await _assertViewUser(tester: tester, initiator: initiator, target: target, shouldFind: true);
 }
 
 Future<void> _assertViewUserBlocked({
@@ -96,12 +64,7 @@ Future<void> _assertViewUserBlocked({
   required UserTestFixture initiator,
   required UserTestFixture target,
 }) async {
-  await _assertViewUser(
-    tester: tester,
-    initiator: initiator,
-    target: target,
-    shouldFind: false,
-  );
+  await _assertViewUser(tester: tester, initiator: initiator, target: target, shouldFind: false);
 }
 
 Future<void> _assertViewUser({
@@ -116,23 +79,13 @@ Future<void> _assertViewUser({
   await tester.login(email: initiator.email, password: initiator.password);
 
   final userAdministrationView = find.byType(UserAdministrationView);
-  expect(
-    userAdministrationView,
-    findsOne,
-    reason: 'Should show UserAdministrationView after login',
-  );
+  expect(userAdministrationView, findsOne, reason: 'Should show UserAdministrationView after login');
 
   final userList = userAdministrationView.findDescendant(UserList);
-  expect(
-    userList,
-    findsOne,
-    reason: 'Should show UserList in UserAdministrationView',
-  );
+  expect(userList, findsOne, reason: 'Should show UserList in UserAdministrationView');
 
   final targetUserTile = userList.findDescendantMatching(
-    find.byWidgetPredicate(
-      (widget) => widget is UserTile && widget.user.isSameAs(target.user),
-    ),
+    find.byWidgetPredicate((widget) => widget is UserTile && widget.user.isSameAs(target.user)),
   );
   expect(
     targetUserTile,
