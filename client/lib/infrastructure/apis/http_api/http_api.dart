@@ -1,18 +1,25 @@
 import 'dart:convert';
-import 'package:client/infrastructure/apis/http_api_response.dart';
 import 'package:http/http.dart' as http;
 
 part 'http_method.dart';
+part 'http_api_response.dart';
 
 class _UnauthorizedException implements Exception {}
 
+/// Abstract base class for making HTTP API calls.
+///
+/// Provides generic methods for GET, POST, PUT, and DELETE requests, with support for authentication and token refresh.
 abstract class HttpApi {
+  /// Creates a new [HttpApi].
   const HttpApi();
 
   static String _baseUrl = 'http://10.0.2.2:8080';
 
+  /// Sets the base URL for all API requests.
   static set baseUrl(String url) => _baseUrl = url;
 
+  /// Performs a GET request to [endpoint] and maps the response using [map].
+  /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callGet<T>({
     required String endpoint,
     required T Function(HttpApiResponse response) map,
@@ -28,6 +35,8 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
+  /// Performs a POST request to [endpoint] with [data] and maps the response using [map].
+  /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callPost<T>({
     required String endpoint,
     Object? data,
@@ -45,6 +54,8 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
+  /// Performs a PUT request to [endpoint] with [data] and maps the response using [map].
+  /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callPut<T>({
     required String endpoint,
     Object? data,
@@ -62,6 +73,8 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
+  /// Performs a DELETE request to [endpoint] and maps the response using [map].
+  /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callDelete<T>({
     required String endpoint,
     required T Function(HttpApiResponse response) map,
@@ -77,6 +90,7 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
+  /// Internal helper to perform the HTTP request and decode the response.
   Future<Map<String, dynamic>> _call({
     required HttpMethod method,
     required String endpoint,
@@ -86,11 +100,7 @@ abstract class HttpApi {
   }) async {
     http.Response response;
     if (accessToken == null) {
-      response = await _doPlainRequest(
-        method: method,
-        endpoint: endpoint,
-        data: data,
-      );
+      response = await _doPlainRequest(method: method, endpoint: endpoint, data: data);
     } else {
       response = await _doAuthedRequest(
         method: method,
@@ -100,20 +110,15 @@ abstract class HttpApi {
         refreshAccessToken: refreshAccessToken,
       );
     }
-    final decoded = response.body.isNotEmpty
-        ? jsonDecode(response.body)
-        : <String, dynamic>{};
+    final decoded = response.body.isNotEmpty ? jsonDecode(response.body) : <String, dynamic>{};
     if (decoded is Map<String, dynamic>) {
       return decoded;
     }
     throw Exception('Invalid response format: expected a JSON object');
   }
 
-  Future<http.Response> _doPlainRequest({
-    required HttpMethod method,
-    required String endpoint,
-    Object? data,
-  }) async {
+  /// Performs a plain (unauthenticated) HTTP request.
+  Future<http.Response> _doPlainRequest({required HttpMethod method, required String endpoint, Object? data}) async {
     final uri = _buildUri(endpoint);
     return switch (method) {
       Get() => await http.get(uri),
@@ -123,6 +128,7 @@ abstract class HttpApi {
     };
   }
 
+  /// Performs an authenticated HTTP request, with optional token refresh.
   Future<http.Response> _doAuthedRequest({
     required HttpMethod method,
     required String endpoint,
@@ -145,14 +151,17 @@ abstract class HttpApi {
     return await _withAuthRetry(request, accessToken, refreshAccessToken);
   }
 
+  /// Builds a [Uri] for the given [endpoint] using the current base URL.
   Uri _buildUri(String endpoint) {
     return Uri.parse('$_baseUrl$endpoint');
   }
 
+  /// Builds authentication headers for the given [accessToken].
   Map<String, String> _buildAuthHeaders(String accessToken) {
     return {'Authorization': 'Bearer $accessToken'};
   }
 
+  /// Handles authentication retry logic for requests that return 401 Unauthorized.
   Future<http.Response> _withAuthRetry(
     Future<http.Response> Function(String token) req,
     String accessToken,
@@ -170,9 +179,8 @@ abstract class HttpApi {
     return response;
   }
 
-  Future<String?> _refreshAccessToken(
-    Future<String?> Function()? refreshAccessToken,
-  ) async {
+  /// Invokes the [refreshAccessToken] callback to obtain a new token.
+  Future<String?> _refreshAccessToken(Future<String?> Function()? refreshAccessToken) async {
     if (refreshAccessToken != null) {
       return await refreshAccessToken();
     }

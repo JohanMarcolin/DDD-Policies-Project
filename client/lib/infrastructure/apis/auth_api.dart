@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:client/infrastructure/apis/http_api.dart';
+import 'package:client/infrastructure/apis/http_api/http_api.dart';
 import 'package:client/infrastructure/mappers/user_mapper.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/entities/user.dart';
@@ -7,19 +7,18 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:error_codes/error_codes.dart';
 
-typedef CurrentUser = User;
-
+/// API for authentication-related operations: login, logout, and token refresh.
 class AuthApi extends HttpApi {
-  AuthApi({required AuthTokenService authTokenService})
-    : _authTokenService = authTokenService;
+  AuthApi({required AuthTokenService authTokenService}) : _authTokenService = authTokenService;
 
   final AuthTokenService _authTokenService;
 
-  Future<CurrentUser> login({
-    required Email email,
-    required Password password,
-  }) async {
-    return await callPost<CurrentUser>(
+  /// Logs in a user with [email] and [password].
+  ///
+  /// On success, saves tokens and returns the authenticated [User].
+  /// Throws [AuthApiException] on failure.
+  Future<User> login({required Email email, required Password password}) async {
+    return await callPost<User>(
       endpoint: '/auth/login',
       data: jsonEncode({'email': email.value, 'password': password.value}),
       map: (response) {
@@ -30,12 +29,14 @@ class AuthApi extends HttpApi {
           );
           return UserMapper.toDomainUser(response.data['currentUser']);
         }
-
-        throw AuthApiException(response.errorCode!);
+        throw AuthApiException(response.errorCode);
       },
     );
   }
 
+  /// Logs out the current user, invalidating the refresh token and clearing local tokens.
+  ///
+  /// Throws [AuthApiException] on failure.
   Future<void> logout() async {
     final refreshToken = await _authTokenService.refreshToken;
 
@@ -46,32 +47,35 @@ class AuthApi extends HttpApi {
         if (response.isSuccess) {
           return;
         }
-        throw AuthApiException(response.errorCode!);
+        throw AuthApiException(response.errorCode);
       },
     );
 
     await _authTokenService.clearTokens();
   }
 
-  Future<CurrentUser> refreshAccessToken() async {
-    return await callPost<CurrentUser>(
+  /// Refreshes the access token using the stored refresh token.
+  ///
+  /// On success, updates the access token and returns the authenticated [User].
+  /// Throws [AuthApiException] on failure.
+  Future<User> refreshAccessToken() async {
+    return await callPost<User>(
       endpoint: '/auth/refresh',
       data: jsonEncode({'refreshToken': await _authTokenService.refreshToken}),
       map: (response) {
         if (response.isSuccess) {
-          _authTokenService.setAccessToken(
-            accessToken: response.data['accessToken'],
-          );
+          _authTokenService.setAccessToken(accessToken: response.data['accessToken']);
           return UserMapper.toDomainUser(response.data['currentUser']);
         }
-        throw AuthApiException(response.errorCode!);
+        throw AuthApiException(response.errorCode);
       },
     );
   }
 }
 
+/// Exception thrown for authentication API errors.
 class AuthApiException implements Exception {
   final ErrorCode errorCode;
-  AuthApiException(String errorCode)
-    : errorCode = errorCodeFromString(errorCode);
+
+  AuthApiException(String? errorCode) : errorCode = errorCodeFromString(errorCode);
 }

@@ -87,7 +87,7 @@ sealed class ServerErrorCode extends ErrorCode {}
 
 final class ServerUnhandledServer extends ServerErrorCode {}
 
-ErrorCode errorCodeFromString(String errorCode) {
+ErrorCode errorCodeFromString(String? errorCode) {
   switch (errorCode) {
     case 'PayloadMissingRequestBody':
       return PayloadMissingRequestBody();

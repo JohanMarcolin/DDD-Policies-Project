@@ -1,4 +1,4 @@
-import 'package:client/infrastructure/apis/test_api.dart';
+import 'package:client/infrastructure/apis/integration_test_api/integration_test_api.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/value_objects/role.dart';

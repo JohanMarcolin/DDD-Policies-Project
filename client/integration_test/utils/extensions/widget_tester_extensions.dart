@@ -1,4 +1,4 @@
-import 'package:client/infrastructure/apis/test_api.dart';
+import 'package:client/infrastructure/apis/integration_test_api/integration_test_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
