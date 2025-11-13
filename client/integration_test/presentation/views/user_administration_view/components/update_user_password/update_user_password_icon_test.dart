@@ -8,27 +8,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../../../test/bloc/utils/mock_user_credentials.dart';
 import '../../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../../utils/user_test_runner.dart';
-import '../../../../../utils/extensions/widget_finder_extension.dart';
-import '../../../../../utils/extensions/widget_tester_extension.dart';
+import '../../../../../utils/extensions/widget_finder_extensions.dart';
+import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderUpdateUserPasswordIcon({
-    required User currentUser,
-    required User targetUser,
-  }) async {
+  Future<void> renderUpdateUserPasswordIcon({required User currentUser, required User targetUser}) async {
     return renderWidgetWithBlocStubs(
       testWidget: UpdateUserPasswordIcon(user: targetUser),
-      currentUser: currentUser,
+      mockCurrentUser: currentUser,
       mockUserRepository: mockUserRepository,
     );
   }
 }
 
+/// Entry point for [UpdateUserPasswordIcon] integration tests.
+///
+/// Covers presentation scenarios for successful and failed update user password attempts.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -36,15 +37,12 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserTestRunner.userTestFixturePolicy(
+  UserTestRunner.forEachUserPairWithPolicy(
     policy: UpdateUserPasswordPolicy(),
     users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {
       testWidgets('shows solid action icon', (WidgetTester tester) async {
-        await tester.renderUpdateUserPasswordIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updatePasswordIcon = find.byType(UpdateUserPasswordIcon);
         expect(updatePasswordIcon, findsOne);
@@ -56,13 +54,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isFalse);
       });
 
-      testWidgets('shows dialog when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserPasswordIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows dialog when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updatePasswordIcon = find.byType(UpdateUserPasswordIcon);
         final actionIcon = updatePasswordIcon.findDescendant(ActionIcon);
@@ -71,16 +64,12 @@ Future<void> main() async {
         await tester.tap(actionIcon);
         await tester.pumpAndSettle();
 
-        final updatePasswordDialogChild = find.byType(
-          UpdateUserPasswordDialogChild,
-        );
+        final updatePasswordDialogChild = find.byType(UpdateUserPasswordDialogChild);
         expect(updatePasswordDialogChild, findsOne);
 
         final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserUpdatingSelf
-            ? 'Update Your Password'
-            : 'Update User Password';
+        final expectedTitle = isUserUpdatingSelf ? 'Update Your Password' : 'Update User Password';
         expect(find.text(expectedTitle), findsOne);
 
         final expectedLabel = 'New Password';
@@ -88,10 +77,7 @@ Future<void> main() async {
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {
-        await tester.renderUpdateUserPasswordIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
         final actionIcon = find.byType(ActionIcon);
         await tester.tap(actionIcon);
         await tester.pumpAndSettle();
@@ -102,54 +88,36 @@ Future<void> main() async {
         expect(find.byType(UpdateUserPasswordDialogChild), findsNothing);
       });
 
-      testWidgets(
-        'confirm with valid password shows success snackbar and closes dialog',
-        (WidgetTester tester) async {
-          when(
-            () => mockUserRepository.updatePassword(
-              userId: targetUser.userId,
-              newPassword: mockValidPassword,
-            ),
-          ).thenAnswer((_) async => {});
+      testWidgets('confirm with valid password shows success snackbar and closes dialog', (WidgetTester tester) async {
+        when(
+          () => mockUserRepository.updatePassword(userId: targetUser.userId, newPassword: mockValidPassword),
+        ).thenAnswer((_) async => {});
 
-          await tester.renderUpdateUserPasswordIcon(
-            currentUser: currentUser,
-            targetUser: targetUser,
-          );
-          final actionIcon = find.byType(ActionIcon);
-          await tester.tap(actionIcon);
-          await tester.pumpAndSettle();
-          expect(find.byType(UpdateUserPasswordDialogChild), findsOne);
-          final passwordField = find.byType(TextField);
-          await tester.enterText(passwordField, mockValidPassword.value);
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
+        final actionIcon = find.byType(ActionIcon);
+        await tester.tap(actionIcon);
+        await tester.pumpAndSettle();
+        expect(find.byType(UpdateUserPasswordDialogChild), findsOne);
+        final passwordField = find.byType(TextField);
+        await tester.enterText(passwordField, mockValidPassword.value);
 
-          final confirmButton = find.text('Confirm');
-          await tester.tap(confirmButton);
-          await tester.pumpAndSettle();
+        final confirmButton = find.text('Confirm');
+        await tester.tap(confirmButton);
+        await tester.pumpAndSettle();
 
-          expect(find.byType(UpdateUserPasswordDialogChild), findsNothing);
+        expect(find.byType(UpdateUserPasswordDialogChild), findsNothing);
 
-          verify(
-            () => mockUserRepository.updatePassword(
-              userId: targetUser.userId,
-              newPassword: mockValidPassword,
-            ),
-          ).called(1);
-          expect(
-            ActionSnackBarHelper.lastMessage,
-            'Password updated successfully',
-          );
-        },
-      );
+        verify(
+          () => mockUserRepository.updatePassword(userId: targetUser.userId, newPassword: mockValidPassword),
+        ).called(1);
+        expect(ActionSnackBarHelper.lastMessage, 'Password updated successfully');
+      });
 
       for (final invalidPassword in mockInvalidPasswords) {
         testWidgets(
           'confirm with invalid password "${invalidPassword.value}" shows error snackbar and keeps dialog open',
           (WidgetTester tester) async {
-            await tester.renderUpdateUserPasswordIcon(
-              currentUser: currentUser,
-              targetUser: targetUser,
-            );
+            await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
 
             final actionIcon = find.byType(ActionIcon);
             await tester.tap(actionIcon);
@@ -163,10 +131,7 @@ Future<void> main() async {
             expect(find.byType(UpdateUserPasswordDialogChild), findsOne);
 
             verifyNever(
-              () => mockUserRepository.updatePassword(
-                userId: targetUser.userId,
-                newPassword: invalidPassword,
-              ),
+              () => mockUserRepository.updatePassword(userId: targetUser.userId, newPassword: invalidPassword),
             );
 
             String expectedMessage;
@@ -175,16 +140,13 @@ Future<void> main() async {
             } else if (invalidPassword == mockTooLongPassword) {
               expectedMessage = 'Password is too long';
             } else if (invalidPassword == mockMissingUppercasePassword) {
-              expectedMessage =
-                  'Password must contain at least one uppercase letter';
+              expectedMessage = 'Password must contain at least one uppercase letter';
             } else if (invalidPassword == mockMissingLowercasePassword) {
-              expectedMessage =
-                  'Password must contain at least one lowercase letter';
+              expectedMessage = 'Password must contain at least one lowercase letter';
             } else if (invalidPassword == mockMissingNumberPassword) {
               expectedMessage = 'Password must contain at least one number';
             } else if (invalidPassword == mockMissingSpecialCharPassword) {
-              expectedMessage =
-                  'Password must contain at least one special character';
+              expectedMessage = 'Password must contain at least one special character';
             } else {
               expectedMessage = 'Invalid password';
             }
@@ -194,13 +156,8 @@ Future<void> main() async {
       }
     },
     onUnauthorized: (currentUser, targetUser, reason) {
-      testWidgets('should show greyed out action icon', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserPasswordIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('should show greyed out action icon', (WidgetTester tester) async {
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updatePasswordIcon = find.byType(UpdateUserPasswordIcon);
         expect(updatePasswordIcon, findsOne);
@@ -212,13 +169,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isTrue);
       });
 
-      testWidgets('shows snackbar when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserPasswordIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows snackbar when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderUpdateUserPasswordIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updatePasswordIcon = find.byType(UpdateUserPasswordIcon);
         final actionIcon = updatePasswordIcon.findDescendant(ActionIcon);
@@ -226,22 +178,14 @@ Future<void> main() async {
 
         await tester.tap(actionIcon);
         await tester.pumpAndSettle();
-        final updatePasswordDialogChild = find.byType(
-          UpdateUserPasswordDialogChild,
-        );
+        final updatePasswordDialogChild = find.byType(UpdateUserPasswordDialogChild);
 
         expect(updatePasswordDialogChild, findsNothing);
         switch (reason as UpdateUserPasswordUnauthorizedReason) {
           case CannotUpdatePasswordOnAnalyst():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You cannot update the password of an analyst.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the password of an analyst.');
           case CanOnlyUpdatePasswordOnSelf():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You can only update your own password.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own password.');
         }
       });
     },

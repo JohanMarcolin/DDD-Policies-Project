@@ -6,22 +6,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../test/bloc/infrastructure/auth_bloc_test.dart';
+import '../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../test/bloc/utils/mock_users.dart';
-import '../utils/extensions/widget_finder_extension.dart';
-import '../utils/extensions/widget_tester_extension.dart';
+import '../utils/extensions/widget_finder_extensions.dart';
+import '../utils/extensions/widget_tester_extensions.dart';
 
 late MockAuthApi mockAuthApi;
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderUserAdministrationApp() async =>
-      await renderWidgetWithBlocStubs(
-        testWidget: UserAdministrationApp(),
-        mockAuthApi: mockAuthApi,
-        mockUserRepository: mockUserRepository,
-      );
+  Future<void> renderUserAdministrationApp() async => await renderWidgetWithBlocStubs(
+    testWidget: UserAdministrationApp(),
+    mockAuthApi: mockAuthApi,
+    mockUserRepository: mockUserRepository,
+  );
 }
 
+/// Entry point for [UserAdministrationApp] integration tests.
+///
+/// Covers presentation scenarios for user administration app display.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -30,19 +34,14 @@ Future<void> main() async {
       mockAuthApi = MockAuthApi();
       mockUserRepository = MockUserRepository();
     });
-    testWidgets(
-      'displays user administration view with all required static components',
-      (WidgetTester tester) async {
-        await tester.renderUserAdministrationApp();
+    testWidgets('displays user administration view with all required static components', (WidgetTester tester) async {
+      await tester.renderUserAdministrationApp();
 
-        final userAdministrationApp = find.byType(UserAdministrationApp);
-        expect(userAdministrationApp, findsOne);
-      },
-    );
+      final userAdministrationApp = find.byType(UserAdministrationApp);
+      expect(userAdministrationApp, findsOne);
+    });
 
-    testWidgets('shows login view when user is not authenticated', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('shows login view when user is not authenticated', (WidgetTester tester) async {
       await tester.renderUserAdministrationApp();
 
       final userAdministrationApp = find.byType(UserAdministrationApp);
@@ -54,12 +53,8 @@ Future<void> main() async {
       expect(loginView, findsOne);
     });
 
-    testWidgets('shows user administration view when user is authenticated', (
-      WidgetTester tester,
-    ) async {
-      when(
-        () => mockAuthApi.refreshAccessToken(),
-      ).thenAnswer((_) async => mockUser);
+    testWidgets('shows user administration view when user is authenticated', (WidgetTester tester) async {
+      when(() => mockAuthApi.refreshAccessToken()).thenAnswer((_) async => mockUser);
 
       await tester.renderUserAdministrationApp();
 
@@ -70,9 +65,7 @@ Future<void> main() async {
 
       await tester.pump();
 
-      final userAdministrationView = userAdministrationApp.findDescendant(
-        UserAdministrationView,
-      );
+      final userAdministrationView = userAdministrationApp.findDescendant(UserAdministrationView);
       expect(userAdministrationView, findsOne);
     });
   });

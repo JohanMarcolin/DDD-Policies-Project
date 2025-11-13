@@ -7,26 +7,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../../utils/user_test_runner.dart';
-import '../../../../../utils/extensions/widget_finder_extension.dart';
-import '../../../../../utils/extensions/widget_tester_extension.dart';
+import '../../../../../utils/extensions/widget_finder_extensions.dart';
+import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderDeleteUserIcon({
-    required User currentUser,
-    required User targetUser,
-  }) async {
+  Future<void> renderDeleteUserIcon({required User currentUser, required User targetUser}) async {
     return renderWidgetWithBlocStubs(
       testWidget: DeleteUserIcon(user: targetUser),
-      currentUser: currentUser,
+      mockCurrentUser: currentUser,
       mockUserRepository: mockUserRepository,
     );
   }
 }
 
+/// Entry point for [DeleteUserIcon] integration tests.
+///
+/// Covers presentation scenarios for successful and failed delete user attempts.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -34,15 +35,12 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserTestRunner.userTestFixturePolicy(
+  UserTestRunner.forEachUserPairWithPolicy(
     policy: DeleteUserPolicy(),
     users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {
       testWidgets('shows solid action icon', (WidgetTester tester) async {
-        await tester.renderDeleteUserIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
 
         final deleteUserIcon = find.byType(DeleteUserIcon);
         expect(deleteUserIcon, findsOne);
@@ -54,13 +52,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isFalse);
       });
 
-      testWidgets('shows dialog when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderDeleteUserIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows dialog when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
 
         final deleteUserIcon = find.byType(DeleteUserIcon);
         final actionIcon = deleteUserIcon.findDescendant(ActionIcon);
@@ -74,9 +67,7 @@ Future<void> main() async {
 
         final isUserDeletingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserDeletingSelf
-            ? 'Delete Your Account'
-            : 'Delete User Account';
+        final expectedTitle = isUserDeletingSelf ? 'Delete Your Account' : 'Delete User Account';
         expect(find.text(expectedTitle), findsOne);
 
         final expectedLabel = isUserDeletingSelf
@@ -86,10 +77,7 @@ Future<void> main() async {
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {
-        await tester.renderDeleteUserIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
         final actionIcon = find.byType(ActionIcon);
         await tester.tap(actionIcon);
         await tester.pumpAndSettle();
@@ -100,47 +88,32 @@ Future<void> main() async {
         expect(find.byType(DeleteUserDialogChild), findsNothing);
       });
 
-      testWidgets(
-        'confirm with valid delete shows success snackbar and closes dialog',
-        (WidgetTester tester) async {
-          when(
-            () => mockUserRepository.delete(userId: targetUser.userId),
-          ).thenAnswer((_) async => {});
+      testWidgets('confirm with valid delete shows success snackbar and closes dialog', (WidgetTester tester) async {
+        when(() => mockUserRepository.delete(userId: targetUser.userId)).thenAnswer((_) async => {});
 
-          await tester.renderDeleteUserIcon(
-            currentUser: currentUser,
-            targetUser: targetUser,
-          );
-          final actionIcon = find.byType(ActionIcon);
-          await tester.tap(actionIcon);
-          await tester.pumpAndSettle();
-          expect(find.byType(DeleteUserDialogChild), findsOne);
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
+        final actionIcon = find.byType(ActionIcon);
+        await tester.tap(actionIcon);
+        await tester.pumpAndSettle();
+        expect(find.byType(DeleteUserDialogChild), findsOne);
 
-          final confirmButton = find.text('Confirm');
-          await tester.tap(confirmButton);
-          await tester.pumpAndSettle();
+        final confirmButton = find.text('Confirm');
+        await tester.tap(confirmButton);
+        await tester.pumpAndSettle();
 
-          expect(find.byType(DeleteUserDialogChild), findsNothing);
+        expect(find.byType(DeleteUserDialogChild), findsNothing);
 
-          verify(
-            () => mockUserRepository.delete(userId: targetUser.userId),
-          ).called(1);
+        verify(() => mockUserRepository.delete(userId: targetUser.userId)).called(1);
 
-          final expectedMessage = currentUser.isSameAs(targetUser)
-              ? 'You have deleted your account'
-              : 'User deleted successfully';
-          expect(ActionSnackBarHelper.lastMessage, expectedMessage);
-        },
-      );
+        final expectedMessage = currentUser.isSameAs(targetUser)
+            ? 'You have deleted your account'
+            : 'User deleted successfully';
+        expect(ActionSnackBarHelper.lastMessage, expectedMessage);
+      });
     },
     onUnauthorized: (currentUser, targetUser, reason) {
-      testWidgets('should show greyed out action icon', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderDeleteUserIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('should show greyed out action icon', (WidgetTester tester) async {
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
 
         final deleteUserIcon = find.byType(DeleteUserIcon);
         expect(deleteUserIcon, findsOne);
@@ -152,13 +125,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isTrue);
       });
 
-      testWidgets('shows snackbar when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderDeleteUserIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows snackbar when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderDeleteUserIcon(currentUser: currentUser, targetUser: targetUser);
 
         final deleteUserIcon = find.byType(DeleteUserIcon);
         final actionIcon = deleteUserIcon.findDescendant(ActionIcon);
@@ -171,20 +139,11 @@ Future<void> main() async {
         expect(deleteUserDialogChild, findsNothing);
         switch (reason as DeleteUserUnauthorizedReason) {
           case CannotDeleteSelf():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You cannot delete yourself.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete yourself.');
           case CannotDeleteAnalyst():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You cannot delete an analyst.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete an analyst.');
           case CanOnlyDeleteSelf():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You can only delete your own account.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You can only delete your own account.');
         }
       });
     },

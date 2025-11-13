@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../utils/extensions/widget_finder_extension.dart';
-import '../utils/extensions/widget_tester_extension.dart';
-import '../utils/test_server_fixture.dart';
+import '../utils/extensions/widget_finder_extensions.dart';
+import '../utils/extensions/widget_tester_extensions.dart';
+import '../utils/integration_test_server_fixture.dart';
 
 /// Entry point for User Authentication integration tests.
 ///
@@ -15,12 +15,12 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('User Authentication Scenario', () {
-    setUpAll(() async => await TestServerFixture.setup());
+    setUpAll(() async => await IntegrationTestServerFixture.setup());
 
-    tearDownAll(() async => await TestServerFixture.teardown());
+    tearDownAll(() async => await IntegrationTestServerFixture.teardown());
 
     testWidgets('should login, persist session, and logout successfully', (WidgetTester tester) async {
-      for (final user in await TestServerFixture.createAllUserFixtures()) {
+      for (final user in await IntegrationTestServerFixture.createAllUserFixtures()) {
         final roleName = user.role.name;
 
         await tester.startApp();

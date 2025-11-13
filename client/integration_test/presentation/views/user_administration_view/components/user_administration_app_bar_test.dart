@@ -6,22 +6,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../test/bloc/infrastructure/auth_bloc_test.dart';
+import '../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../../test/bloc/utils/mock_users.dart';
-import '../../../../utils/extensions/widget_finder_extension.dart';
-import '../../../../utils/extensions/widget_tester_extension.dart';
+import '../../../../utils/extensions/widget_finder_extensions.dart';
+import '../../../../utils/extensions/widget_tester_extensions.dart';
 
 late MockAuthApi mockAuthApi;
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderUserAdministrationAppBar() async =>
-      await renderWidgetWithBlocStubs(
-        testWidget: UserAdministrationAppBar(),
-        mockAuthApi: mockAuthApi,
-        mockUserRepository: mockUserRepository,
-      );
+  Future<void> renderUserAdministrationAppBar() async => await renderWidgetWithBlocStubs(
+    testWidget: UserAdministrationAppBar(),
+    mockAuthApi: mockAuthApi,
+    mockUserRepository: mockUserRepository,
+  );
 }
 
+/// Entry point for [UserAdministrationAppBar] integration tests.
+///
+/// Covers presentation scenarios for authentication state changes and logout functionality.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -30,24 +34,15 @@ Future<void> main() async {
       mockAuthApi = MockAuthApi();
       mockUserRepository = MockUserRepository();
     });
-    testWidgets('displays app bar with all required static components', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('displays app bar with all required static components', (WidgetTester tester) async {
       await tester.renderUserAdministrationAppBar();
 
       final userAdministrationAppBar = find.byType(UserAdministrationAppBar);
       expect(userAdministrationAppBar, findsOne);
-      expect(
-        userAdministrationAppBar.findDescendantMatching(
-          find.text('User Administration'),
-        ),
-        findsOne,
-      );
+      expect(userAdministrationAppBar.findDescendantMatching(find.text('User Administration')), findsOne);
     });
 
-    testWidgets('does not show logout icon when unauthenticated', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('does not show logout icon when unauthenticated', (WidgetTester tester) async {
       await tester.renderUserAdministrationAppBar();
 
       tester.authBlocWithStubs.add(AuthRefreshRequested());
@@ -58,35 +53,26 @@ Future<void> main() async {
       expect(logoutIcon, findsNothing);
     });
 
-    testWidgets(
-      'shows logout icon when authenticated and triggers logout event',
-      (WidgetTester tester) async {
-        when(
-          () => mockAuthApi.refreshAccessToken(),
-        ).thenAnswer((_) async => mockUser);
+    testWidgets('shows logout icon when authenticated and triggers logout event', (WidgetTester tester) async {
+      when(() => mockAuthApi.refreshAccessToken()).thenAnswer((_) async => mockUser);
 
-        when(() => mockAuthApi.logout()).thenAnswer((_) async {});
+      when(() => mockAuthApi.logout()).thenAnswer((_) async {});
 
-        await tester.renderUserAdministrationAppBar();
+      await tester.renderUserAdministrationAppBar();
 
-        tester.authBlocWithStubs.add(AuthRefreshRequested());
+      tester.authBlocWithStubs.add(AuthRefreshRequested());
 
-        await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-        final logoutIcon = find.byIcon(Icons.logout);
-        expect(logoutIcon, findsOne);
-        await tester.tap(logoutIcon);
+      final logoutIcon = find.byIcon(Icons.logout);
+      expect(logoutIcon, findsOne);
+      await tester.tap(logoutIcon);
 
-        verify(() => mockAuthApi.logout()).called(1);
-      },
-    );
+      verify(() => mockAuthApi.logout()).called(1);
+    });
 
-    testWidgets('shows auth failure message when logout fails', (
-      WidgetTester tester,
-    ) async {
-      when(
-        () => mockAuthApi.refreshAccessToken(),
-      ).thenAnswer((_) async => mockUser);
+    testWidgets('shows auth failure message when logout fails', (WidgetTester tester) async {
+      when(() => mockAuthApi.refreshAccessToken()).thenAnswer((_) async => mockUser);
 
       when(() => mockAuthApi.logout()).thenAnswer((_) async {
         throw Exception('Logout failed');
@@ -104,10 +90,7 @@ Future<void> main() async {
 
       verify(() => mockAuthApi.logout()).called(1);
 
-      expect(
-        ActionSnackBarHelper.lastMessage,
-        'Logout failed. Please log in again or try again later.',
-      );
+      expect(ActionSnackBarHelper.lastMessage, 'Logout failed. Please log in again or try again later.');
     });
   });
 }

@@ -75,7 +75,7 @@ void main() {
 
   group('UserAdministrationViewBloc', () {
     group('{Initialization}', () {
-      UserTestRunner.userTestFixturePairs(
+      UserTestRunner.forEachUserPair(
         users: allMockUserPairs,
         onUserPairCase: (currentUser, targetUser) {
           _blocTest(
@@ -90,7 +90,7 @@ void main() {
 
     group('{Public Methods}', () {
       group('{Authorization Methods}', () {
-        UserTestRunner.userTestFixturePairs(
+        UserTestRunner.forEachUserPair(
           users: [mockUser, otherMockUser],
           onUserPairCase: (currentUser, targetUser) {
             _blocTest(
@@ -106,7 +106,7 @@ void main() {
       });
 
       group('{Authorization Methods}', () {
-        UserTestRunner.userTestFixturePairs(
+        UserTestRunner.forEachUserPair(
           users: [mockUser, mockAdmin, mockAnalyst],
           onUserPairCase: (currentUser, targetUser) {
             final targetUserRole = targetUser.role.name;
@@ -144,7 +144,7 @@ void main() {
       });
 
       group('{Validation Methods}', () {
-        UserTestRunner.userTestFixturePairs(
+        UserTestRunner.forEachUserPair(
           users: allMockUserPairs,
           onUserPairCase: (currentUser, targetUser) {
             group('{Email Validation}', () {
@@ -191,7 +191,7 @@ void main() {
     });
     group('{Events}', () {
       group('{FetchUsersRequested Event}', () {
-        UserTestRunner.userTestFixturePolicy(
+        UserTestRunner.forEachUserPairWithPolicy(
           policy: ViewUserPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -244,7 +244,7 @@ void main() {
         );
       });
       group('{DeleteUserRequested Event}', () {
-        UserTestRunner.userTestFixturePolicy(
+        UserTestRunner.forEachUserPairWithPolicy(
           policy: DeleteUserPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -287,7 +287,7 @@ void main() {
       });
 
       group('{UpdateUserEmailRequested Event}', () {
-        UserTestRunner.userTestFixturePolicy(
+        UserTestRunner.forEachUserPairWithPolicy(
           policy: UpdateUserEmailPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {
@@ -349,7 +349,7 @@ void main() {
       });
 
       group('{UpdateUserPasswordRequested Event}', () {
-        UserTestRunner.userTestFixturePolicy(
+        UserTestRunner.forEachUserPairWithPolicy(
           policy: UpdateUserPasswordPolicy(),
           users: allMockUserPairs,
           onAuthorized: (currentUser, targetUser) {

@@ -1,24 +1,30 @@
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:server/test/utils/factories/test_user_entry_factory.dart';
 
+/// Utility class to run tests for different user role combinations.
 class UserTestRunner {
-  static Future<void> userTestFixturePairs({
+  /// Iterates over all pairs of [users] and invokes [onUserPairCase] for each actor/subject combination.
+  ///
+  /// Useful for generating tests that need to cover all possible user-to-user scenarios.
+  static Future<void> forEachUserPair({
     required List<User> users,
     required void Function(User actor, User subject) onUserPairCase,
   }) async {
-    _forEachUserPair(users: users, testCallback: onUserPairCase);
+    _iterateUserPairs(users: users, testCallback: onUserPairCase);
   }
 
-  static Future<void> userTestFixturePolicy({
+  /// Iterates over all pairs of [users], applies [policy], and invokes [onAuthorized] or [onUnauthorized]
+  /// depending on the policy result for each actor/subject combination.
+  ///
+  /// This method is useful for policy-driven tests, ensuring both authorized and unauthorized cases are covered.
+  static Future<void> forEachUserPairWithPolicy({
     required ActionPolicy<User, User> policy,
     required List<User> users,
     required void Function(User actor, User subject) onAuthorized,
-    required void Function(User actor, User subject, dynamic reason)
-    onUnauthorized,
+    required void Function(User actor, User subject, dynamic reason) onUnauthorized,
   }) async {
-    _forEachUserPair(
+    _iterateUserPairs(
       users: users,
       testCallback: (actor, subject) {
         final result = policy.authorize(actor, subject);
@@ -36,7 +42,8 @@ class UserTestRunner {
     );
   }
 
-  static void _forEachUserPair({
+  /// Internal helper to iterate over all actor/subject pairs in [users] and invoke [testCallback].
+  static void _iterateUserPairs({
     required List<User> users,
     required void Function(User actor, User subject) testCallback,
   }) {
@@ -46,62 +53,6 @@ class UserTestRunner {
           actor.isSameAs(subject)
               ? '${actor.role.name} acting on self'
               : '${actor.role.name} acting on ${subject.role.name}',
-          () {
-            testCallback(actor, subject);
-          },
-        );
-      }
-    }
-  }
-
-  static Future<void> testUserTestFixturePairs({
-    required List<UserTestFixture> userTestFixtures,
-    required void Function(UserTestFixture actor, UserTestFixture subject)
-    onUserTestFixturePairCase,
-  }) async {
-    _forEachUserTestFixturePair(
-      userTestFixtures: userTestFixtures,
-      testCallback: onUserTestFixturePairCase,
-    );
-  }
-
-  static Future<void> testUserTestFixturePolicy({
-    required ActionPolicy<User, User> policy,
-    required List<UserTestFixture> userTestFixtures,
-    required void Function(UserTestFixture actor, UserTestFixture subject)
-    onAuthorized,
-    required void Function(UserTestFixture actor, UserTestFixture subject)
-    onUnauthorized,
-  }) async {
-    _forEachUserTestFixturePair(
-      userTestFixtures: userTestFixtures,
-      testCallback: (actor, subject) {
-        final result = policy.authorize(actor.user, subject.user);
-        switch (result) {
-          case Authorized():
-            group('(action authorized)', () {
-              onAuthorized(actor, subject);
-            });
-          case Unauthorized():
-            group('(action unauthorized)', () {
-              onUnauthorized(actor, subject);
-            });
-        }
-      },
-    );
-  }
-
-  static void _forEachUserTestFixturePair({
-    required List<UserTestFixture> userTestFixtures,
-    required void Function(UserTestFixture actor, UserTestFixture subject)
-    testCallback,
-  }) {
-    for (final actor in userTestFixtures) {
-      for (final subject in userTestFixtures) {
-        group(
-          actor.user.isSameAs(subject.user)
-              ? '${actor.user.role.name} acting on self'
-              : '${actor.user.role.name} acting on ${subject.user.role.name}',
           () {
             testCallback(actor, subject);
           },

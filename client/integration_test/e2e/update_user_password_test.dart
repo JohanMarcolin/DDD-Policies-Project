@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../utils/extensions/widget_tester_extension.dart';
-import '../utils/test_server_fixture.dart';
+import '../utils/extensions/widget_tester_extensions.dart';
+import '../utils/integration_test_server_fixture.dart';
 
 /// Entry point for Update User Password integration tests.
 ///
@@ -19,15 +19,15 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Update User Password Scenario', () {
-    setUp(() async => await TestServerFixture.setup());
-    tearDown(() async => await TestServerFixture.teardown());
+    setUp(() async => await IntegrationTestServerFixture.setup());
+    tearDown(() async => await IntegrationTestServerFixture.teardown());
 
     final viewUserPolicy = ViewUserPolicy();
     final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
 
     for (final role in Role.values) {
       testWidgets('${role.name} updating password on self scenario', (WidgetTester tester) async {
-        final self = await TestServerFixture.createUserFixture(role: role);
+        final self = await IntegrationTestServerFixture.createUserFixture(role: role);
 
         final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
@@ -48,8 +48,8 @@ void main() {
       });
       for (final targetRole in Role.values) {
         testWidgets('${role.name} updating password on ${targetRole.name} scenario', (WidgetTester tester) async {
-          final initiator = await TestServerFixture.createUserFixture(role: role);
-          final target = await TestServerFixture.createUserFixture(role: targetRole);
+          final initiator = await IntegrationTestServerFixture.createUserFixture(role: role);
+          final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
           final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
           switch (viewTarget) {

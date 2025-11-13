@@ -8,27 +8,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../../../test/bloc/utils/mock_user_credentials.dart';
 import '../../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../../utils/user_test_runner.dart';
-import '../../../../../utils/extensions/widget_finder_extension.dart';
-import '../../../../../utils/extensions/widget_tester_extension.dart';
+import '../../../../../utils/extensions/widget_finder_extensions.dart';
+import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
 late MockUserRepository mockUserRepository;
 
 extension on WidgetTester {
-  Future<void> renderUpdateUserEmailIcon({
-    required User currentUser,
-    required User targetUser,
-  }) async {
+  Future<void> renderUpdateUserEmailIcon({required User currentUser, required User targetUser}) async {
     return renderWidgetWithBlocStubs(
       testWidget: UpdateUserEmailIcon(user: targetUser),
-      currentUser: currentUser,
+      mockCurrentUser: currentUser,
       mockUserRepository: mockUserRepository,
     );
   }
 }
 
+/// Entry point for [UpdateUserEmailIcon] integration tests.
+///
+/// Covers presentation scenarios for successful and failed update user email attempts.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -36,15 +37,12 @@ Future<void> main() async {
     mockUserRepository = MockUserRepository();
   });
 
-  UserTestRunner.userTestFixturePolicy(
+  UserTestRunner.forEachUserPairWithPolicy(
     policy: UpdateUserEmailPolicy(),
     users: allMockUserPairs,
     onAuthorized: (currentUser, targetUser) {
       testWidgets('shows solid action icon', (WidgetTester tester) async {
-        await tester.renderUpdateUserEmailIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updateEmailIcon = find.byType(UpdateUserEmailIcon);
         expect(updateEmailIcon, findsOne);
@@ -56,13 +54,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isFalse);
       });
 
-      testWidgets('shows dialog when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserEmailIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows dialog when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updateEmailIcon = find.byType(UpdateUserEmailIcon);
         final actionIcon = updateEmailIcon.findDescendant(ActionIcon);
@@ -76,9 +69,7 @@ Future<void> main() async {
 
         final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserUpdatingSelf
-            ? 'Update Your Email'
-            : 'Update User Email';
+        final expectedTitle = isUserUpdatingSelf ? 'Update Your Email' : 'Update User Email';
         expect(find.text(expectedTitle), findsOne);
 
         final expectedLabel = 'New Email';
@@ -86,10 +77,7 @@ Future<void> main() async {
       });
 
       testWidgets('cancel closes dialog', (WidgetTester tester) async {
-        await tester.renderUpdateUserEmailIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
         final actionIcon = find.byType(ActionIcon);
         await tester.tap(actionIcon);
         await tester.pumpAndSettle();
@@ -100,86 +88,55 @@ Future<void> main() async {
         expect(find.byType(UpdateUserEmailDialogChild), findsNothing);
       });
 
-      testWidgets(
-        'confirm with valid email shows success snackbar and closes dialog',
-        (WidgetTester tester) async {
-          when(
-            () => mockUserRepository.updateEmail(
-              userId: targetUser.userId,
-              newEmail: mockValidEmail,
-            ),
-          ).thenAnswer((_) async => {});
+      testWidgets('confirm with valid email shows success snackbar and closes dialog', (WidgetTester tester) async {
+        when(
+          () => mockUserRepository.updateEmail(userId: targetUser.userId, newEmail: mockValidEmail),
+        ).thenAnswer((_) async => {});
 
-          await tester.renderUpdateUserEmailIcon(
-            currentUser: currentUser,
-            targetUser: targetUser,
-          );
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
+        final actionIcon = find.byType(ActionIcon);
+        await tester.tap(actionIcon);
+        await tester.pumpAndSettle();
+        expect(find.byType(UpdateUserEmailDialogChild), findsOne);
+        final emailField = find.byType(TextField);
+        await tester.enterText(emailField, mockValidEmail.value);
+
+        final confirmButton = find.text('Confirm');
+        await tester.tap(confirmButton);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(UpdateUserEmailDialogChild), findsNothing);
+
+        verify(() => mockUserRepository.updateEmail(userId: targetUser.userId, newEmail: mockValidEmail)).called(1);
+        expect(ActionSnackBarHelper.lastMessage, 'Email updated successfully');
+      });
+
+      for (final invalidEmail in mockInvalidEmails) {
+        testWidgets('confirm with invalid email "${invalidEmail.value}" shows error snackbar and keeps dialog open', (
+          WidgetTester tester,
+        ) async {
+          await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
+
           final actionIcon = find.byType(ActionIcon);
           await tester.tap(actionIcon);
           await tester.pumpAndSettle();
           expect(find.byType(UpdateUserEmailDialogChild), findsOne);
           final emailField = find.byType(TextField);
-          await tester.enterText(emailField, mockValidEmail.value);
-
+          await tester.enterText(emailField, invalidEmail.value);
           final confirmButton = find.text('Confirm');
           await tester.tap(confirmButton);
           await tester.pumpAndSettle();
+          expect(find.byType(UpdateUserEmailDialogChild), findsOne);
 
-          expect(find.byType(UpdateUserEmailDialogChild), findsNothing);
+          verifyNever(() => mockUserRepository.updateEmail(userId: targetUser.userId, newEmail: invalidEmail));
 
-          verify(
-            () => mockUserRepository.updateEmail(
-              userId: targetUser.userId,
-              newEmail: mockValidEmail,
-            ),
-          ).called(1);
-          expect(
-            ActionSnackBarHelper.lastMessage,
-            'Email updated successfully',
-          );
-        },
-      );
-
-      for (final invalidEmail in mockInvalidEmails) {
-        testWidgets(
-          'confirm with invalid email "${invalidEmail.value}" shows error snackbar and keeps dialog open',
-          (WidgetTester tester) async {
-            await tester.renderUpdateUserEmailIcon(
-              currentUser: currentUser,
-              targetUser: targetUser,
-            );
-
-            final actionIcon = find.byType(ActionIcon);
-            await tester.tap(actionIcon);
-            await tester.pumpAndSettle();
-            expect(find.byType(UpdateUserEmailDialogChild), findsOne);
-            final emailField = find.byType(TextField);
-            await tester.enterText(emailField, invalidEmail.value);
-            final confirmButton = find.text('Confirm');
-            await tester.tap(confirmButton);
-            await tester.pumpAndSettle();
-            expect(find.byType(UpdateUserEmailDialogChild), findsOne);
-
-            verifyNever(
-              () => mockUserRepository.updateEmail(
-                userId: targetUser.userId,
-                newEmail: invalidEmail,
-              ),
-            );
-
-            expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
-          },
-        );
+          expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
+        });
       }
     },
     onUnauthorized: (currentUser, targetUser, reason) {
-      testWidgets('should show greyed out action icon', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserEmailIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('should show greyed out action icon', (WidgetTester tester) async {
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updateEmailIcon = find.byType(UpdateUserEmailIcon);
         expect(updateEmailIcon, findsOne);
@@ -191,13 +148,8 @@ Future<void> main() async {
         expect(actionIconWidget.isGreyedOut, isTrue);
       });
 
-      testWidgets('shows snackbar when action icon is tapped', (
-        WidgetTester tester,
-      ) async {
-        await tester.renderUpdateUserEmailIcon(
-          currentUser: currentUser,
-          targetUser: targetUser,
-        );
+      testWidgets('shows snackbar when action icon is tapped', (WidgetTester tester) async {
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
 
         final updateEmailIcon = find.byType(UpdateUserEmailIcon);
         final actionIcon = updateEmailIcon.findDescendant(ActionIcon);
@@ -210,15 +162,9 @@ Future<void> main() async {
         expect(updateEmailDialogChild, findsNothing);
         switch (reason as UpdateUserEmailUnauthorizedReason) {
           case CannotUpdateEmailOnAnalyst():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You cannot update the email of an analyst.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the email of an analyst.');
           case CanOnlyUpdateEmailOnSelf():
-            expect(
-              ActionSnackBarHelper.lastMessage,
-              'You can only update your own email.',
-            );
+            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own email.');
         }
       });
     },
