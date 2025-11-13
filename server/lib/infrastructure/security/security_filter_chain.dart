@@ -9,16 +9,14 @@ extension CurrentUserRequestExtension on Request {
   User get currentUser {
     final user = context['currentUser'] as User?;
     if (user == null) {
-      throw AuthenticatedUserNotFoundException(
-          SecurityMissingAuthorizationHeader());
+      throw AuthenticatedUserNotFoundException(SecurityMissingAuthorizationHeader());
     }
     return user;
   }
 }
 
 class SecurityFilterChain {
-  SecurityFilterChain({required TokenService tokenService})
-      : _tokenService = tokenService;
+  SecurityFilterChain({required TokenService tokenService}) : _tokenService = tokenService;
 
   final TokenService _tokenService;
 
@@ -39,8 +37,7 @@ class SecurityFilterChain {
         };
       };
 
-  bool _isProtectedPath(String path) =>
-      _protectedPaths.any((protected) => path.startsWith(protected));
+  bool _isProtectedPath(String path) => _protectedPaths.any((protected) => path.startsWith(protected));
 
   Request _authorize(Request req) {
     final verifiedAccessToken = _getVerifiedAccessToken(req);
@@ -71,13 +68,11 @@ class SecurityFilterChain {
     final authHeader = req.headers['authorization'];
 
     if (authHeader == null) {
-      throw MissingAuthorizationHeaderException(
-          SecurityMissingAuthorizationHeader());
+      throw MissingAuthorizationHeaderException(SecurityMissingAuthorizationHeader());
     }
 
     if (!authHeader.startsWith('Bearer ')) {
-      throw MalformedAuthorizationHeaderException(
-          SecurityMalformedAuthorizationHeader());
+      throw MalformedAuthorizationHeaderException(SecurityMalformedAuthorizationHeader());
     }
 
     return authHeader.substring(7);

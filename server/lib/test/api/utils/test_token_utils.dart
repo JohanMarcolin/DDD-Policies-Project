@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../utils/factories/test_user_entry_factory.dart';
 import '../../utils/factories/test_server_factory.dart';
 
-Future<String> getAccessToken(
-    {required UserTestFixture userTestFixture}) async {
+Future<String> getAccessToken({required UserTestFixture userTestFixture}) async {
   final response = await http.post(
     Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
     body: jsonEncode({

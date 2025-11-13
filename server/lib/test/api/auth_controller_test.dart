@@ -19,15 +19,10 @@ void main() {
   group('Auth Controller', () {
     group('Shall succeed', () {
       for (final testEntry in testEntries) {
-        test(
-            'Login returns tokens and current user for valid {$testEntry} credentials',
-            () async {
+        test('Login returns tokens and current user for valid {$testEntry} credentials', () async {
           final response = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({
-              'email': testEntry.email.value,
-              'password': testEntry.password.value
-            }),
+            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
           );
 
           expect(response.statusCode, 200);
@@ -44,15 +39,10 @@ void main() {
       }
 
       for (final testEntry in testEntries) {
-        test(
-            'Refresh returns new access token and current user for valid {$testEntry} credentials',
-            () async {
+        test('Refresh returns new access token and current user for valid {$testEntry} credentials', () async {
           final loginResponse = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({
-              'email': testEntry.email.value,
-              'password': testEntry.password.value
-            }),
+            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
           );
 
           final loginBody = jsonDecode(loginResponse.body);
@@ -77,10 +67,7 @@ void main() {
         test('Logout succeeds with valid refresh token', () async {
           final loginResponse = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({
-              'email': testEntry.email.value,
-              'password': testEntry.password.value
-            }),
+            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
           );
           final loginBody = jsonDecode(loginResponse.body);
           final refreshToken = loginBody['data']['refreshToken'];
@@ -97,16 +84,14 @@ void main() {
       test('Login fails for invalid credentials', () async {
         final response = await http.post(
           Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode(
-              {'email': testEntries.first.email.value, 'password': 'wrong'}),
+          body: jsonEncode({'email': testEntries.first.email.value, 'password': 'wrong'}),
         );
         expect(response.statusCode, equals(403));
       });
       test('Login fails for invalid credentials', () async {
         final response = await http.post(
           Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode(
-              {'email': testEntries.first.email.value, 'password': 'wrong'}),
+          body: jsonEncode({'email': testEntries.first.email.value, 'password': 'wrong'}),
         );
         expect(response.statusCode, equals(403));
         final body = jsonDecode(response.body);
@@ -136,8 +121,7 @@ void main() {
       test('Login fails for user not found', () async {
         final response = await http.post(
           Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode(
-              {'email': 'notfound@example.com', 'password': 'irrelevant'}),
+          body: jsonEncode({'email': 'notfound@example.com', 'password': 'irrelevant'}),
         );
         expect(response.statusCode, equals(404));
         final body = jsonDecode(response.body);
@@ -169,10 +153,7 @@ void main() {
         for (final missingEmail in [null, '']) {
           final response = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({
-              'password': testEntries.first.password.value,
-              'email': missingEmail
-            }),
+            body: jsonEncode({'password': testEntries.first.password.value, 'email': missingEmail}),
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);
@@ -184,10 +165,7 @@ void main() {
         for (final missingPassword in [null, '']) {
           final response = await http.post(
             Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({
-              'email': testEntries.first.email.value,
-              'password': missingPassword
-            }),
+            body: jsonEncode({'email': testEntries.first.email.value, 'password': missingPassword}),
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);

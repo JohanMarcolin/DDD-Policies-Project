@@ -13,19 +13,14 @@ Middleware globalExceptionHandler() {
         print(e);
         return switch (e) {
           BadRequestException(:final errorCode) => badRequest(errorCode),
-          MalformedAuthorizationHeaderException(:final errorCode) =>
-            badRequest(errorCode),
+          MalformedAuthorizationHeaderException(:final errorCode) => badRequest(errorCode),
           NotFoundException(:final errorCode) => notFound(errorCode),
           ForbiddenException(:final errorCode) => forbidden(errorCode),
-          InvalidAccessTokenException(:final errorCode) =>
-            unauthorized(errorCode),
-          InvalidRefreshTokenException(:final errorCode) =>
-            unauthorized(errorCode),
-          AuthenticatedUserNotFoundException(:final errorCode) =>
-            forbidden(errorCode),
+          InvalidAccessTokenException(:final errorCode) => unauthorized(errorCode),
+          InvalidRefreshTokenException(:final errorCode) => unauthorized(errorCode),
+          AuthenticatedUserNotFoundException(:final errorCode) => forbidden(errorCode),
           ServerErrorException(:final errorCode) => serverError(errorCode),
-          PolicyViolationException(:final reason) =>
-            forbidden(null, reason.toString()),
+          PolicyViolationException(:final reason) => forbidden(null, reason.toString()),
           _ => serverError(ServerUnhandledServer()),
         };
       }

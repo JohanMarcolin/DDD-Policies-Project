@@ -12,9 +12,7 @@ import '../mappers/user_mapper.dart';
 import '../security/security_filter_chain.dart';
 
 class UserService {
-  UserService(
-      {required UserRepository userRepository,
-      required UserAdministrationService userAdministrationService})
+  UserService({required UserRepository userRepository, required UserAdministrationService userAdministrationService})
       : _userRepository = userRepository,
         _userAdministrationService = userAdministrationService;
 
@@ -22,16 +20,14 @@ class UserService {
   final UserAdministrationService _userAdministrationService;
 
   Future<Response> getAllUsers(Request req) async {
-    final users =
-        await _userAdministrationService.viewUsers(initiator: req.currentUser);
+    final users = await _userAdministrationService.viewUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
   }
 
   Future<Response> getUserById(Request req) async {
     final userId = extractUserIdFromParams(req);
 
-    final user = await _userAdministrationService.viewUser(
-        initiator: req.currentUser, userId: userId);
+    final user = await _userAdministrationService.viewUser(initiator: req.currentUser, userId: userId);
 
     if (user == null) {
       throw NotFoundException(RefreshUserNotFound());
@@ -62,8 +58,7 @@ class UserService {
     }
     final email = Email(newEmail);
 
-    await _userAdministrationService.updateUserEmail(
-        initiator: req.currentUser, target: targetUser, newEmail: email);
+    await _userAdministrationService.updateUserEmail(initiator: req.currentUser, target: targetUser, newEmail: email);
 
     return ok();
   }
@@ -80,9 +75,7 @@ class UserService {
     }
 
     await _userAdministrationService.updateUserPassword(
-        initiator: req.currentUser,
-        target: targetUser,
-        newPassword: Password(newPassword));
+        initiator: req.currentUser, target: targetUser, newPassword: Password(newPassword));
 
     return ok();
   }

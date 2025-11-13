@@ -13,9 +13,7 @@ import '../repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 
 class AuthService {
-  AuthService(
-      {required InMemoryUserRepository userRepository,
-      required TokenService tokenService})
+  AuthService({required InMemoryUserRepository userRepository, required TokenService tokenService})
       : _userRepository = userRepository,
         _tokenService = tokenService;
 
@@ -42,8 +40,7 @@ class AuthService {
       throw NotFoundException(LoginUserNotFound());
     }
 
-    if (!_userRepository.isPasswordVerified(
-        userId: user.userId, password: Password(password))) {
+    if (!_userRepository.isPasswordVerified(userId: user.userId, password: Password(password))) {
       throw ForbiddenException(LoginInvalidPassword());
     }
 
@@ -71,10 +68,7 @@ class AuthService {
       throw NotFoundException(RefreshUserNotFound());
     }
 
-    return ok({
-      'currentUser': UserMapper.toJson(user),
-      'accessToken': _tokenService.generateAccessToken(user)
-    });
+    return ok({'currentUser': UserMapper.toJson(user), 'accessToken': _tokenService.generateAccessToken(user)});
   }
 
   Future<Response> handleLogout(Request req) async {

@@ -3,9 +3,7 @@ import 'package:bcrypt/bcrypt.dart';
 import 'package:domain/value_objects/password.dart';
 
 class PasswordHasher {
-  Password hash(Password password) =>
-      Password(BCrypt.hashpw(password.value, BCrypt.gensalt()));
+  Password hash(Password password) => Password(BCrypt.hashpw(password.value, BCrypt.gensalt()));
 
-  bool isVerified(Password password, Password hashedPassword) =>
-      BCrypt.checkpw(password.value, hashedPassword.value);
+  bool isVerified(Password password, Password hashedPassword) => BCrypt.checkpw(password.value, hashedPassword.value);
 }

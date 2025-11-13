@@ -20,8 +20,7 @@ class JsonResponseCreated extends JsonResponseEntity {
 }
 
 class JsonResponseNoContent extends JsonResponseEntity {
-  static Response asShelfResponse() =>
-      Response(204, headers: JsonResponseEntity.jsonHeaders);
+  static Response asShelfResponse() => Response(204, headers: JsonResponseEntity.jsonHeaders);
 }
 
 class JsonResponseDeleted extends JsonResponseEntity {
@@ -36,8 +35,7 @@ class JsonResponseNotFound extends JsonResponseEntity {
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse(
-      [ErrorCode? errorCode, String? policyViolationDetails]) {
+  static Response asShelfResponse([ErrorCode? errorCode, String? policyViolationDetails]) {
     final body = <String, Object>{'isSuccess': false};
 
     if (errorCode != null) body['errorCode'] = errorCode.toString();
@@ -54,8 +52,7 @@ class JsonResponseForbidden extends JsonResponseEntity {
 
 class JsonResponseBadRequest extends JsonResponseEntity {
   static Response asShelfResponse(ErrorCode errorCode) => Response.badRequest(
-        body:
-            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
@@ -63,17 +60,14 @@ class JsonResponseBadRequest extends JsonResponseEntity {
 class JsonResponseUnauthorized extends JsonResponseEntity {
   static Response asShelfResponse(ErrorCode errorCode) => Response(
         401,
-        body:
-            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseServerError extends JsonResponseEntity {
-  static Response asShelfResponse(ErrorCode errorCode) =>
-      Response.internalServerError(
-        body:
-            jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+  static Response asShelfResponse(ErrorCode errorCode) => Response.internalServerError(
+        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

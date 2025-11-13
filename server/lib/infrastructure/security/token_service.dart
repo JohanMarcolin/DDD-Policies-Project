@@ -11,8 +11,7 @@ import '../http/exceptions/request_exceptions.dart';
 typedef AccessToken = String;
 
 class TokenService {
-  TokenService({required RefreshTokenDatabase refreshTokenDatabase})
-      : _refreshTokenDatabase = refreshTokenDatabase;
+  TokenService({required RefreshTokenDatabase refreshTokenDatabase}) : _refreshTokenDatabase = refreshTokenDatabase;
 
   final RefreshTokenDatabase _refreshTokenDatabase;
 
@@ -80,11 +79,9 @@ class TokenService {
     return verifiedRefreshToken;
   }
 
-  void revokeRefreshToken(User user) =>
-      _refreshTokenDatabase.delete(user.userId);
+  void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.userId);
 
-  String _signToken(JWT token, Duration expiration) =>
-      token.sign(_key, expiresIn: expiration);
+  String _signToken(JWT token, Duration expiration) => token.sign(_key, expiresIn: expiration);
 
   JWT? _verifyToken(String token) => JWT.tryVerify(token, _key);
 

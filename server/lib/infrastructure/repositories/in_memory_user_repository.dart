@@ -7,8 +7,7 @@ import 'package:error_codes/error_codes.dart';
 import '../databases/user_database.dart';
 import '../databases/user_password_database.dart';
 import '../http/exceptions/request_exceptions.dart';
-import '../http/exceptions/request_exceptions.dart'
-    show NotFoundException, ServerErrorException;
+import '../http/exceptions/request_exceptions.dart' show NotFoundException, ServerErrorException;
 
 class InMemoryUserRepository implements UserRepository {
   InMemoryUserRepository({
@@ -42,8 +41,7 @@ class InMemoryUserRepository implements UserRepository {
   Future<User?> getByEmail({required Email email}) async {
     try {
       final users = _userdatabase.getAll();
-      final user =
-          users.where((user) => user.email.value == email.value).toList();
+      final user = users.where((user) => user.email.value == email.value).toList();
       return user.isNotEmpty ? user.first : null;
     } catch (e) {
       throw ServerErrorException(UserRepoFailedToFetchUserByEmail());
@@ -51,8 +49,7 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateEmail(
-      {required UserId userId, required Email newEmail}) async {
+  Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
     try {
       final user = _userdatabase.get(userId);
       if (user == null) {
@@ -70,8 +67,7 @@ class InMemoryUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updatePassword(
-      {required UserId userId, required Password newPassword}) async {
+  Future<void> updatePassword({required UserId userId, required Password newPassword}) async {
     try {
       _userPasswordDatabase.put(userId, newPassword);
     } catch (e) {
@@ -88,8 +84,7 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
-  bool isPasswordVerified(
-      {required UserId userId, required Password password}) {
+  bool isPasswordVerified({required UserId userId, required Password password}) {
     try {
       return _userPasswordDatabase.isPasswordVerified(userId, password);
     } catch (e) {

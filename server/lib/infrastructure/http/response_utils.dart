@@ -13,17 +13,13 @@ Response noContent() => JsonResponseNoContent.asShelfResponse();
 
 Response deleted() => JsonResponseDeleted.asShelfResponse();
 
-Response notFound(ErrorCode errorCode) =>
-    JsonResponseNotFound.asShelfResponse(errorCode);
+Response notFound(ErrorCode errorCode) => JsonResponseNotFound.asShelfResponse(errorCode);
 
 Response forbidden([ErrorCode? errorCode, String? policyViolationDetails]) =>
     JsonResponseForbidden.asShelfResponse(errorCode, policyViolationDetails);
 
-Response badRequest(ErrorCode errorCode) =>
-    JsonResponseBadRequest.asShelfResponse(errorCode);
+Response badRequest(ErrorCode errorCode) => JsonResponseBadRequest.asShelfResponse(errorCode);
 
-Response unauthorized(ErrorCode errorCode) =>
-    JsonResponseUnauthorized.asShelfResponse(errorCode);
+Response unauthorized(ErrorCode errorCode) => JsonResponseUnauthorized.asShelfResponse(errorCode);
 
-Response serverError(ErrorCode errorCode) =>
-    JsonResponseServerError.asShelfResponse(errorCode);
+Response serverError(ErrorCode errorCode) => JsonResponseServerError.asShelfResponse(errorCode);

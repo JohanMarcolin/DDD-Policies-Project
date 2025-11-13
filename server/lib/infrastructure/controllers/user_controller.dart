@@ -3,8 +3,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../services/user_service.dart';
 
 class UserController {
-  UserController({required UserService userService})
-      : _userService = userService {
+  UserController({required UserService userService}) : _userService = userService {
     _userRouter.get('/all', _getAllUsers);
     _userRouter.get('/<userId>', _getUserById);
     _userRouter.delete('/<userId>', _deleteUser);

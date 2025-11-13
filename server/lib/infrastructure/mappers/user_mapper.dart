@@ -12,8 +12,7 @@ class UserMapper {
         'role': user.role.name,
       };
 
-  static List<UserJson> toJsonList(List<User> users) =>
-      users.map(toJson).toList();
+  static List<UserJson> toJsonList(List<User> users) => users.map(toJson).toList();
 
   static User fromJson(Map<String, dynamic> json) {
     return User(

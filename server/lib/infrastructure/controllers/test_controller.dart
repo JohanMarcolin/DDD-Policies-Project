@@ -3,8 +3,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../services/test_service.dart';
 
 class TestController {
-  TestController({required TestService testService})
-      : _testService = testService {
+  TestController({required TestService testService}) : _testService = testService {
     _testRouter.post('/create-all-user-fixtures', _createAllUserFixtures);
     _testRouter.delete('/delete-all-user-fixtures', _deleteAllUserFixtures);
     _testRouter.post('/create-user-fixture/<roleName>', _createUserFixture);

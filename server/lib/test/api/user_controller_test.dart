@@ -15,8 +15,7 @@ import 'utils/test_token_utils.dart';
 void main() {
   final userTestFixtures = UserTestFixtureFactory.defaultUserTestFixtures;
 
-  Future<String> getToken(UserTestFixture entry) async =>
-      await getAccessToken(userTestFixture: entry);
+  Future<String> getToken(UserTestFixture entry) async => await getAccessToken(userTestFixture: entry);
 
   group('User Controller', () {
     for (final initiator in userTestFixtures) {
@@ -55,30 +54,23 @@ void main() {
               for (final user in users) {
                 final userId = UserId(user['userId']);
                 final email = Email(user['email']);
-                final role =
-                    Role.values.firstWhere((role) => role.name == user['role']);
+                final role = Role.values.firstWhere((role) => role.name == user['role']);
 
                 expect(userId, isNotNull);
                 expect(email, isNotNull);
                 expect(role, isNotNull);
 
-                expect(
-                    ViewUserPolicy().authorize(initiator.user,
-                        User(userId: userId, email: email, role: role)),
+                expect(ViewUserPolicy().authorize(initiator.user, User(userId: userId, email: email, role: role)),
                     isA<Authorized>());
               }
             });
           });
 
           group('_getUserById', () {
-            final canViewUser =
-                ViewUserPolicy().authorize(initiator.user, target.user);
-            test(
-                'should ${canViewUser.isAuthorized ? '' : 'NOT'} get user by id',
-                () async {
+            final canViewUser = ViewUserPolicy().authorize(initiator.user, target.user);
+            test('should ${canViewUser.isAuthorized ? '' : 'NOT'} get user by id', () async {
               final response = await http.get(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}'),
                 headers: getAuthHeader(accessToken),
               );
               final body = jsonDecode(response.body);
@@ -102,14 +94,10 @@ void main() {
           });
 
           group('_deleteUser', () {
-            final canDeleteUser =
-                DeleteUserPolicy().authorize(initiator.user, target.user);
-            test(
-                'should ${canDeleteUser.isAuthorized ? '' : 'NOT'} delete user by id',
-                () async {
+            final canDeleteUser = DeleteUserPolicy().authorize(initiator.user, target.user);
+            test('should ${canDeleteUser.isAuthorized ? '' : 'NOT'} delete user by id', () async {
               final response = await http.delete(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}'),
                 headers: getAuthHeader(accessToken),
               );
               final body = jsonDecode(response.body);
@@ -127,19 +115,15 @@ void main() {
           });
 
           group('_updateEmail', () {
-            final canUpdateEmail =
-                UpdateUserEmailPolicy().authorize(initiator.user, target.user);
-            test(
-                'should ${canUpdateEmail.isAuthorized ? '' : 'NOT'} update email with valid email',
-                () async {
+            final canUpdateEmail = UpdateUserEmailPolicy().authorize(initiator.user, target.user);
+            test('should ${canUpdateEmail.isAuthorized ? '' : 'NOT'} update email with valid email', () async {
               final email = Email('valid@example.com');
 
               expect(EmailValidationPolicy().isValid(email), isTrue);
               final validEmail = email;
 
               final response = await http.put(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}/email'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}/email'),
                 headers: getAuthHeader(accessToken),
                 body: jsonEncode({'newEmail': validEmail.value}),
               );
@@ -163,8 +147,7 @@ void main() {
               final invalidEmail = email;
 
               final response = await http.put(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}/email'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}/email'),
                 headers: getAuthHeader(accessToken),
                 body: jsonEncode({'newEmail': invalidEmail.value}),
               );
@@ -175,26 +158,21 @@ void main() {
                 case Unauthorized():
                   expect(response.statusCode, 403);
                   expect(body['isSuccess'], isFalse);
-                  expect(body['policyViolationDetails'],
-                      EmailInvalidFormat().toString());
+                  expect(body['policyViolationDetails'], EmailInvalidFormat().toString());
               }
             });
           });
 
           group('_updatePassword', () {
-            final canUpdatePassword = UpdateUserPasswordPolicy()
-                .authorize(initiator.user, target.user);
-            test(
-                'should ${canUpdatePassword.isAuthorized ? '' : 'NOT'} update password with valid password',
-                () async {
+            final canUpdatePassword = UpdateUserPasswordPolicy().authorize(initiator.user, target.user);
+            test('should ${canUpdatePassword.isAuthorized ? '' : 'NOT'} update password with valid password', () async {
               final password = PasswordValidationPolicy.generatePassword();
 
               expect(PasswordValidationPolicy().isValid(password), isTrue);
               final validPassword = password;
 
               final response = await http.put(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}/password'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}/password'),
                 headers: getAuthHeader(accessToken),
                 body: jsonEncode({'newPassword': validPassword.value}),
               );
@@ -218,8 +196,7 @@ void main() {
               final invalidPassword = password;
 
               final response = await http.put(
-                Uri.parse(
-                    '${TestServerFactory.baseUrl}/user/${target.userId.value}/password'),
+                Uri.parse('${TestServerFactory.baseUrl}/user/${target.userId.value}/password'),
                 headers: getAuthHeader(accessToken),
                 body: jsonEncode({'newPassword': invalidPassword.value}),
               );
@@ -230,8 +207,7 @@ void main() {
                 case Unauthorized():
                   expect(response.statusCode, 403);
                   expect(body['isSuccess'], isFalse);
-                  expect(body['policyViolationDetails'],
-                      PasswordTooShort().toString());
+                  expect(body['policyViolationDetails'], PasswordTooShort().toString());
               }
             });
           });

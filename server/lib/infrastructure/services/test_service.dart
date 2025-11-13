@@ -53,8 +53,7 @@ class TestService {
     return created(_userFixtureMap(userFixture.user, userFixture.password));
   }
 
-  Future<({User user, Password password})> _createUserFixture(
-      {Role role = Role.user}) async {
+  Future<({User user, Password password})> _createUserFixture({Role role = Role.user}) async {
     final userId = UserId.generate();
     final email = Email('${role.name}_${Uuid().v4().substring(0, 4)}@test.com');
     final user = User(email: email, userId: userId, role: role);

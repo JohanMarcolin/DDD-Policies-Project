@@ -35,8 +35,7 @@ class UserTestFixtureFactory {
     role: Role.analyst,
   );
 
-  static List<UserTestFixture> get defaultUserTestFixtures =>
-      _getDefaultUserTestFixtures();
+  static List<UserTestFixture> get defaultUserTestFixtures => _getDefaultUserTestFixtures();
 
   static void setupDefaultUsers({
     required UserDatabase userDatabase,
@@ -59,8 +58,7 @@ class UserTestFixtureFactory {
     ];
   }
 
-  static UserTestFixture _getDefaultUserTestFixtureWithPassword(
-      {required Role role, required int number}) {
+  static UserTestFixture _getDefaultUserTestFixtureWithPassword({required Role role, required int number}) {
     final roleName = role.name;
     return UserTestFixture(
       user: User(
@@ -72,8 +70,7 @@ class UserTestFixtureFactory {
     );
   }
 
-  static User _createUser(
-      {required UserId userId, required Email email, required Role role}) {
+  static User _createUser({required UserId userId, required Email email, required Role role}) {
     return User(
       userId: userId,
       email: email,

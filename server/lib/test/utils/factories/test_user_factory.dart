@@ -39,11 +39,9 @@ class UserTestFixtureFactory {
     analyst2,
   ];
 
-  static Analyst _createAnalyst({required Email email}) =>
-      Analyst(userId: UserId.generate(), email: email);
+  static Analyst _createAnalyst({required Email email}) => Analyst(userId: UserId.generate(), email: email);
 
-  static Admin _createAdmin({required Email email}) =>
-      Admin(userId: UserId.generate(), email: email);
+  static Admin _createAdmin({required Email email}) => Admin(userId: UserId.generate(), email: email);
 
   static User _createUser({required Email email, Role role = Role.user}) =>
       User(userId: UserId.generate(), email: email, role: role);

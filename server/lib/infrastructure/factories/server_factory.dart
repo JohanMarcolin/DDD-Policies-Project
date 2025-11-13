@@ -23,10 +23,7 @@ import '../services/user_service.dart';
 
 class ServerFactory {
   ServerFactory(
-      {this.host = '0.0.0.0',
-      required this.port,
-      this.enableTestRoutes = false,
-      this.includeDefaultUsers = false});
+      {this.host = '0.0.0.0', required this.port, this.enableTestRoutes = false, this.includeDefaultUsers = false});
   final String host;
   final int port;
   final bool enableTestRoutes;
@@ -38,15 +35,13 @@ class ServerFactory {
     final router = Router();
     final userDatabase = UserDatabase();
     final passwordHasher = PasswordHasher();
-    final userPasswordDatabase =
-        UserPasswordDatabase(passwordHasher: passwordHasher);
+    final userPasswordDatabase = UserPasswordDatabase(passwordHasher: passwordHasher);
     final inMemoryUserRepository = InMemoryUserRepository(
       userDatabase: userDatabase,
       userPasswordDatabase: userPasswordDatabase,
     );
     final refreshTokenDatabase = RefreshTokenDatabase();
-    final tokenService =
-        TokenService(refreshTokenDatabase: refreshTokenDatabase);
+    final tokenService = TokenService(refreshTokenDatabase: refreshTokenDatabase);
     final securityFilterChain = SecurityFilterChain(tokenService: tokenService);
     final authService = AuthService(
       userRepository: inMemoryUserRepository,
@@ -70,9 +65,8 @@ class ServerFactory {
       passwordValidationPolicy: passwordValidationPolicy,
     );
 
-    final userService = UserService(
-        userRepository: inMemoryUserRepository,
-        userAdministrationService: userAdministrationService);
+    final userService =
+        UserService(userRepository: inMemoryUserRepository, userAdministrationService: userAdministrationService);
 
     final authController = AuthController(authService: authService);
     final userController = UserController(userService: userService);
