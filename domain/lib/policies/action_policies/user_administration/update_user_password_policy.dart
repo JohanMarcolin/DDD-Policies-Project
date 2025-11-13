@@ -1,11 +1,9 @@
 part of '../action_policy.dart';
 
 final class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
-  const UpdateUserPasswordPolicy()
-      : super(authorize: _authorizeUpdateUserPassword);
+  const UpdateUserPasswordPolicy() : super(authorize: _authorizeUpdateUserPassword);
 
-  static ActionPolicyResult _authorizeUpdateUserPassword(
-      User initiator, User target) {
+  static ActionPolicyResult _authorizeUpdateUserPassword(User initiator, User target) {
     final isModifyingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {
@@ -29,8 +27,6 @@ final class UpdateUserPasswordPolicy extends ActionPolicy<User, User> {
 
 sealed class UpdateUserPasswordUnauthorizedReason {}
 
-class CannotUpdatePasswordOnAnalyst
-    implements UpdateUserPasswordUnauthorizedReason {}
+class CannotUpdatePasswordOnAnalyst implements UpdateUserPasswordUnauthorizedReason {}
 
-class CanOnlyUpdatePasswordOnSelf
-    implements UpdateUserPasswordUnauthorizedReason {}
+class CanOnlyUpdatePasswordOnSelf implements UpdateUserPasswordUnauthorizedReason {}

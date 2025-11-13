@@ -1,7 +1,6 @@
 part of '../user_administration_view.dart';
 
-class UserAdministrationAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class UserAdministrationAppBar extends StatelessWidget implements PreferredSizeWidget {
   const UserAdministrationAppBar({super.key});
 
   @override
@@ -15,10 +14,7 @@ class UserAdministrationAppBar extends StatelessWidget
         BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthFailure) {
-              ActionSnackBarHelper.show(
-                message:
-                    'Logout failed. Please log in again or try again later.',
-              );
+              ActionSnackBarHelper.show(message: 'Logout failed. Please log in again or try again later.');
             } else {
               ActionSnackBarHelper.show(message: 'Logged out successfully.');
             }

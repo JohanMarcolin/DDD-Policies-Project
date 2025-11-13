@@ -5,12 +5,7 @@ class ActionIcon extends StatelessWidget {
   final bool isGreyedOut;
   final VoidCallback onPressed;
 
-  const ActionIcon({
-    super.key,
-    required this.icon,
-    required this.isGreyedOut,
-    required this.onPressed,
-  });
+  const ActionIcon({super.key, required this.icon, required this.isGreyedOut, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +13,9 @@ class ActionIcon extends StatelessWidget {
       clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
-        IconButton(
-          icon: Icon(icon),
-          color: isGreyedOut ? Colors.grey : null,
-          onPressed: onPressed,
-        ),
+        IconButton(icon: Icon(icon), color: isGreyedOut ? Colors.grey : null, onPressed: onPressed),
         if (isGreyedOut)
-          Positioned(
-            top: 4,
-            right: 4,
-            child: Icon(Icons.info_outline, size: 16, color: Colors.blueAccent),
-          ),
+          Positioned(top: 4, right: 4, child: Icon(Icons.info_outline, size: 16, color: Colors.blueAccent)),
       ],
     );
   }

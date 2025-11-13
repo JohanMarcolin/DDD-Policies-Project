@@ -9,18 +9,11 @@ import 'package:domain/value_objects/password.dart';
 part 'user_administration_view_event.dart';
 part 'user_administration_view_state.dart';
 
-class UserAdministrationViewBloc
-    extends Bloc<UserAdministrationViewEvent, UserAdministrationViewState>
-    with
-        BlocPresentationMixin<
-          UserAdministrationViewState,
-          UserAdministrationViewEvent
-        > {
-  UserAdministrationViewBloc({
-    required User currentUser,
-    required this.userAdministrationService,
-  }) : _currentUser = currentUser,
-       super(UserAdministrationViewInitial()) {
+class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserAdministrationViewState>
+    with BlocPresentationMixin<UserAdministrationViewState, UserAdministrationViewEvent> {
+  UserAdministrationViewBloc({required User currentUser, required this.userAdministrationService})
+    : _currentUser = currentUser,
+      super(UserAdministrationViewInitial()) {
     on<FetchUsersRequested>(_onFetchRequested);
     on<DeleteUserRequested>(_onDeleteRequested);
     on<UpdateUserEmailRequested>(_onUpdateEmailRequested);
@@ -30,58 +23,36 @@ class UserAdministrationViewBloc
   final User _currentUser;
   final UserAdministrationService userAdministrationService;
 
-  bool isAdministratingSelf(User targetUser) =>
-      _currentUser.isSameAs(targetUser);
+  bool isAdministratingSelf(User targetUser) => _currentUser.isSameAs(targetUser);
 
   ActionPolicyResult authorizeDeleteUser(User targetUser) =>
-      userAdministrationService.deleteUserPolicy.authorize(
-        _currentUser,
-        targetUser,
-      );
+      userAdministrationService.deleteUserPolicy.authorize(_currentUser, targetUser);
 
   ActionPolicyResult authorizeUpdateEmail(User targetUser) =>
-      userAdministrationService.updateUserEmailPolicy.authorize(
-        _currentUser,
-        targetUser,
-      );
+      userAdministrationService.updateUserEmailPolicy.authorize(_currentUser, targetUser);
 
   ActionPolicyResult authorizeUpdatePassword(User targetUser) =>
-      userAdministrationService.updateUserPasswordPolicy.authorize(
-        _currentUser,
-        targetUser,
-      );
+      userAdministrationService.updateUserPasswordPolicy.authorize(_currentUser, targetUser);
 
-  ValidationPolicyResult validateEmail(Email email) =>
-      userAdministrationService.emailValidationPolicy.validate(email);
+  ValidationPolicyResult validateEmail(Email email) => userAdministrationService.emailValidationPolicy.validate(email);
 
   ValidationPolicyResult validatePassword(Password password) =>
       userAdministrationService.passwordValidationPolicy.validate(password);
 
-  Future<void> _onFetchRequested(
-    FetchUsersRequested event,
-    Emitter<UserAdministrationViewState> emit,
-  ) async {
+  Future<void> _onFetchRequested(FetchUsersRequested event, Emitter<UserAdministrationViewState> emit) async {
     emit(UserAdministrationViewLoading());
     try {
-      final users = await userAdministrationService.viewUsers(
-        initiator: _currentUser,
-      );
+      final users = await userAdministrationService.viewUsers(initiator: _currentUser);
       emit(UserAdministrationViewLoaded(users));
     } catch (e) {
       emit(UserAdministrationViewFailure());
     }
   }
 
-  Future<void> _onDeleteRequested(
-    DeleteUserRequested event,
-    Emitter<UserAdministrationViewState> emit,
-  ) async {
+  Future<void> _onDeleteRequested(DeleteUserRequested event, Emitter<UserAdministrationViewState> emit) async {
     try {
       final isDeletingSelf = isAdministratingSelf(event.targetUser);
-      await userAdministrationService.deleteUser(
-        initiator: _currentUser,
-        target: event.targetUser,
-      );
+      await userAdministrationService.deleteUser(initiator: _currentUser, target: event.targetUser);
       if (isDeletingSelf) {
         emitPresentation(DeleteSelfSuccess());
       } else {

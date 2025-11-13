@@ -18,8 +18,7 @@ void main() {
     });
     test('enforce throws for invalid', () {
       final policy = DummyAlwaysInvalidValidationPolicy();
-      expect(() => policy.enforce('anything'),
-          throwsA(isA<ValidationPolicyViolationException>()));
+      expect(() => policy.enforce('anything'), throwsA(isA<ValidationPolicyViolationException>()));
     });
   });
 }

@@ -3,10 +3,7 @@ part of '../user_administration_view.dart';
 typedef EventMessageMapper<TEvent> = String Function(TEvent event);
 typedef UnauthorizedMessageMapper<TReason> = String Function(TReason reason);
 typedef DialogChildBuilder =
-    Widget Function(
-      BuildContext context, {
-      required Future<void> Function(BuildContext context) closeDialog,
-    });
+    Widget Function(BuildContext context, {required Future<void> Function(BuildContext context) closeDialog});
 typedef OnConfirmCallback = void Function(BuildContext context, String value);
 
 class UserActionIcon<TActionUnauthorizedReason> extends StatelessWidget {
@@ -27,8 +24,7 @@ class UserActionIcon<TActionUnauthorizedReason> extends StatelessWidget {
   final bool Function(UserAdministrationViewEvent event)? closeDialogOnEvent;
   final EventMessageMapper<UserAdministrationViewEvent> eventMessageMapper;
   final TActionUnauthorizedReason? unauthorizedReason;
-  final UnauthorizedMessageMapper<TActionUnauthorizedReason>
-  unauthorizedMessageMapper;
+  final UnauthorizedMessageMapper<TActionUnauthorizedReason> unauthorizedMessageMapper;
 
   @override
   Widget build(BuildContext context) {
@@ -50,31 +46,20 @@ class UserActionIcon<TActionUnauthorizedReason> extends StatelessWidget {
       context: context,
       child: BlocProvider.value(
         value: context.read<UserAdministrationViewBloc>(),
-        child:
-            BlocPresentationListener<
-              UserAdministrationViewBloc,
-              UserAdministrationViewEvent
-            >(
-              listener: (_, event) async {
-                _showAuthorizedActionSnackBar(context, event);
-                if (closeDialogOnEvent?.call(event) == true) {
-                  await ActionDialogHelper.close(context);
-                }
-              },
-              child: dialogChildBuilder(
-                context,
-                closeDialog: (_) async =>
-                    await ActionDialogHelper.close(context),
-              ),
-            ),
+        child: BlocPresentationListener<UserAdministrationViewBloc, UserAdministrationViewEvent>(
+          listener: (_, event) async {
+            _showAuthorizedActionSnackBar(context, event);
+            if (closeDialogOnEvent?.call(event) == true) {
+              await ActionDialogHelper.close(context);
+            }
+          },
+          child: dialogChildBuilder(context, closeDialog: (_) async => await ActionDialogHelper.close(context)),
+        ),
       ),
     );
   }
 
-  Future<void> _showAuthorizedActionSnackBar(
-    BuildContext context,
-    UserAdministrationViewEvent event,
-  ) async {
+  Future<void> _showAuthorizedActionSnackBar(BuildContext context, UserAdministrationViewEvent event) async {
     final message = eventMessageMapper(event);
     if (message.isNotEmpty) {
       ActionSnackBarHelper.show(message: message);
@@ -83,9 +68,7 @@ class UserActionIcon<TActionUnauthorizedReason> extends StatelessWidget {
 
   Future<void> _showUnauthorizedReasonSnackBar(BuildContext context) async {
     if (unauthorizedReason == null) return;
-    final message = unauthorizedMessageMapper(
-      unauthorizedReason as TActionUnauthorizedReason,
-    );
+    final message = unauthorizedMessageMapper(unauthorizedReason as TActionUnauthorizedReason);
     if (message.isNotEmpty) {
       ActionSnackBarHelper.show(message: message);
     }

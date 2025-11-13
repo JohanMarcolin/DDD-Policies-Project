@@ -28,10 +28,7 @@ class ConfirmInputDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(child: const Text('Cancel'), onPressed: () => onCancel()),
-        TextButton(
-          child: const Text('Confirm'),
-          onPressed: () => onConfirm(controller.text),
-        ),
+        TextButton(child: const Text('Confirm'), onPressed: () => onConfirm(controller.text)),
       ],
     );
   }

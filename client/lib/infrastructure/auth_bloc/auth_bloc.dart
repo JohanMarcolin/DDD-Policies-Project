@@ -9,9 +9,7 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc({required AuthApi authApi})
-    : _authApi = authApi,
-      super(AuthInitial()) {
+  AuthBloc({required AuthApi authApi}) : _authApi = authApi, super(AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRefreshRequested>(_onRefreshRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
@@ -20,16 +18,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   final AuthApi _authApi;
 
-  Future<void> _onLoginRequested(
-    AuthLoginRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLoginRequested(AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final currentUser = await _authApi.login(
-        email: event.email,
-        password: event.password,
-      );
+      final currentUser = await _authApi.login(email: event.email, password: event.password);
       emit(Authenticated(currentUser: currentUser));
     } on AuthApiException catch (e) {
       emit(Unauthenticated(e.errorCode));
@@ -38,10 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRefreshRequested(
-    AuthRefreshRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onRefreshRequested(AuthRefreshRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final currentUser = await _authApi.refreshAccessToken();
@@ -53,10 +42,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogoutRequested(
-    AuthLogoutRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLogoutRequested(AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       await _authApi.logout();
@@ -68,10 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRevokeAuthentication(
-    AuthRevokeAuthentication event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onRevokeAuthentication(AuthRevokeAuthentication event, Emitter<AuthState> emit) async {
     emit(Unauthenticated());
   }
 }

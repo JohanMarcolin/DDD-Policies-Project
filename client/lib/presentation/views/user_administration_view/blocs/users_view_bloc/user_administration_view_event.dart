@@ -45,10 +45,7 @@ sealed class UpdateUserPasswordEvent extends UserAdministrationViewEvent {}
 class UpdateUserPasswordRequested extends UpdateUserPasswordEvent {
   final User targetUser;
   final Password newPassword;
-  UpdateUserPasswordRequested({
-    required this.targetUser,
-    required this.newPassword,
-  });
+  UpdateUserPasswordRequested({required this.targetUser, required this.newPassword});
 }
 
 class UpdateUserPasswordInvalid extends UpdateUserPasswordEvent {

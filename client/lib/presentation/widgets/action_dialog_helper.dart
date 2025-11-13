@@ -3,19 +3,12 @@ import 'package:flutter/material.dart';
 class ActionDialogHelper {
   static Widget? currentChild;
 
-  static Future<void> show({
-    required BuildContext context,
-    required Widget child,
-  }) {
+  static Future<void> show({required BuildContext context, required Widget child}) {
     currentChild = child;
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Dialog(
-        child: child,
-        insetPadding: EdgeInsets.all(24),
-        backgroundColor: Colors.transparent,
-      ),
+      builder: (_) => Dialog(child: child, insetPadding: EdgeInsets.all(24), backgroundColor: Colors.transparent),
     );
   }
 

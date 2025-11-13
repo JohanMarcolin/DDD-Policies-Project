@@ -54,14 +54,12 @@ void main() {
       final password = Password('Abcdefg1');
       final result = policy.validate(password);
       expect(result, isA<Invalid>());
-      expect(
-          (result as Invalid).reason, isA<PasswordMissingSpecialCharacter>());
+      expect((result as Invalid).reason, isA<PasswordMissingSpecialCharacter>());
     });
 
     test('enforce throws for invalid password', () {
       final password = Password('abc');
-      expect(() => policy.enforce(password),
-          throwsA(isA<PolicyViolationException>()));
+      expect(() => policy.enforce(password), throwsA(isA<PolicyViolationException>()));
     });
 
     test('enforce does not throw for valid password', () {

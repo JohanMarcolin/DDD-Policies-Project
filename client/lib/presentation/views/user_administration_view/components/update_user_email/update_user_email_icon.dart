@@ -13,19 +13,13 @@ class UpdateUserEmailIcon extends StatelessWidget {
     return UserActionIcon<UpdateUserEmailUnauthorizedReason>(
       icon: Icons.email,
       isActionAuthorized: updateEmail is Authorized,
-      dialogChildBuilder: (context, {required closeDialog}) =>
-          UpdateUserEmailDialogChild(
-            isUserUpdatingSelf: bloc.isAdministratingSelf(user),
-            onCancel: () async => await closeDialog(context),
-            onConfirm: (value) {
-              bloc.add(
-                UpdateUserEmailRequested(
-                  targetUser: user,
-                  newEmail: Email(value),
-                ),
-              );
-            },
-          ),
+      dialogChildBuilder: (context, {required closeDialog}) => UpdateUserEmailDialogChild(
+        isUserUpdatingSelf: bloc.isAdministratingSelf(user),
+        onCancel: () async => await closeDialog(context),
+        onConfirm: (value) {
+          bloc.add(UpdateUserEmailRequested(targetUser: user, newEmail: Email(value)));
+        },
+      ),
       closeDialogOnEvent: (event) => event is UpdateUserEmailSuccess,
       eventMessageMapper: (event) => switch (event) {
         UpdateUserEmailInvalid() => 'Invalid email format',
@@ -33,12 +27,9 @@ class UpdateUserEmailIcon extends StatelessWidget {
         UpdateUserEmailSuccess() => 'Email updated successfully',
         _ => '',
       },
-      unauthorizedReason: updateEmail is Unauthorized
-          ? updateEmail.reason as UpdateUserEmailUnauthorizedReason
-          : null,
+      unauthorizedReason: updateEmail is Unauthorized ? updateEmail.reason as UpdateUserEmailUnauthorizedReason : null,
       unauthorizedMessageMapper: (reason) => switch (reason) {
-        CannotUpdateEmailOnAnalyst() =>
-          'You cannot update the email of an analyst.',
+        CannotUpdateEmailOnAnalyst() => 'You cannot update the email of an analyst.',
         CanOnlyUpdateEmailOnSelf() => 'You can only update your own email.',
       },
     );

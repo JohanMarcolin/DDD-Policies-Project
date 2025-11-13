@@ -17,16 +17,14 @@ void main() {
 
     test('enforce returns value for Granted', () {
       final policy = DummyAlwaysAuthorizedActionPolicy();
-      final result = policy.requireAuthorization('initiator', 'target',
-          onAuthorized: () => 'allowed');
+      final result = policy.requireAuthorization('initiator', 'target', onAuthorized: () => 'allowed');
       expect(result, equals('allowed'));
     });
 
     test('enforce throws ActionPolicyViolationException for Denied', () {
       final policy = DummyAlwaysUnauthorizedActionPolicy();
       expect(
-        () => policy.requireAuthorization('initiator', 'target',
-            onAuthorized: () => 'should not reach'),
+        () => policy.requireAuthorization('initiator', 'target', onAuthorized: () => 'should not reach'),
         throwsA(isA<ActionPolicyViolationException>()),
       );
     });

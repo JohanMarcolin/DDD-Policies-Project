@@ -15,17 +15,12 @@ import 'presentation/views/user_administration_view/blocs/users_view_bloc/user_a
 import 'presentation/views/user_administration_view/user_administration_view.dart';
 
 void main() {
-  AuthBloc setupAuthBloc() =>
-      AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()));
+  AuthBloc setupAuthBloc() => AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()));
 
   final authBloc = setupAuthBloc();
   runApp(
     MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(
-          create: (_) => authBloc..add(AuthRefreshRequested()),
-        ),
-      ],
+      providers: [BlocProvider<AuthBloc>(create: (_) => authBloc..add(AuthRefreshRequested()))],
       child: const UserAdministrationApp(),
     ),
   );
@@ -38,19 +33,14 @@ class UserAdministrationApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'User Administration App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
       builder: FlutterEasyDialogs.builder(),
       home: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is Authenticated) {
-            final userAdministrationViewBloc = _setupUserAdministrationViewBloc(
-              state.currentUser,
-            );
+            final userAdministrationViewBloc = _setupUserAdministrationViewBloc(state.currentUser);
             return BlocProvider(
-              create: (_) =>
-                  userAdministrationViewBloc..add(FetchUsersRequested()),
+              create: (_) => userAdministrationViewBloc..add(FetchUsersRequested()),
               child: const UserAdministrationView(),
             );
           }
@@ -61,9 +51,7 @@ class UserAdministrationApp extends StatelessWidget {
     );
   }
 
-  UserAdministrationViewBloc _setupUserAdministrationViewBloc(
-    User currentUser,
-  ) {
+  UserAdministrationViewBloc _setupUserAdministrationViewBloc(User currentUser) {
     return UserAdministrationViewBloc(
       currentUser: currentUser,
       userAdministrationService: UserAdministrationService(

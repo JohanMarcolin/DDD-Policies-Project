@@ -33,26 +33,16 @@ class UserAdministrationView extends StatelessWidget {
       value: context.read<UserAdministrationViewBloc>(),
       child: Scaffold(
         appBar: const UserAdministrationAppBar(),
-        body:
-            BlocBuilder<
-              UserAdministrationViewBloc,
-              UserAdministrationViewState
-            >(
-              builder: (context, state) {
-                return switch (state) {
-                  UserAdministrationViewLoading() => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  UserAdministrationViewFailure() => Center(
-                    child: Text('Failure loading users'),
-                  ),
-                  UserAdministrationViewLoaded(:final users) => UserList(
-                    users: users,
-                  ),
-                  _ => const SizedBox.shrink(),
-                };
-              },
-            ),
+        body: BlocBuilder<UserAdministrationViewBloc, UserAdministrationViewState>(
+          builder: (context, state) {
+            return switch (state) {
+              UserAdministrationViewLoading() => const Center(child: CircularProgressIndicator()),
+              UserAdministrationViewFailure() => Center(child: Text('Failure loading users')),
+              UserAdministrationViewLoaded(:final users) => UserList(users: users),
+              _ => const SizedBox.shrink(),
+            };
+          },
+        ),
       ),
     );
   }

@@ -28,8 +28,7 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
     if (includeNumbers && !value.contains(RegExp(r'[0-9]'))) {
       return Invalid(reason: PasswordMissingNumber());
     }
-    if (includeSpecialCharacters &&
-        !value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
+    if (includeSpecialCharacters && !value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
       return Invalid(reason: PasswordMissingSpecialCharacter());
     }
     return Valid();
@@ -56,8 +55,7 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
 
     while (true) {
       final candidate = Password(
-        List.generate(length, (_) => chars[random.nextInt(chars.length)])
-            .join(),
+        List.generate(length, (_) => chars[random.nextInt(chars.length)]).join(),
       );
       if (PasswordValidationPolicy().validate(candidate) is Valid) {
         return candidate;

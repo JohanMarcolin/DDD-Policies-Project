@@ -9,6 +9,5 @@ abstract class UserRepository {
   Future<User?> getByEmail({required Email email});
   Future<void> delete({required UserId userId});
   Future<void> updateEmail({required UserId userId, required Email newEmail});
-  Future<void> updatePassword(
-      {required UserId userId, required Password newPassword});
+  Future<void> updatePassword({required UserId userId, required Password newPassword});
 }

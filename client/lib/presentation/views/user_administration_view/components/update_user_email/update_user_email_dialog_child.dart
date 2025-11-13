@@ -14,15 +14,8 @@ class UpdateUserEmailDialogChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = isUserUpdatingSelf
-        ? 'Update Your Email'
-        : 'Update User Email';
+    final title = isUserUpdatingSelf ? 'Update Your Email' : 'Update User Email';
 
-    return ConfirmInputDialog(
-      title: title,
-      label: 'New Email',
-      onCancel: onCancel,
-      onConfirm: onConfirm,
-    );
+    return ConfirmInputDialog(title: title, label: 'New Email', onCancel: onCancel, onConfirm: onConfirm);
   }
 }

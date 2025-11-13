@@ -35,10 +35,7 @@ class HttpUserRepository implements domain.UserRepository {
   }
 
   @override
-  Future<void> updateEmail({
-    required UserId userId,
-    required Email newEmail,
-  }) async {
+  Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
     try {
       await _userApi.updateEmail(userId: userId, newEmail: newEmail);
     } catch (_) {
@@ -47,10 +44,7 @@ class HttpUserRepository implements domain.UserRepository {
   }
 
   @override
-  Future<void> updatePassword({
-    required UserId userId,
-    required Password newPassword,
-  }) async {
+  Future<void> updatePassword({required UserId userId, required Password newPassword}) async {
     try {
       await _userApi.updatePassword(userId: userId, newPassword: newPassword);
     } catch (_) {

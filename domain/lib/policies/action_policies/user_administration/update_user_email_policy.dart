@@ -3,8 +3,7 @@ part of '../action_policy.dart';
 final class UpdateUserEmailPolicy extends ActionPolicy<User, User> {
   const UpdateUserEmailPolicy() : super(authorize: _authorizeUpdateUserEmail);
 
-  static ActionPolicyResult _authorizeUpdateUserEmail(
-      User initiator, User target) {
+  static ActionPolicyResult _authorizeUpdateUserEmail(User initiator, User target) {
     final isModifyingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {

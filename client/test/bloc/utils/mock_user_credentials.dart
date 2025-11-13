@@ -24,12 +24,8 @@ List<Email> mockInvalidEmails = [
 
 Password mockValidPassword = PasswordValidationPolicy.generatePassword();
 
-Password mockTooShortPassword = Password(
-  'p' * (PasswordValidationPolicy.minLength - 1),
-);
-Password mockTooLongPassword = Password(
-  'p' * (PasswordValidationPolicy.maxLength + 1),
-);
+Password mockTooShortPassword = Password('p' * (PasswordValidationPolicy.minLength - 1));
+Password mockTooLongPassword = Password('p' * (PasswordValidationPolicy.maxLength + 1));
 Password mockMissingUppercasePassword = Password('password1!');
 Password mockMissingLowercasePassword = Password('PASSWORD1!');
 Password mockMissingNumberPassword = Password('Password!');

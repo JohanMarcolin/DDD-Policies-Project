@@ -16,8 +16,7 @@ class DummyUserRepository implements UserRepository {
   Future<User?> get({required UserId userId}) async => _users.where((u) => u.userId == userId).firstOrNull;
 
   @override
-  Future<User?> getByEmail({required Email email}) async =>
-      _users.where((u) => u.email == email).firstOrNull;
+  Future<User?> getByEmail({required Email email}) async => _users.where((u) => u.email == email).firstOrNull;
 
   @override
   Future<void> delete({required UserId userId}) async {

@@ -27,8 +27,7 @@ void main() {
       expect(
         () => policy.enforce(email),
         throwsA(
-          predicate((e) =>
-              e is PolicyViolationException && e.reason is EmailInvalidFormat),
+          predicate((e) => e is PolicyViolationException && e.reason is EmailInvalidFormat),
         ),
       );
     });

@@ -14,8 +14,7 @@ abstract base class ActionPolicy<TInitiator, TTarget> {
 
   final ActionPolicyResult Function(TInitiator, TTarget) authorize;
 
-  bool isAuthorized(TInitiator initiator, TTarget target) =>
-      authorize(initiator, target) is Authorized;
+  bool isAuthorized(TInitiator initiator, TTarget target) => authorize(initiator, target) is Authorized;
 
   dynamic requireAuthorization(
     TInitiator initiator,

@@ -54,27 +54,14 @@ void main() {
     group('{Events}', () {
       group('{AuthLoginRequested}', () {
         _blocTest(
-          description:
-              'should emit AuthLoading and Authenticated on successful login',
+          description: 'should emit AuthLoading and Authenticated on successful login',
           stub: () => when(
-            () => blocTestContext.mockApi.login(
-              email: mockValidEmail,
-              password: mockValidPassword,
-            ),
+            () => blocTestContext.mockApi.login(email: mockValidEmail, password: mockValidPassword),
           ).thenAnswer((_) async => mockUser),
-          act: (bloc) => bloc.add(
-            AuthLoginRequested(
-              email: mockValidEmail,
-              password: mockValidPassword,
-            ),
-          ),
+          act: (bloc) => bloc.add(AuthLoginRequested(email: mockValidEmail, password: mockValidPassword)),
           expect: () => [
             isA<AuthLoading>(),
-            isA<Authenticated>().having(
-              (s) => s.currentUser,
-              'currentUser',
-              mockUser,
-            ),
+            isA<Authenticated>().having((s) => s.currentUser, 'currentUser', mockUser),
           ],
           verify: (bloc) => expect(bloc.state, isA<Authenticated>()),
         );
@@ -82,73 +69,40 @@ void main() {
         _blocTest(
           description: 'should not authenticate on invalid credentials',
           stub: () => when(
-            () => blocTestContext.mockApi.login(
-              email: mockInvalidEmail,
-              password: mockTooShortPassword,
-            ),
+            () => blocTestContext.mockApi.login(email: mockInvalidEmail, password: mockTooShortPassword),
           ).thenThrow(AuthApiException('INVALID_CREDENTIALS')),
-          act: (bloc) => bloc.add(
-            AuthLoginRequested(
-              email: mockInvalidEmail,
-              password: mockTooShortPassword,
-            ),
-          ),
-          expect: () => [
-            isA<AuthLoading>(),
-            isA<Unauthenticated>().having(
-              (s) => s.errorCode,
-              'errorCode',
-              isNotNull,
-            ),
-          ],
+          act: (bloc) => bloc.add(AuthLoginRequested(email: mockInvalidEmail, password: mockTooShortPassword)),
+          expect: () => [isA<AuthLoading>(), isA<Unauthenticated>().having((s) => s.errorCode, 'errorCode', isNotNull)],
           verify: (bloc) => expect(bloc.state, isA<Unauthenticated>()),
         );
       });
 
       group('{AuthRefreshRequested}', () {
         _blocTest(
-          description:
-              'should emit AuthLoading and Authenticated on successful refresh',
-          stub: () => when(
-            () => blocTestContext.mockApi.refreshAccessToken(),
-          ).thenAnswer((_) async => mockUser),
+          description: 'should emit AuthLoading and Authenticated on successful refresh',
+          stub: () => when(() => blocTestContext.mockApi.refreshAccessToken()).thenAnswer((_) async => mockUser),
           act: (bloc) => bloc.add(AuthRefreshRequested()),
           expect: () => [
             isA<AuthLoading>(),
-            isA<Authenticated>().having(
-              (s) => s.currentUser,
-              'currentUser',
-              mockUser,
-            ),
+            isA<Authenticated>().having((s) => s.currentUser, 'currentUser', mockUser),
           ],
           verify: (bloc) => expect(bloc.state, isA<Authenticated>()),
         );
 
         _blocTest(
           description: 'should not authenticate on refresh failure',
-          stub: () => when(
-            () => blocTestContext.mockApi.refreshAccessToken(),
-          ).thenThrow(AuthApiException('TOKEN_EXPIRED')),
+          stub: () =>
+              when(() => blocTestContext.mockApi.refreshAccessToken()).thenThrow(AuthApiException('TOKEN_EXPIRED')),
           act: (bloc) => bloc.add(AuthRefreshRequested()),
-          expect: () => [
-            isA<AuthLoading>(),
-            isA<Unauthenticated>().having(
-              (s) => s.errorCode,
-              'errorCode',
-              isNotNull,
-            ),
-          ],
+          expect: () => [isA<AuthLoading>(), isA<Unauthenticated>().having((s) => s.errorCode, 'errorCode', isNotNull)],
           verify: (bloc) => expect(bloc.state, isA<Unauthenticated>()),
         );
       });
 
       group('{AuthLogoutRequested}', () {
         _blocTest(
-          description:
-              'should emit AuthLoading and Unauthenticated on successful logout',
-          stub: () => when(
-            () => blocTestContext.mockApi.logout(),
-          ).thenAnswer((_) async {}),
+          description: 'should emit AuthLoading and Unauthenticated on successful logout',
+          stub: () => when(() => blocTestContext.mockApi.logout()).thenAnswer((_) async {}),
           act: (bloc) => bloc.add(AuthLogoutRequested()),
           expect: () => [isA<AuthLoading>(), isA<Unauthenticated>()],
           verify: (bloc) => expect(bloc.state, isA<Unauthenticated>()),
@@ -156,9 +110,7 @@ void main() {
 
         _blocTest(
           description: 'should not emit Unauthenticated on logout failure',
-          stub: () => when(
-            () => blocTestContext.mockApi.logout(),
-          ).thenThrow(Exception('Logout failed')),
+          stub: () => when(() => blocTestContext.mockApi.logout()).thenThrow(Exception('Logout failed')),
           act: (bloc) => bloc.add(AuthLogoutRequested()),
           expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
           verify: (bloc) => expect(bloc.state, isA<AuthFailure>()),

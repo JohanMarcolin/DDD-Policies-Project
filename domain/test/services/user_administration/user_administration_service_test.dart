@@ -30,20 +30,17 @@ void main() {
       expect(users, containsAll([user1, user2]));
     });
     test('viewUser returns user by id', () async {
-      final user = await userAdministrationService.viewUser(
-          initiator: user1, userId: user2.userId);
+      final user = await userAdministrationService.viewUser(initiator: user1, userId: user2.userId);
       expect(user, equals(user2));
     });
     test('deleteUser removes user', () async {
-      await userAdministrationService.deleteUser(
-          initiator: admin, target: user2);
+      await userAdministrationService.deleteUser(initiator: admin, target: user2);
       final users = await userAdministrationService.viewUsers(initiator: admin);
       expect(users, isNot(contains(user2)));
     });
     test('updateUserEmail updates email', () async {
       final newEmail = Email('new@email.com');
-      userAdministrationService.updateUserEmail(
-          initiator: user1, target: user1, newEmail: newEmail);
+      userAdministrationService.updateUserEmail(initiator: user1, target: user1, newEmail: newEmail);
       final users = await userAdministrationService.viewUsers(initiator: user1);
       final updatedUser = users.firstWhere((u) => u.userId == user1.userId);
       expect(updatedUser.email, equals(newEmail));

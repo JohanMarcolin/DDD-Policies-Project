@@ -10,6 +10,5 @@ class UserMapper {
     role: Role.values.firstWhere((r) => r.name == json['role']),
   );
 
-  static List<User> toDomainUserList(List<Map<String, dynamic>> jsonList) =>
-      jsonList.map(toDomainUser).toList();
+  static List<User> toDomainUserList(List<Map<String, dynamic>> jsonList) => jsonList.map(toDomainUser).toList();
 }

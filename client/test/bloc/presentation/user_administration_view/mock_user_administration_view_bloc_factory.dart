@@ -9,10 +9,7 @@ import 'package:mocktail/mocktail.dart';
 class MockUserRepository extends Mock implements domain.UserRepository {}
 
 class MockUserAdministrationViewBlocFactory {
-  MockUserAdministrationViewBlocFactory._(
-    this.mockServiceRepository,
-    this.mockBloc,
-  );
+  MockUserAdministrationViewBlocFactory._(this.mockServiceRepository, this.mockBloc);
   factory MockUserAdministrationViewBlocFactory({required User currentUser}) {
     final mockServiceRepository = MockUserRepository();
 
@@ -26,14 +23,8 @@ class MockUserAdministrationViewBlocFactory {
       passwordValidationPolicy: PasswordValidationPolicy(),
     );
 
-    final mockBloc = UserAdministrationViewBloc(
-      currentUser: currentUser,
-      userAdministrationService: mockService,
-    );
-    return MockUserAdministrationViewBlocFactory._(
-      mockServiceRepository,
-      mockBloc,
-    );
+    final mockBloc = UserAdministrationViewBloc(currentUser: currentUser, userAdministrationService: mockService);
+    return MockUserAdministrationViewBlocFactory._(mockServiceRepository, mockBloc);
   }
 
   final MockUserRepository mockServiceRepository;

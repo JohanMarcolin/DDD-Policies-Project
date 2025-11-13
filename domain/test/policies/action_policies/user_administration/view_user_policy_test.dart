@@ -1,8 +1,7 @@
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:test/test.dart';
 
-import '../../../utils/users.dart'
-    show analyst, otherAnalyst, admin, otherAdmin, user, otherUser;
+import '../../../utils/users.dart' show analyst, otherAnalyst, admin, otherAdmin, user, otherUser;
 
 void main() {
   group('ViewUserPolicy', () {

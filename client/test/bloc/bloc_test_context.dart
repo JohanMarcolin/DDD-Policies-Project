@@ -7,11 +7,7 @@ class BlocTestContext<TUser, TFactory, TBloc, TRepo> {
   final TBloc Function(TFactory factory) getBloc;
   final TRepo Function(TFactory factory) getRepo;
 
-  BlocTestContext({
-    required this.factoryBuilder,
-    required this.getBloc,
-    required this.getRepo,
-  });
+  BlocTestContext({required this.factoryBuilder, required this.getBloc, required this.getRepo});
 
   void setup(TUser currentUser) {
     factory = factoryBuilder(currentUser);
