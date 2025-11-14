@@ -1,4 +1,3 @@
-import 'package:client/infrastructure/apis/integration_test_api/integration_test_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
@@ -14,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/main.dart' as app;
+import 'package:global_utils/user_test_fixture.dart';
 
 import '../../../test/bloc/infrastructure/auth_bloc_test.dart';
 import '../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';

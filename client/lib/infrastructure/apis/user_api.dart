@@ -1,13 +1,13 @@
 import 'dart:convert';
-import 'package:client/infrastructure/apis/http_api/http_api.dart';
 import 'package:client/infrastructure/apis/auth_api.dart';
-import 'package:client/infrastructure/mappers/user_mapper.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
+import 'package:global_utils/user_mapper.dart';
+import 'package:global_utils/http_api/http_api.dart';
 
 /// API for user administration operations.
 class UserApi extends HttpApi {

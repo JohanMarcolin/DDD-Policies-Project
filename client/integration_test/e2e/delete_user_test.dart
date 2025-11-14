@@ -1,14 +1,14 @@
-import 'package:client/infrastructure/apis/integration_test_api/integration_test_api.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/confirm_dialog.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:global_utils/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
 
+import '../integration_test_server_fixture.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
-import '../utils/integration_test_server_fixture.dart';
 
 /// Entry point for Delete User integration tests.
 ///

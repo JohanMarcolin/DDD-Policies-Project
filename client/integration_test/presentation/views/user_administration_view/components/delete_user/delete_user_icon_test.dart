@@ -4,12 +4,12 @@ import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:global_utils/user_test_runner.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../../../test/bloc/utils/mock_users.dart';
-import '../../../../../utils/user_test_runner.dart';
 import '../../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../../utils/extensions/widget_tester_extensions.dart';
 

@@ -3,7 +3,7 @@ import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

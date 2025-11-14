@@ -4,10 +4,10 @@ import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:global_utils/error_codes.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:mocktail/mocktail.dart';

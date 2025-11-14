@@ -1,5 +1,6 @@
 import 'package:domain/repositories/user_repository.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
+import 'package:global_utils/user_mapper.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
@@ -8,7 +9,6 @@ import 'package:domain/value_objects/password.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/request_utils.dart';
 import '../http/response_utils.dart';
-import '../mappers/user_mapper.dart';
 import '../security/security_filter_chain.dart';
 
 class UserService {

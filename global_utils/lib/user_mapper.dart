@@ -19,7 +19,14 @@ class UserMapper {
       userId: UserId(json['userId']),
       email: Email(json['email']),
       role: Role.values.firstWhere((r) => r.name == json['role']),
-      // ...other fields...
     );
   }
+
+  static User toDomainUser(Map<String, dynamic> json) => User(
+        userId: UserId(json['userId'].toString()),
+        email: Email(json['email'] as String),
+        role: Role.values.firstWhere((r) => r.name == json['role']),
+      );
+
+  static List<User> toDomainUserList(List<Map<String, dynamic>> jsonList) => jsonList.map(toDomainUser).toList();
 }

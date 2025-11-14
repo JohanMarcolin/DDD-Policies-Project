@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import '../integration_test_server_fixture.dart';
 import '../utils/extensions/widget_finder_extensions.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
-import '../utils/integration_test_server_fixture.dart';
 
 /// Entry point for User Authentication integration tests.
 ///

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
 import 'package:shelf/shelf.dart';
 
 part 'json_response_entity.dart';

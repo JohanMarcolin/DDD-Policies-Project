@@ -1,4 +1,5 @@
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
+import 'package:global_utils/user_mapper.dart';
 
 import '../http/request_utils.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -8,7 +9,6 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/response_utils.dart';
-import '../mappers/user_mapper.dart';
 import '../repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 

@@ -1,6 +1,6 @@
-import '../../infrastructure/factories/server_factory.dart';
+import '../infrastructure/server.dart';
 
 void main() async {
-  final serverFactory = ServerFactory(port: 8080, includeDefaultUsers: true);
+  final serverFactory = Server(port: 8080);
   await serverFactory.start();
 }

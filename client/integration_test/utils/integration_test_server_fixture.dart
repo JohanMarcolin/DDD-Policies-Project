@@ -1,8 +1,9 @@
-import 'package:client/infrastructure/apis/http_api/http_api.dart';
-import 'package:client/infrastructure/apis/integration_test_api/integration_test_api.dart';
+import '../integration_test_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:server/test/utils/factories/test_server_factory.dart';
+import 'package:global_utils/test_server_fixture.dart';
+import 'package:global_utils/user_test_fixture.dart';
+import 'package:global_utils/http_api/http_api.dart';
 
 /// Provides setup, teardown, and test data utilities for integration tests requiring a running backend server.
 ///
@@ -17,8 +18,8 @@ class IntegrationTestServerFixture {
   ///
   /// Call this in your test's `setUp` method before any test logic that requires backend access.
   static Future<void> setup() async {
-    await TestServerFactory.start(enableTestRoutes: true);
-    HttpApi.baseUrl = TestServerFactory.baseUrl;
+    await TestServerFixture.start(enableTestRoutes: true);
+    HttpApi.baseUrl = TestServerFixture.baseUrl;
     _integrationTestApi = IntegrationTestApi();
     _authTokenService = AuthTokenService();
   }
@@ -29,7 +30,7 @@ class IntegrationTestServerFixture {
   static Future<void> teardown() async {
     await _integrationTestApi.deleteAllUserFixtures();
     await _authTokenService.clearTokens();
-    await TestServerFactory.stop();
+    await TestServerFixture.stop();
   }
 
   /// Creates a user fixture with the specified [role] on the backend test server.

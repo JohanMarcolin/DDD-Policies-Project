@@ -1,7 +1,6 @@
-import 'package:client/infrastructure/mappers/user_mapper.dart';
 import 'package:domain/value_objects/password.dart';
-
-import '../apis/integration_test_api/integration_test_api.dart';
+import 'package:global_utils/user_mapper.dart';
+import 'package:global_utils/user_test_fixture.dart';
 
 class UserTestFixtureMapper {
   static UserTestFixture fromJson(Map<String, dynamic> json) {

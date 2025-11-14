@@ -2,10 +2,10 @@ import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
 import 'package:client/presentation/widgets/button.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
+import 'package:global_utils/error_codes.dart';
 
 part 'components/login_app_bar.dart';
 part 'components/login_form.dart';

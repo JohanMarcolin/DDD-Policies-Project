@@ -1,4 +1,4 @@
-import 'package:error_codes/error_codes.dart';
+import 'package:global_utils/error_codes.dart';
 
 sealed class RequestException implements Exception {
   const RequestException(this.errorCode);

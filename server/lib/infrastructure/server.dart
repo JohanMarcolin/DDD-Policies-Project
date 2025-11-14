@@ -5,29 +5,27 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
-import '../../../test/utils/factories/test_user_entry_factory.dart';
-import '../controllers/test_controller.dart';
-import '../databases/user_password_database.dart';
-import '../http/global_exception_handler.dart';
-import '../repositories/in_memory_user_repository.dart';
-import '../security/password_hasher.dart';
-import '../controllers/auth_controller.dart';
-import '../services/auth_service.dart';
-import '../databases/refresh_token_database.dart';
-import '../databases/user_database.dart';
-import '../security/token_service.dart';
-import '../controllers/user_controller.dart';
-import '../security/security_filter_chain.dart';
-import '../services/test_service.dart';
-import '../services/user_service.dart';
+import 'controllers/test_controller.dart';
+import 'databases/user_password_database.dart';
+import 'http/global_exception_handler.dart';
+import 'repositories/in_memory_user_repository.dart';
+import 'security/password_hasher.dart';
+import 'controllers/auth_controller.dart';
+import 'services/auth_service.dart';
+import 'databases/refresh_token_database.dart';
+import 'databases/user_database.dart';
+import 'security/token_service.dart';
+import 'controllers/user_controller.dart';
+import 'security/security_filter_chain.dart';
+import 'services/test_service.dart';
+import 'services/user_service.dart';
 
-class ServerFactory {
-  ServerFactory(
-      {this.host = '0.0.0.0', required this.port, this.enableTestRoutes = false, this.includeDefaultUsers = false});
+class Server {
+  Server({this.host = '0.0.0.0', required this.port, this.enableTestRoutes = false, this.setupTestUsers = false});
   final String host;
   final int port;
   final bool enableTestRoutes;
-  final bool includeDefaultUsers;
+  final bool setupTestUsers;
   HttpServer? _server;
   late String baseUrl;
 
@@ -85,13 +83,6 @@ class ServerFactory {
       );
 
       router.mount('/test/', testController.handler);
-    }
-
-    if (includeDefaultUsers) {
-      UserTestFixtureFactory.setupDefaultUsers(
-        userDatabase: userDatabase,
-        userPasswordDatabase: userPasswordDatabase,
-      );
     }
 
     final pipeline = const Pipeline()

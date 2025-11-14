@@ -1,6 +1,6 @@
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/scaffolding.dart';
 
 /// Utility class to run tests for different user role combinations.
 class UserTestRunner {
@@ -28,15 +28,14 @@ class UserTestRunner {
       users: users,
       testCallback: (actor, subject) {
         final result = policy.authorize(actor, subject);
-        switch (result) {
-          case Authorized():
-            group('(action authorized)', () {
-              onAuthorized(actor, subject);
-            });
-          case Unauthorized(:final reason):
-            group('(action unauthorized)', () {
-              onUnauthorized(actor, subject, reason);
-            });
+        if (result is Authorized) {
+          group('(action authorized)', () {
+            onAuthorized(actor, subject);
+          });
+        } else if (result is Unauthorized) {
+          group('(action unauthorized)', () {
+            onUnauthorized(actor, subject, result.reason);
+          });
         }
       },
     );

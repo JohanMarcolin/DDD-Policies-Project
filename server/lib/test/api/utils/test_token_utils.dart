@@ -1,11 +1,18 @@
 import 'dart:convert';
+import 'package:global_utils/test_server_fixture.dart';
+import 'package:global_utils/user_test_fixture.dart';
 import 'package:http/http.dart' as http;
-import '../../utils/factories/test_user_entry_factory.dart';
-import '../../utils/factories/test_server_factory.dart';
 
-Future<String> getAccessToken({required UserTestFixture userTestFixture}) async {
+Future<Map<String, String>> getAuthHeader(UserTestFixture userTestFixture) async {
+  final accessToken = await _getAccessToken(userTestFixture: userTestFixture);
+  return {
+    'Authorization': 'Bearer $accessToken',
+  };
+}
+
+Future<String> _getAccessToken({required UserTestFixture userTestFixture}) async {
   final response = await http.post(
-    Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+    Uri.parse('${TestServerFixture.baseUrl}/auth/login'),
     body: jsonEncode({
       'email': userTestFixture.email.value,
       'password': userTestFixture.password.value,
@@ -14,7 +21,3 @@ Future<String> getAccessToken({required UserTestFixture userTestFixture}) async 
   final data = jsonDecode(response.body);
   return data['data']['accessToken'] as String;
 }
-
-Map<String, String> getAuthHeader(String accessToken) => {
-      'Authorization': 'Bearer $accessToken',
-    };

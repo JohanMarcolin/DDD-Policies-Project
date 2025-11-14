@@ -1,28 +1,32 @@
 import 'dart:convert';
+import 'package:domain/value_objects/role.dart';
+import 'package:global_utils/user_test_fixture.dart';
+import 'package:server/test/api/api_test_server_fixture.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
-import '../utils/factories/test_server_factory.dart';
-import '../utils/factories/test_user_entry_factory.dart';
-
 void main() {
-  final testEntries = UserTestFixtureFactory.defaultUserTestFixtures;
+  late UserTestFixture initiator;
 
   setUpAll(() async {
-    await TestServerFactory.start(includeDefaultUsers: true);
+    await ApiTestServerFixture.setup();
   });
 
   tearDownAll(() async {
-    await TestServerFactory.stop();
+    await ApiTestServerFixture.teardown();
   });
 
   group('Auth Controller', () {
     group('Shall succeed', () {
-      for (final testEntry in testEntries) {
-        test('Login returns tokens and current user for valid {$testEntry} credentials', () async {
+      for (final role in Role.values) {
+        setUp(() async {
+          initiator = await ApiTestServerFixture.createUserFixture(role: role);
+        });
+
+        test('Login returns tokens and current user for valid ${role.name} credentials', () async {
           final response = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
           );
 
           expect(response.statusCode, 200);
@@ -34,22 +38,20 @@ void main() {
 
           expect(accessToken, isNotNull);
           expect(refreshToken, isNotNull);
-          expect(currentUser['userId'], equals(testEntry.user.userId.value));
+          expect(currentUser['userId'], equals(initiator.userId.value));
         });
-      }
 
-      for (final testEntry in testEntries) {
-        test('Refresh returns new access token and current user for valid {$testEntry} credentials', () async {
+        test('Refresh returns new access token and current user for valid ${role.name} credentials', () async {
           final loginResponse = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
           );
 
           final loginBody = jsonDecode(loginResponse.body);
           final refreshToken = loginBody['data']['refreshToken'];
 
           final refreshResponse = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/refresh'),
             body: jsonEncode({'refreshToken': refreshToken}),
           );
 
@@ -60,20 +62,19 @@ void main() {
           final currentUser = refreshBody['data']['currentUser'];
 
           expect(newAccessToken, isNotNull);
-          expect(currentUser['userId'], equals(testEntry.user.userId.value));
+          expect(currentUser['userId'], equals(initiator.userId.value));
         });
-      }
-      for (final testEntry in testEntries) {
+
         test('Logout succeeds with valid refresh token', () async {
           final loginResponse = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({'email': testEntry.email.value, 'password': testEntry.password.value}),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
           );
           final loginBody = jsonDecode(loginResponse.body);
           final refreshToken = loginBody['data']['refreshToken'];
 
           final logoutResponse = await http.delete(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/logout/$refreshToken'),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/logout/$refreshToken'),
           );
           expect(logoutResponse.statusCode, equals(204));
         });
@@ -81,67 +82,81 @@ void main() {
     });
 
     group('Shall fail', () {
-      test('Login fails for invalid credentials', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'email': testEntries.first.email.value, 'password': 'wrong'}),
-        );
-        expect(response.statusCode, equals(403));
-      });
-      test('Login fails for invalid credentials', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'email': testEntries.first.email.value, 'password': 'wrong'}),
-        );
-        expect(response.statusCode, equals(403));
-        final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('LoginInvalidPassword'));
-      });
+      for (final role in Role.values) {
+        final roleName = role.name;
 
-      test('Login fails for missing email', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'password': testEntries.first.password.value}),
-        );
-        expect(response.statusCode, equals(400));
-        final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('LoginMissingEmail'));
-      });
+        setUp(() async {
+          initiator = await ApiTestServerFixture.createUserFixture(role: role);
+        });
 
-      test('Login fails for missing password', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'email': testEntries.first.email.value}),
-        );
-        expect(response.statusCode, equals(400));
-        final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('LoginMissingPassword'));
-      });
+        test('Login fails for invalid $roleName credentials', () async {
+          final response = await http.post(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': initiator.email.value, 'password': 'wrong'}),
+          );
+          expect(response.statusCode, equals(403));
+        });
+        test('Login fails for invalid credentials', () async {
+          final user = await ApiTestServerFixture.createUserFixture(role: role);
 
-      test('Login fails for user not found', () async {
-        final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-          body: jsonEncode({'email': 'notfound@example.com', 'password': 'irrelevant'}),
-        );
-        expect(response.statusCode, equals(404));
-        final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('LoginUserNotFound'));
-      });
+          final response = await http.post(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': user.email.value, 'password': 'wrong'}),
+          );
+          expect(response.statusCode, equals(403));
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginInvalidPassword'));
+        });
 
-      test('Logout fails for invalid refresh token', () async {
-        final response = await http.delete(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/logout/invalidtoken'),
-        );
-        expect(response.statusCode, equals(401));
-        final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('TokenInvalidRefreshToken'));
-      });
+        test('Login fails for missing email', () async {
+          final user = await ApiTestServerFixture.createUserFixture(role: role);
+
+          final response = await http.post(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'password': user.password.value}),
+          );
+          expect(response.statusCode, equals(400));
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginMissingEmail'));
+        });
+
+        test('Login fails for missing password', () async {
+          final user = await ApiTestServerFixture.createUserFixture(role: role);
+
+          final response = await http.post(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': user.email.value}),
+          );
+          expect(response.statusCode, equals(400));
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginMissingPassword'));
+        });
+
+        test('Login fails for user not found', () async {
+          final response = await http.post(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': 'notfound@example.com', 'password': 'irrelevant'}),
+          );
+          expect(response.statusCode, equals(404));
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('LoginUserNotFound'));
+        });
+
+        test('Logout fails for invalid refresh token', () async {
+          final response = await http.delete(
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/logout/invalidtoken'),
+          );
+          expect(response.statusCode, equals(401));
+          final body = jsonDecode(response.body);
+          expect(body['errorCode'], equals('TokenInvalidRefreshToken'));
+        });
+      }
     });
 
     group('Login input validation', () {
       test('Empty request body returns 400', () async {
         final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
+          Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
           body: '',
         );
         expect(response.statusCode, 400);
@@ -152,8 +167,8 @@ void main() {
       test('Missing email returns 400', () async {
         for (final missingEmail in [null, '']) {
           final response = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({'password': testEntries.first.password.value, 'email': missingEmail}),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'password': 'irrelevant', 'email': missingEmail}),
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);
@@ -164,8 +179,8 @@ void main() {
       test('Missing password returns 400', () async {
         for (final missingPassword in [null, '']) {
           final response = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/login'),
-            body: jsonEncode({'email': testEntries.first.email.value, 'password': missingPassword}),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
+            body: jsonEncode({'email': 'some@example.com', 'password': missingPassword}),
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);
@@ -177,7 +192,7 @@ void main() {
     group('Refresh input validation', () {
       test('Empty request body returns 400', () async {
         final response = await http.post(
-          Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
+          Uri.parse('${ApiTestServerFixture.baseUrl}/auth/refresh'),
           body: '',
         );
         expect(response.statusCode, 400);
@@ -186,7 +201,7 @@ void main() {
       test('Missing refreshToken returns 400', () async {
         for (final missingRefreshToken in [null, '']) {
           final response = await http.post(
-            Uri.parse('${TestServerFactory.baseUrl}/auth/refresh'),
+            Uri.parse('${ApiTestServerFixture.baseUrl}/auth/refresh'),
             body: jsonEncode({'refreshToken': missingRefreshToken}),
           );
           expect(response.statusCode, 400);
