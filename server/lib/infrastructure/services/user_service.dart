@@ -1,6 +1,6 @@
 import 'package:domain/repositories/user_repository.dart';
 import 'package:global_utils/error_codes.dart';
-import 'package:global_utils/user_mapper.dart';
+import 'package:global_utils/mappers/user_mapper.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';

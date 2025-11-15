@@ -6,7 +6,7 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:global_utils/error_codes.dart';
-import 'package:global_utils/user_mapper.dart';
+import 'package:global_utils/mappers/user_mapper.dart';
 import 'package:global_utils/http_api/http_api.dart';
 
 /// API for user administration operations.

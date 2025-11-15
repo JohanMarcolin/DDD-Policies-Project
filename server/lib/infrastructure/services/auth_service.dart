@@ -1,5 +1,5 @@
 import 'package:global_utils/error_codes.dart';
-import 'package:global_utils/user_mapper.dart';
+import 'package:global_utils/mappers/user_mapper.dart';
 
 import '../http/request_utils.dart';
 import 'package:shelf_router/shelf_router.dart';

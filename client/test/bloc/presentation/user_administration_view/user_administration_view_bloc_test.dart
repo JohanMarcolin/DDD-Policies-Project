@@ -8,7 +8,7 @@ import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/repositories/user_repository.dart' as domain;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:global_utils/user_test_runner.dart';
+import 'package:global_utils/test/user_test_runner.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../utils/mock_user_credentials.dart';

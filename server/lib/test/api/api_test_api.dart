@@ -1,7 +1,7 @@
 import 'package:domain/value_objects/role.dart';
 import 'package:global_utils/error_codes.dart';
-import 'package:global_utils/user_test_fixture.dart';
-import 'package:global_utils/user_test_fixture_mapper.dart';
+import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:global_utils/mappers/user_test_fixture_mapper.dart';
 import 'package:global_utils/http_api/http_api.dart';
 
 /// API for managing test user fixtures in Api tests.

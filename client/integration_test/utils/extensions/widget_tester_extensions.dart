@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/main.dart' as app;
-import 'package:global_utils/user_test_fixture.dart';
+import 'package:global_utils/test/user_test_fixture.dart';
 
 import '../../../test/bloc/infrastructure/auth_bloc_test.dart';
 import '../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';

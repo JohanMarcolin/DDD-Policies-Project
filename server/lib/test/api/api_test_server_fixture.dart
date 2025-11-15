@@ -1,6 +1,6 @@
 import 'package:domain/value_objects/role.dart';
-import 'package:global_utils/test_server_fixture.dart';
-import 'package:global_utils/user_test_fixture.dart';
+import 'package:global_utils/test/test_server_fixture.dart';
+import 'package:global_utils/test/user_test_fixture.dart';
 import 'package:global_utils/http_api/http_api.dart';
 import 'package:server/test/api/api_test_api.dart';
 

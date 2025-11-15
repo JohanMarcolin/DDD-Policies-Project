@@ -5,7 +5,7 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:global_utils/user_test_fixture.dart';
+import 'package:global_utils/test/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../integration_test_server_fixture.dart';
