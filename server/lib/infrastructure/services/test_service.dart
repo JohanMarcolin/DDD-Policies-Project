@@ -66,10 +66,10 @@ class TestService {
   }
 
   Future<Response> deleteAllUserFixtures(Request req) async {
-    final users = _userDatabase.getAll();
+    final users = await _userDatabase.getAll();
     for (final user in users) {
-      _userDatabase.delete(user.userId);
-      _userPasswordDatabase.delete(user.userId);
+      await _userDatabase.delete(user.userId);
+      await _userPasswordDatabase.delete(user.userId);
     }
     return deleted();
   }

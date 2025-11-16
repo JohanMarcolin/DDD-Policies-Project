@@ -1,5 +1,8 @@
+import 'package:domain/repositories/user_repository.dart';
+import 'package:domain/value_objects/id.dart';
 import 'package:global_utils/error_codes.dart';
 import 'package:global_utils/mappers/user_mapper.dart';
+import 'package:server/infrastructure/databases/user_password_database.dart';
 
 import '../http/request_utils.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -9,15 +12,19 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/response_utils.dart';
-import '../repositories/in_memory_user_repository.dart';
 import '../security/token_service.dart';
 
 class AuthService {
-  AuthService({required InMemoryUserRepository userRepository, required TokenService tokenService})
+  AuthService(
+      {required UserRepository userRepository,
+      required UserPasswordDatabase userPasswordDatabase,
+      required TokenService tokenService})
       : _userRepository = userRepository,
+        _userPasswordDatabase = userPasswordDatabase,
         _tokenService = tokenService;
 
-  final InMemoryUserRepository _userRepository;
+  final UserRepository _userRepository;
+  final UserPasswordDatabase _userPasswordDatabase;
   final TokenService _tokenService;
 
   Future<Response> handleLogin(Request req) async {
@@ -40,15 +47,25 @@ class AuthService {
       throw NotFoundException(LoginUserNotFound());
     }
 
-    if (!_userRepository.isPasswordVerified(userId: user.userId, password: Password(password))) {
+    final isUserPasswordVerified = await _isPasswordVerified(userId: user.userId, password: Password(password));
+
+    if (!isUserPasswordVerified) {
       throw ForbiddenException(LoginInvalidPassword());
     }
 
-    return ok({
-      'currentUser': UserMapper.toJson(user),
-      'accessToken': _tokenService.generateAccessToken(user),
-      'refreshToken': _tokenService.generateRefreshToken(user)
-    });
+    final currentUser = UserMapper.toJson(user);
+    final accessToken = _tokenService.generateAccessToken(user);
+    final refreshToken = await _tokenService.generateRefreshToken(user);
+
+    return ok({'currentUser': currentUser, 'accessToken': accessToken, 'refreshToken': refreshToken});
+  }
+
+  Future<bool> _isPasswordVerified({required UserId userId, required Password password}) async {
+    try {
+      return await _userPasswordDatabase.isPasswordVerified(userId, password);
+    } catch (e) {
+      throw ServerErrorException(UserRepoCouldNotVerifyPassword());
+    }
   }
 
   Future<Response> handleRefreshAccessToken(Request req) async {
@@ -59,7 +76,7 @@ class AuthService {
       throw BadRequestException(RefreshMissingRefreshToken());
     }
 
-    final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
+    final verifiedRefreshToken = await _tokenService.verifyRefreshToken(refreshToken);
 
     final userId = _tokenService.extractUserId(verifiedRefreshToken);
     final user = await _userRepository.get(userId: userId);
@@ -73,14 +90,12 @@ class AuthService {
 
   Future<Response> handleLogout(Request req) async {
     final refreshToken = req.params['refreshToken'];
-    print(refreshToken);
-    print('logout called');
 
     if (refreshToken == null || refreshToken.isEmpty) {
       throw BadRequestException(LogoutMissingRefreshToken());
     }
 
-    final verifiedRefreshToken = _tokenService.verifyRefreshToken(refreshToken);
+    final verifiedRefreshToken = await _tokenService.verifyRefreshToken(refreshToken);
 
     final userId = _tokenService.extractUserId(verifiedRefreshToken);
     final user = await _userRepository.get(userId: userId);
@@ -89,11 +104,13 @@ class AuthService {
       throw NotFoundException(LogoutMissingUser());
     }
 
-    _tokenService.revokeRefreshToken(user);
+    await _tokenService.revokeRefreshToken(user);
 
     final revokedRefreshToken = refreshToken;
 
-    if (!_tokenService.isVerifiedRefreshToken(revokedRefreshToken)) {
+    final isVerifiedRefreshToken = await _tokenService.isVerifiedRefreshToken(revokedRefreshToken);
+
+    if (!isVerifiedRefreshToken) {
       return deleted();
     }
 

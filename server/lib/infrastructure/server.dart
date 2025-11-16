@@ -1,4 +1,11 @@
 import 'dart:io';
+import 'package:domain/entities/user.dart';
+import 'package:domain/repositories/user_repository.dart';
+import 'package:domain/value_objects/email.dart';
+import 'package:domain/value_objects/id.dart';
+import 'package:domain/value_objects/password.dart';
+import 'package:domain/value_objects/role.dart';
+import 'package:global_utils/test/user_test_fixture.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
@@ -20,15 +27,24 @@ import 'security/security_filter_chain.dart';
 import 'services/test_service.dart';
 import 'services/user_service.dart';
 
+/// Shelf-based HTTP server.
+///
+/// Manages routing, middleware, controller setup, and optionally seeds development/test users.
+///
+/// - Set [exposeTestRoutes] to true to enable internal test endpoints for development and integration testing.
+/// - Set [seedDevelopmentUsers] to true to populate the database with predefined test users for local development and manual testing.
 class Server {
-  Server({this.host = '0.0.0.0', required this.port, this.enableTestRoutes = false, this.setupTestUsers = false});
+  Server({this.host = '0.0.0.0', this.port = 8080, this.exposeTestRoutes = false, this.seedDevelopmentUsers = false});
   final String host;
   final int port;
-  final bool enableTestRoutes;
-  final bool setupTestUsers;
+  final bool exposeTestRoutes;
+  final bool seedDevelopmentUsers;
   HttpServer? _server;
   late String baseUrl;
 
+  /// Starts the server, configures all routes, middleware, and optionally seeds test users.
+  ///
+  /// Returns the running [HttpServer] instance.
   Future<HttpServer> start() async {
     final router = Router();
     final userDatabase = UserDatabase();
@@ -41,48 +57,25 @@ class Server {
     final refreshTokenDatabase = RefreshTokenDatabase();
     final tokenService = TokenService(refreshTokenDatabase: refreshTokenDatabase);
     final securityFilterChain = SecurityFilterChain(tokenService: tokenService);
-    final authService = AuthService(
-      userRepository: inMemoryUserRepository,
-      tokenService: tokenService,
-    );
-    final viewUserPolicy = ViewUserPolicy();
-    final updateUserEmailPolicy = UpdateUserEmailPolicy();
-    final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
-    final deleteUserPolicy = DeleteUserPolicy();
 
-    final emailValidationPolicy = EmailValidationPolicy();
-    final passwordValidationPolicy = PasswordValidationPolicy();
-
-    final userAdministrationService = UserAdministrationService(
-      userRepository: inMemoryUserRepository,
-      viewUserPolicy: viewUserPolicy,
-      updateUserEmailPolicy: updateUserEmailPolicy,
-      updateUserPasswordPolicy: updateUserPasswordPolicy,
-      deleteUserPolicy: deleteUserPolicy,
-      emailValidationPolicy: emailValidationPolicy,
-      passwordValidationPolicy: passwordValidationPolicy,
-    );
-
-    final userService =
-        UserService(userRepository: inMemoryUserRepository, userAdministrationService: userAdministrationService);
-
-    final authController = AuthController(authService: authService);
-    final userController = UserController(userService: userService);
-
-    router.mount('/auth/', authController.handler);
-    router.mount('/user/', userController.handler);
-
-    if (enableTestRoutes) {
-      final testService = TestService(
-        userDatabase: userDatabase,
+    _setupControllers(
+        router: router,
+        userRepository: inMemoryUserRepository,
         userPasswordDatabase: userPasswordDatabase,
-      );
+        tokenService: tokenService);
 
-      final testController = TestController(
-        testService: testService,
-      );
-
+    if (exposeTestRoutes) {
+      final testService = TestService(userDatabase: userDatabase, userPasswordDatabase: userPasswordDatabase);
+      final testController = TestController(testService: testService);
       router.mount('/test/', testController.handler);
+    }
+
+    if (seedDevelopmentUsers) {
+      final fixtures = _setupDevelopmentUserFixtures();
+      for (final fixture in fixtures) {
+        await userDatabase.put(fixture.user.userId, fixture.user);
+        await userPasswordDatabase.put(fixture.user.userId, fixture.password);
+      }
     }
 
     final pipeline = const Pipeline()
@@ -99,8 +92,73 @@ class Server {
     return server;
   }
 
+  /// Stops the running server and releases all resources.
+  ///
+  /// After calling this, the server instance cannot be reused until [start] is called again.
   Future<void> stop() async {
     await _server?.close(force: true);
     _server = null;
   }
+}
+
+/// Configures and mounts all controllers and their routes on the [router].
+///
+/// [userRepository] and [tokenService] are injected dependencies for controller/service construction.
+void _setupControllers(
+    {required Router router,
+    required UserRepository userRepository,
+    required UserPasswordDatabase userPasswordDatabase,
+    required TokenService tokenService}) {
+  final authService = AuthService(
+    userRepository: userRepository,
+    userPasswordDatabase: userPasswordDatabase,
+    tokenService: tokenService,
+  );
+  final viewUserPolicy = ViewUserPolicy();
+  final updateUserEmailPolicy = UpdateUserEmailPolicy();
+  final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
+  final deleteUserPolicy = DeleteUserPolicy();
+  final emailValidationPolicy = EmailValidationPolicy();
+  final passwordValidationPolicy = PasswordValidationPolicy();
+  final userAdministrationService = UserAdministrationService(
+    userRepository: userRepository,
+    viewUserPolicy: viewUserPolicy,
+    updateUserEmailPolicy: updateUserEmailPolicy,
+    updateUserPasswordPolicy: updateUserPasswordPolicy,
+    deleteUserPolicy: deleteUserPolicy,
+    emailValidationPolicy: emailValidationPolicy,
+    passwordValidationPolicy: passwordValidationPolicy,
+  );
+  final userService = UserService(
+    userRepository: userRepository,
+    userAdministrationService: userAdministrationService,
+  );
+  final authController = AuthController(authService: authService);
+  final userController = UserController(userService: userService);
+  router.mount('/auth/', authController.handler);
+  router.mount('/user/', userController.handler);
+}
+
+/// Generates a list of [UserTestFixture] for development/test seeding.
+List<UserTestFixture> _setupDevelopmentUserFixtures() {
+  final fixtureCredentials = [
+    {'email': 'user1', 'password': 'user1', 'role': Role.user},
+    {'email': 'user2', 'password': 'user2', 'role': Role.user},
+    {'email': 'admin1', 'password': 'admin1', 'role': Role.admin},
+    {'email': 'admin2', 'password': 'admin2', 'role': Role.admin},
+    {'email': 'analyst1', 'password': 'analyst1', 'role': Role.analyst},
+    {'email': 'analyst2', 'password': 'analyst2', 'role': Role.analyst},
+  ];
+  final fixtures = <UserTestFixture>[];
+  for (var credentials in fixtureCredentials) {
+    final user = User(
+      userId: UserId.generate(),
+      email: Email(credentials['email'] as String),
+      role: credentials['role'] as Role,
+    );
+    final password = Password(credentials['password'] as String);
+    final userFixture = UserTestFixture(user: user, password: password);
+    fixtures.add(userFixture);
+  }
+  return fixtures;
 }

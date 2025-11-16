@@ -19,7 +19,7 @@ class ApiTestServerFixture {
   ///
   /// Call this in your test's `setUp` method before any test logic that requires backend access.
   static Future<void> setup() async {
-    await TestServerFixture.start(enableTestRoutes: true);
+    await TestServerFixture.start(exposeTestRoutes: true);
     _baseUrl = TestServerFixture.baseUrl;
     HttpApi.baseUrl = _baseUrl;
     _apiTestApi = ApiTestApi();

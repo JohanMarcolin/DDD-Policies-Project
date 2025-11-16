@@ -45,23 +45,23 @@ class TokenService {
     return verifiedAccessToken;
   }
 
-  RefreshToken generateRefreshToken(User user) {
+  Future<RefreshToken> generateRefreshToken(User user) async {
     final jwt = JWT({'id': user.userId.value});
     final token = _signToken(jwt, _refreshTokenExpiration);
-    _refreshTokenDatabase.put(user.userId, token);
+    await _refreshTokenDatabase.put(user.userId, token);
     return token;
   }
 
-  bool isVerifiedRefreshToken(RefreshToken token) {
+  Future<bool> isVerifiedRefreshToken(RefreshToken token) async {
     try {
-      verifyRefreshToken(token);
+      await verifyRefreshToken(token);
       return true;
     } catch (_) {
       return false;
     }
   }
 
-  JWT verifyRefreshToken(RefreshToken token) {
+  Future<JWT> verifyRefreshToken(RefreshToken token) async {
     final verifiedRefreshToken = _verifyToken(token);
 
     if (verifiedRefreshToken == null) {
@@ -70,7 +70,7 @@ class TokenService {
 
     final tokenId = extractUserId(verifiedRefreshToken);
 
-    final storedToken = _refreshTokenDatabase.get(tokenId);
+    final storedToken = await _refreshTokenDatabase.get(tokenId);
 
     if (storedToken == null || storedToken != token) {
       throw InvalidRefreshTokenException(TokenInvalidRefreshToken());
@@ -79,7 +79,7 @@ class TokenService {
     return verifiedRefreshToken;
   }
 
-  void revokeRefreshToken(User user) => _refreshTokenDatabase.delete(user.userId);
+  Future<void> revokeRefreshToken(User user) async => await _refreshTokenDatabase.delete(user.userId);
 
   String _signToken(JWT token, Duration expiration) => token.sign(_key, expiresIn: expiration);
 

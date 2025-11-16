@@ -6,9 +6,9 @@ class TestServerFixture {
   static Server? _server;
   static HttpServer? _httpServer;
 
-  static Future<void> start({bool enableTestRoutes = false, bool setupTestUsers = false}) async {
+  static Future<void> start({bool exposeTestRoutes = false, bool seedDevelopmentUsers = false}) async {
     final randomPort = 0;
-    _server = Server(port: randomPort, enableTestRoutes: enableTestRoutes, setupTestUsers: setupTestUsers);
+    _server = Server(port: randomPort, exposeTestRoutes: exposeTestRoutes, seedDevelopmentUsers: seedDevelopmentUsers);
     _httpServer = await _server!.start();
   }
 

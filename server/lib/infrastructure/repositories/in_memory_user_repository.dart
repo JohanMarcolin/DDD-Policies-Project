@@ -40,7 +40,7 @@ class InMemoryUserRepository implements UserRepository {
   @override
   Future<User?> getByEmail({required Email email}) async {
     try {
-      final users = _userdatabase.getAll();
+      final users = await _userdatabase.getAll();
       final user = users.where((user) => user.email.value == email.value).toList();
       return user.isNotEmpty ? user.first : null;
     } catch (e) {
@@ -51,7 +51,7 @@ class InMemoryUserRepository implements UserRepository {
   @override
   Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
     try {
-      final user = _userdatabase.get(userId);
+      final user = await _userdatabase.get(userId);
       if (user == null) {
         throw NotFoundException(UserRepoUserNotFoundById());
       }
@@ -81,14 +81,6 @@ class InMemoryUserRepository implements UserRepository {
       _userdatabase.delete(userId);
     } catch (e) {
       throw ServerErrorException(UserRepoFailedToDeleteUser());
-    }
-  }
-
-  bool isPasswordVerified({required UserId userId, required Password password}) {
-    try {
-      return _userPasswordDatabase.isPasswordVerified(userId, password);
-    } catch (e) {
-      throw ServerErrorException(UserRepoCouldNotVerifyPassword());
     }
   }
 }

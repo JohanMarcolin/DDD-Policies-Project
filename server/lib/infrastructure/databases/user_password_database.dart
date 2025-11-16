@@ -11,22 +11,18 @@ class UserPasswordDatabase implements Database<Password> {
   final Map<Id, Password> _passwords = {};
 
   @override
-  Password? get(Id id) => _passwords[id];
+  Future<Password?> get(Id id) async => _passwords[id];
 
   @override
-  List<Password> getAll() => _passwords.values.toList();
+  Future<List<Password>> getAll() async => _passwords.values.toList();
 
   @override
-  void put(Id id, Password password) {
-    _passwords[id] = _passwordHasher.hash(password);
-  }
+  Future<void> put(Id id, Password password) async => _passwords[id] = _passwordHasher.hash(password);
 
   @override
-  void delete(Id id) {
-    _passwords.remove(id);
-  }
+  Future<void> delete(Id id) async => _passwords.remove(id);
 
-  bool isPasswordVerified(Id id, Password password) {
+  Future<bool> isPasswordVerified(Id id, Password password) async {
     final storedPassword = _passwords[id];
     if (storedPassword == null) {
       return false;

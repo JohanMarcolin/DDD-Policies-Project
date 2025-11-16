@@ -3,7 +3,7 @@ import 'package:domain/value_objects/id.dart';
 abstract class Database<T> {
   final Map<Id, T> _items = {};
 
-  T? get(Id id) {
+  Future<T?> get(Id id) async {
     try {
       return _items[id];
     } catch (_) {
@@ -11,13 +11,13 @@ abstract class Database<T> {
     }
   }
 
-  List<T> getAll() => _items.values.toList();
+  Future<List<T>> getAll() async => _items.values.toList();
 
-  void put(Id id, T value) {
+  Future<void> put(Id id, T value) async {
     _items[id] = value;
   }
 
-  void delete(Id id) {
+  Future<void> delete(Id id) async {
     try {
       _items.remove(id);
     } catch (_) {

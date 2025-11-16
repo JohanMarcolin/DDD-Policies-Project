@@ -19,7 +19,7 @@ class IntegrationTestServerFixture {
   ///
   /// Call this in your test's `setUp` method before any test logic that requires backend access.
   static Future<void> setup() async {
-    await TestServerFixture.start(enableTestRoutes: true);
+    await TestServerFixture.start(exposeTestRoutes: true);
     HttpApi.baseUrl = TestServerFixture.baseUrl;
     _integrationTestApi = IntegrationTestApi();
     _authTokenService = AuthTokenService();

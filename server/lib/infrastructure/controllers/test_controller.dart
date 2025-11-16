@@ -2,6 +2,12 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import '../services/test_service.dart';
 
+/// Controller for test utility endpoints.
+///
+/// Provides routes for managing test user fixtures:
+/// - `POST /create-all-user-fixtures`: Creates all user fixtures for all roles.
+/// - `DELETE /delete-all-user-fixtures`: Deletes all user fixtures from the test database.
+/// - `POST /create-user-fixture/<roleName>`: Creates a user fixture for the specified role.
 class TestController {
   TestController({required TestService testService}) : _testService = testService {
     _testRouter.post('/create-all-user-fixtures', _createAllUserFixtures);

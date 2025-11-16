@@ -8,18 +8,14 @@ class UserDatabase implements Database<User> {
   final Map<Id, User> _users = {};
 
   @override
-  User? get(Id id) => _users[id];
+  Future<User?> get(Id id) async => _users[id];
 
   @override
-  List<User> getAll() => _users.values.toList();
+  Future<List<User>> getAll() async => _users.values.toList();
 
   @override
-  void put(Id id, User value) {
-    _users[id] = value;
-  }
+  Future<void> put(Id id, User value) async => _users[id] = value;
 
   @override
-  void delete(Id id) {
-    _users.remove(id);
-  }
+  Future<void> delete(Id id) async => _users.remove(id);
 }
