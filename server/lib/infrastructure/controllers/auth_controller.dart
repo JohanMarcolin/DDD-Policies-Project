@@ -3,12 +3,6 @@ import 'package:shelf_router/shelf_router.dart';
 
 import '../services/auth_service.dart';
 
-/// Controller for authentication endpoints.
-///
-/// Provides routes for user authentication:
-/// - `POST /login`: Authenticates a user and returns tokens and user info.
-/// - `POST /refresh`: Exchanges a refresh token for a new access token.
-/// - `DELETE /logout/<refreshToken>`: Invalidates a refresh token and logs out the user.
 class AuthController {
   AuthController({required AuthService authService})
       : _authService = authService,

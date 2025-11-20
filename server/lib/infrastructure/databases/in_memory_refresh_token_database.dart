@@ -1,11 +1,9 @@
 import 'package:domain/value_objects/id.dart';
-import 'database.dart';
+import 'package:server/infrastructure/security/token_service.dart';
+import 'in_memory_database.dart';
 
-typedef RefreshToken = String;
-
-class RefreshTokenDatabase implements Database<RefreshToken> {
-  RefreshTokenDatabase();
-
+/// Provides an in-memory database for refresh tokens associated with user/session [Id]s.
+class InMemoryRefreshTokenDatabase implements InMemoryDatabase<Id, RefreshToken> {
   final Map<Id, RefreshToken> _tokens = {};
 
   @override

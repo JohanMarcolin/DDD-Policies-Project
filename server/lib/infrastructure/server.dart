@@ -13,14 +13,14 @@ import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'controllers/test_controller.dart';
-import 'databases/user_password_database.dart';
+import 'databases/in_memory_user_password_database.dart';
 import 'http/global_exception_handler.dart';
 import 'repositories/in_memory_user_repository.dart';
 import 'security/password_hasher.dart';
 import 'controllers/auth_controller.dart';
 import 'services/auth_service.dart';
-import 'databases/refresh_token_database.dart';
-import 'databases/user_database.dart';
+import 'databases/in_memory_refresh_token_database.dart';
+import 'databases/in_memory_user_database.dart';
 import 'security/token_service.dart';
 import 'controllers/user_controller.dart';
 import 'security/security_filter_chain.dart';
@@ -47,14 +47,14 @@ class Server {
   /// Returns the running [HttpServer] instance.
   Future<HttpServer> start() async {
     final router = Router();
-    final userDatabase = UserDatabase();
+    final userDatabase = InMemoryUserDatabase();
     final passwordHasher = PasswordHasher();
-    final userPasswordDatabase = UserPasswordDatabase(passwordHasher: passwordHasher);
+    final userPasswordDatabase = InMemoryUserPasswordDatabase(passwordHasher: passwordHasher);
     final inMemoryUserRepository = InMemoryUserRepository(
       userDatabase: userDatabase,
       userPasswordDatabase: userPasswordDatabase,
     );
-    final refreshTokenDatabase = RefreshTokenDatabase();
+    final refreshTokenDatabase = InMemoryRefreshTokenDatabase();
     final tokenService = TokenService(refreshTokenDatabase: refreshTokenDatabase);
     final securityFilterChain = SecurityFilterChain(tokenService: tokenService);
 
@@ -107,7 +107,7 @@ class Server {
 void _setupControllers(
     {required Router router,
     required UserRepository userRepository,
-    required UserPasswordDatabase userPasswordDatabase,
+    required InMemoryUserPasswordDatabase userPasswordDatabase,
     required TokenService tokenService}) {
   final authService = AuthService(
     userRepository: userRepository,

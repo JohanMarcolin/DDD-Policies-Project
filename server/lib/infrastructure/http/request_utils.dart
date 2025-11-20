@@ -9,6 +9,9 @@ import 'package:domain/value_objects/id.dart';
 import 'package:domain/entities/user.dart';
 import 'exceptions/request_exceptions.dart';
 
+/// Retrieves the target [User] from the request using the [UserId].
+///
+/// Throws [NotFoundException] if the user does not exist.
 Future<User> getTargetUser(Request req, UserRepository userRepository) async {
   final userId = extractUserIdFromParams(req);
   final user = await userRepository.get(userId: userId);
@@ -18,6 +21,9 @@ Future<User> getTargetUser(Request req, UserRepository userRepository) async {
   return user;
 }
 
+/// Reads and decodes the JSON body from a [Request].
+///
+/// Throws [BadRequestException] if the body is empty or missing.
 Future<Map<String, dynamic>> readJsonBody(Request req) async {
   final body = await req.readAsString();
 
@@ -28,6 +34,9 @@ Future<Map<String, dynamic>> readJsonBody(Request req) async {
   return jsonDecode(body) as Map<String, dynamic>;
 }
 
+/// Extracts the [UserId] from request parameters.
+///
+/// Throws [BadRequestException] if the param is missing or empty.
 UserId extractUserIdFromParams(Request req) {
   final userIdParam = req.params['userId'];
 

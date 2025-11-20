@@ -2,14 +2,6 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import '../services/user_service.dart';
 
-/// Controller for user administration endpoints.
-///
-/// Provides RESTful routes for user administration:
-/// - `GET /all`: Returns all users.
-/// - `GET /<userId>`: Returns details for a specific user.
-/// - `DELETE /<userId>`: Deletes a user by ID.
-/// - `PUT /<userId>/email`: Updates a user's email address.
-/// - `PUT /<userId>/password`: Updates a user's password.
 class UserController {
   UserController({required UserService userService}) : _userService = userService {
     _userRouter.get('/all', _getAllUsers);

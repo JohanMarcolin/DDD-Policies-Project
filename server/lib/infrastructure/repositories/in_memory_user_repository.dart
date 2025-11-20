@@ -4,21 +4,27 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:global_utils/error_codes.dart';
-import '../databases/user_database.dart';
-import '../databases/user_password_database.dart';
+import '../databases/in_memory_user_database.dart';
+import '../databases/in_memory_user_password_database.dart';
 import '../http/exceptions/request_exceptions.dart';
 import '../http/exceptions/request_exceptions.dart' show NotFoundException, ServerErrorException;
 
+/// In-memory implementation of [UserRepository] for managing [User] entities.
+///
+/// Uses [UserDatabase] and [UserPasswordDatabase] for non-persistent storage and password management.
 class InMemoryUserRepository implements UserRepository {
   InMemoryUserRepository({
-    required UserDatabase userDatabase,
-    required UserPasswordDatabase userPasswordDatabase,
+    required InMemoryUserDatabase userDatabase,
+    required InMemoryUserPasswordDatabase userPasswordDatabase,
   })  : _userdatabase = userDatabase,
         _userPasswordDatabase = userPasswordDatabase;
 
-  final UserDatabase _userdatabase;
-  final UserPasswordDatabase _userPasswordDatabase;
+  final InMemoryUserDatabase _userdatabase;
+  final InMemoryUserPasswordDatabase _userPasswordDatabase;
 
+  /// Returns all users in the repository.
+  ///
+  /// Throws [ServerErrorException] if fetching fails.
   @override
   Future<List<User>> get users async {
     try {
@@ -28,6 +34,9 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
+  /// Retrieves a user by [userId].
+  ///
+  /// Throws [ServerErrorException] if fetching fails.
   @override
   Future<User?> get({required UserId userId}) async {
     try {
@@ -37,6 +46,9 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
+  /// Retrieves a user by [email].
+  ///
+  /// Throws [ServerErrorException] if fetching fails.
   @override
   Future<User?> getByEmail({required Email email}) async {
     try {
@@ -48,6 +60,10 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
+  /// Updates the email address for the user with [userId].
+  ///
+  /// Throws [NotFoundException] if the user does not exist.
+  /// Throws [ServerErrorException] if the update fails.
   @override
   Future<void> updateEmail({required UserId userId, required Email newEmail}) async {
     try {
@@ -66,6 +82,9 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
+  /// Updates the password for the user with [userId].
+  ///
+  /// Throws [ServerErrorException] if the update fails.
   @override
   Future<void> updatePassword({required UserId userId, required Password newPassword}) async {
     try {
@@ -75,6 +94,9 @@ class InMemoryUserRepository implements UserRepository {
     }
   }
 
+  /// Deletes the user with [userId] from the repository.
+  ///
+  /// Throws [ServerErrorException] if the deletion fails.
   @override
   Future<void> delete({required UserId userId}) async {
     try {

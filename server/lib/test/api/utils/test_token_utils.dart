@@ -3,6 +3,9 @@ import 'package:global_utils/test/test_server_fixture.dart';
 import 'package:global_utils/test/user_test_fixture.dart';
 import 'package:http/http.dart' as http;
 
+/// Generates an HTTP Authorization header for the given [UserTestFixture].
+///
+/// Performs a login request and extracts the access token for use in authenticated test requests.
 Future<Map<String, String>> getAuthHeader(UserTestFixture userTestFixture) async {
   final accessToken = await _getAccessToken(userTestFixture: userTestFixture);
   return {
@@ -10,6 +13,9 @@ Future<Map<String, String>> getAuthHeader(UserTestFixture userTestFixture) async
   };
 }
 
+/// Performs a login request for the given [UserTestFixture] and returns the access token.
+///
+/// Used internally by [getAuthHeader] to support authenticated test scenarios.
 Future<String> _getAccessToken({required UserTestFixture userTestFixture}) async {
   final response = await http.post(
     Uri.parse('${TestServerFixture.baseUrl}/auth/login'),

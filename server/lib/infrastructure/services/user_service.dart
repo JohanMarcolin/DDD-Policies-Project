@@ -11,6 +11,7 @@ import '../http/request_utils.dart';
 import '../http/response_utils.dart';
 import '../security/security_filter_chain.dart';
 
+/// Service for handling user-related operations.
 class UserService {
   UserService({required UserRepository userRepository, required UserAdministrationService userAdministrationService})
       : _userRepository = userRepository,
@@ -19,11 +20,17 @@ class UserService {
   final UserRepository _userRepository;
   final UserAdministrationService _userAdministrationService;
 
+  /// Retrieves all users visible to the current initiator.
+  ///
+  /// Returns a list of user JSON objects.
   Future<Response> getAllUsers(Request req) async {
     final users = await _userAdministrationService.viewUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
   }
 
+  /// Retrieves a user by [UserId], if authorized.
+  ///
+  /// Throws [NotFoundException] if the [User] does not exist or is not visible to the initiator.
   Future<Response> getUserById(Request req) async {
     final userId = extractUserIdFromParams(req);
 
@@ -36,6 +43,9 @@ class UserService {
     return ok(UserMapper.toJson(user));
   }
 
+  /// Deletes the target [User], if authorized.
+  ///
+  /// Returns a 200 OK response on success.
   Future<Response> deleteUser(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 
@@ -47,6 +57,9 @@ class UserService {
     return ok();
   }
 
+  /// Updates the [Email] for the target [User], if authorized.
+  ///
+  /// Throws [BadRequestException] if the new email is missing or invalid.
   Future<Response> updateEmail(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 
@@ -63,6 +76,9 @@ class UserService {
     return ok();
   }
 
+  /// Updates the [Password] for the target [User], if authorized.
+  ///
+  /// Throws [BadRequestException] if the new password is missing or invalid.
   Future<Response> updatePassword(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 

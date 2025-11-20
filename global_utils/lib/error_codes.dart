@@ -63,7 +63,7 @@ final class UserRepoCouldNotVerifyPassword extends UserRepoErrorCode {}
 
 sealed class SecurityErrorCode extends ErrorCode {}
 
-final class SecurityMissingCurrentUser extends SecurityErrorCode {}
+final class SecurityMissingAuthenticatedUser extends SecurityErrorCode {}
 
 final class SecurityMissingAuthorizationHeader extends SecurityErrorCode {}
 
@@ -133,8 +133,8 @@ ErrorCode errorCodeFromString(String? errorCode) {
       return UserRepoFailedToDeleteUser();
     case 'UserRepoCouldNotVerifyPassword':
       return UserRepoCouldNotVerifyPassword();
-    case 'SecurityMissingCurrentUser':
-      return SecurityMissingCurrentUser();
+    case 'SecurityMissingAuthenticatedUser':
+      return SecurityMissingAuthenticatedUser();
     case 'SecurityMissingAuthorizationHeader':
       return SecurityMissingAuthorizationHeader();
     case 'SecurityMalformedAuthorizationHeader':

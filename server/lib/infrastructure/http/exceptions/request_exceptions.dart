@@ -1,5 +1,8 @@
 import 'package:global_utils/error_codes.dart';
 
+/// Base class for HTTP request-related exceptions, carrying an [ErrorCode].
+///
+/// All custom request exceptions should extend this class to provide consistent error handling and reporting.
 sealed class RequestException implements Exception {
   const RequestException(this.errorCode);
   final ErrorCode errorCode;

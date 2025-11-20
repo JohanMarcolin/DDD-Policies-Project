@@ -2,7 +2,7 @@ import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:global_utils/error_codes.dart';
 import 'package:global_utils/mappers/user_mapper.dart';
-import 'package:server/infrastructure/databases/user_password_database.dart';
+import 'package:server/infrastructure/databases/in_memory_user_password_database.dart';
 
 import '../http/request_utils.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -14,19 +14,23 @@ import '../http/exceptions/request_exceptions.dart';
 import '../http/response_utils.dart';
 import '../security/token_service.dart';
 
+/// Service for handling authentication-related operations.
 class AuthService {
   AuthService(
       {required UserRepository userRepository,
-      required UserPasswordDatabase userPasswordDatabase,
+      required InMemoryUserPasswordDatabase userPasswordDatabase,
       required TokenService tokenService})
       : _userRepository = userRepository,
         _userPasswordDatabase = userPasswordDatabase,
         _tokenService = tokenService;
 
   final UserRepository _userRepository;
-  final UserPasswordDatabase _userPasswordDatabase;
+  final InMemoryUserPasswordDatabase _userPasswordDatabase;
   final TokenService _tokenService;
 
+  /// Handles [User] login by validating credentials and issuing [AccessToken] and [RefreshToken], as well as providing the current user data.
+  ///
+  /// Throws [BadRequestException], [NotFoundException], or [ForbiddenException] for invalid input or credentials.
   Future<Response> handleLogin(Request req) async {
     final data = await readJsonBody(req);
     final email = data['email'] as String?;
@@ -60,6 +64,9 @@ class AuthService {
     return ok({'currentUser': currentUser, 'accessToken': accessToken, 'refreshToken': refreshToken});
   }
 
+  /// Verifies the user's password against the stored hash.
+  ///
+  /// Throws [ServerErrorException] if verification fails.
   Future<bool> _isPasswordVerified({required UserId userId, required Password password}) async {
     try {
       return await _userPasswordDatabase.isPasswordVerified(userId, password);
@@ -68,6 +75,9 @@ class AuthService {
     }
   }
 
+  /// Handles [AccessToken] refresh using a valid [RefreshToken].
+  ///
+  /// Throws [BadRequestException], [NotFoundException], or [InvalidRefreshTokenException] for invalid input or tokens.
   Future<Response> handleRefreshAccessToken(Request req) async {
     final data = await readJsonBody(req);
     final refreshToken = data['refreshToken'] as String?;
@@ -88,6 +98,9 @@ class AuthService {
     return ok({'currentUser': UserMapper.toJson(user), 'accessToken': _tokenService.generateAccessToken(user)});
   }
 
+  /// Handles user logout by revoking the [RefreshToken].
+  ///
+  /// Throws [BadRequestException], [NotFoundException], or [ServerErrorException] for invalid input or failures.
   Future<Response> handleLogout(Request req) async {
     final refreshToken = req.params['refreshToken'];
 
@@ -108,9 +121,9 @@ class AuthService {
 
     final revokedRefreshToken = refreshToken;
 
-    final isVerifiedRefreshToken = await _tokenService.isVerifiedRefreshToken(revokedRefreshToken);
+    final isValidRefreshToken = await _tokenService.isValidRefreshToken(revokedRefreshToken);
 
-    if (!isVerifiedRefreshToken) {
+    if (!isValidRefreshToken) {
       return deleted();
     }
 

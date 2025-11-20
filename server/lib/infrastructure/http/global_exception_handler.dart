@@ -4,6 +4,10 @@ import 'package:shelf/shelf.dart';
 import 'response_utils.dart';
 import 'exceptions/request_exceptions.dart';
 
+/// Shelf middleware for global exception handling in HTTP requests.
+///
+/// Catches exceptions thrown by downstream handlers and maps them to appropriate HTTP responses.
+/// Handles domain, authentication, and server errors, ensuring consistent error reporting.
 Middleware globalExceptionHandler() {
   return (Handler innerHandler) {
     return (Request request) async {
@@ -11,6 +15,7 @@ Middleware globalExceptionHandler() {
         return await innerHandler(request);
       } catch (e) {
         print(e);
+        // Map known exceptions to HTTP responses; fallback to server error for unknown exceptions.
         return switch (e) {
           BadRequestException(:final errorCode) => badRequest(errorCode),
           MalformedAuthorizationHeaderException(:final errorCode) => badRequest(errorCode),
