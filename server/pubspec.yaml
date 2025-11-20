@@ -1,6 +1,6 @@
 name: server
-version: 0.1.0
-description: Dart Shelf API server
+version: 1.0.0
+description: authentication and resource server for user administration.
 publish_to: none
 environment:
   sdk: '>=3.0.0 <4.0.0'

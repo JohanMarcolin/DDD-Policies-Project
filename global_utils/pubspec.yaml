@@ -1,7 +1,7 @@
 name: global_utils
-version: 0.1.0
+version: 1.0.0
 publish_to: "none"
-description: Utilities for testing ShelfApi and related Dart projects.
+description: utilities for testing, mapping and api interactions.
 environment:
   sdk: ">=3.0.0 <4.0.0"
 dependencies:

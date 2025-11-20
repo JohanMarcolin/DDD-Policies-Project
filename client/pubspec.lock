@@ -25,14 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.7.1"
-  another_flushbar:
-    dependency: "direct main"
-    description:
-      name: another_flushbar
-      sha256: "2b99671c010a7d5770acf5cb24c9f508b919c3a7948b6af9646e773e7da7b757"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.32"
   args:
     dependency: transitive
     description:
@@ -74,7 +66,7 @@ packages:
     source: hosted
     version: "1.1.1"
   bloc_presentation_test:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: bloc_presentation_test
       sha256: "8e2a847383a026f9cbe0c39d5cb285c3a0618be62bc8c27dd393a4ac66b988de"
@@ -82,7 +74,7 @@ packages:
     source: hosted
     version: "1.2.0"
   bloc_test:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: bloc_test
       sha256: "1dd549e58be35148bc22a9135962106aa29334bc1e3f285994946a1057b29d7b"
@@ -311,7 +303,7 @@ packages:
       path: "../global_utils"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "1.0.0"
   http:
     dependency: "direct main"
     description:
@@ -405,14 +397,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  logger:
-    dependency: "direct dev"
-    description:
-      name: logger
-      sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
   logging:
     dependency: transitive
     description:
@@ -454,7 +438,7 @@ packages:
     source: hosted
     version: "2.0.0"
   mocktail:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: mocktail
       sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
@@ -579,7 +563,7 @@ packages:
       path: "../server"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "1.0.0"
   shared_preferences:
     dependency: "direct main"
     description:

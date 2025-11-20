@@ -216,7 +216,7 @@ packages:
       path: "../global_utils"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "1.0.0"
   http:
     dependency: "direct main"
     description:

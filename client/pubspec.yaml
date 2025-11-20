@@ -1,7 +1,7 @@
 name: client
-description: "A new Flutter project."
+description: "The user administration frontend app."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0
 
 environment:
   sdk: ^3.9.2
@@ -21,12 +21,8 @@ dependencies:
   equatable: ^2.0.5
   cupertino_icons: ^1.0.8
   bloc: ^9.0.0
-  another_flushbar: ^1.12.30
   flutter_easy_dialogs: ^4.0.4
   fluttertoast: ^9.0.0
-  bloc_test: ^10.0.0
-  bloc_presentation_test: ^1.2.0
-  mocktail: ^1.0.4
   meta: ^1.16.0
   diff_match_patch: ^0.4.1
 
@@ -36,7 +32,9 @@ dev_dependencies:
   lints: ^6.0.0
   integration_test:
     sdk: flutter
-  logger: ^1.4.0
+  bloc_test: ^10.0.0
+  bloc_presentation_test: ^1.2.0
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true
