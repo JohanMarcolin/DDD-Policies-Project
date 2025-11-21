@@ -2,19 +2,15 @@ name: client
 description: "The user administration frontend app."
 publish_to: 'none'
 version: 1.0.0
-
+resolution: workspace
 environment:
   sdk: ^3.9.2
 dependencies:
+  domain: ^1.0.0
+  global_utils: ^1.0.0
   bloc_presentation: 1.1.1
   flutter:
     sdk: flutter
-  domain:
-    path: ../domain
-  server:
-    path: ../server
-  global_utils:
-    path: ../global_utils
   http: ^1.2.1
   shared_preferences: ^2.2.2
   flutter_bloc: ^9.0.0

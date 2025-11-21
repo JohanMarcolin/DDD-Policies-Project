@@ -1,0 +1,26 @@
+name: ddd_policies_project
+publish_to: "none"
+version: 1.0.0
+
+environment:
+  sdk: '>3.5.0 <4.0.0'
+workspace:
+  - apps/client
+  - apps/server
+  - packages/domain
+  - packages/global_utils
+
+dev_dependencies:
+  melos: ^7.3.0
+  lints: ^6.0.0
+
+melos:
+  scripts:
+    server_start: melos exec --scope=server "dart run lib/application/main.dart"
+    lint: melos exec -concurrency=4 "dart analyze"
+
+    # Tests
+    domain_unit_test: melos exec --scope=domain "dart test"
+    client_bloc_test: melos exec --scope=client --fail-fast "flutter test test/bloc"
+    client_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test"
+    server_api_test: melos exec --scope=server --fail-fast "dart test"

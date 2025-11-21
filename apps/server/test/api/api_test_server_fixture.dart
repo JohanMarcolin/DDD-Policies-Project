@@ -2,7 +2,7 @@ import 'package:domain/value_objects/role.dart';
 import 'package:global_utils/test/test_server_fixture.dart';
 import 'package:global_utils/test/user_test_fixture.dart';
 import 'package:global_utils/http_api/http_api.dart';
-import 'package:server/test/api/api_test_api.dart';
+import 'api_test_api.dart';
 
 /// Provides setup, teardown, and test data utilities for Api tests requiring a running backend server.
 ///

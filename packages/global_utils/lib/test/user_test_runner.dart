@@ -1,6 +1,6 @@
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:test/scaffolding.dart';
+import 'package:test/test.dart';
 
 /// Utility class to run tests for different user role combinations.
 class UserTestRunner {

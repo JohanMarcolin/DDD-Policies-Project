@@ -1,0 +1,12 @@
+name: global_utils
+version: 1.0.0
+publish_to: "none"
+description: utilities for testing, mapping and api interactions.
+resolution: workspace
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+dependencies:
+  domain: ^1.0.0
+  server: ^1.0.0
+  http: ^1.2.1
+  test: ^1.24.0

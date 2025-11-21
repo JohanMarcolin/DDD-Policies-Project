@@ -1,5 +1,11 @@
-.dart_tool/
-.vscode/
-.idea/
+**/.dart_tool*
+**/.vscode*
+**/.idea*
+**/build*
+
 .github/
+
 README.md
+
+# melos generated files
+**/melos_*
