@@ -13,11 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/main.dart' as app;
-import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:test_utils/mocks/mock_users.dart';
+import 'package:test_utils/user_test_fixture.dart';
 
 import '../../../test/bloc/infrastructure/auth_bloc_test.dart';
 import '../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
-import '../../../test/bloc/utils/mock_users.dart' show mockUser;
 import 'widget_finder_extensions.dart';
 
 /// Extension on [WidgetTester] providing utilities to render widgets with stubbed [AuthBloc]

@@ -7,14 +7,12 @@ import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:global_utils/error_codes.dart';
+import 'package:error_codes/error_codes.dart';
 import 'package:integration_test/integration_test.dart';
-
 import 'package:mocktail/mocktail.dart';
-
+import 'package:test_utils/mocks/mock_user_credentials.dart';
+import 'package:test_utils/mocks/mock_users.dart';
 import '../../../../test/bloc/infrastructure/auth_bloc_test.dart';
-import '../../../../test/bloc/utils/mock_user_credentials.dart';
-import '../../../../test/bloc/utils/mock_users.dart';
 import '../../../utils/extensions/widget_finder_extensions.dart';
 
 late MockAuthApi mockAuthApi;

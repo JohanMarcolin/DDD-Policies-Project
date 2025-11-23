@@ -1,7 +1,7 @@
-name: global_utils
+name: test_utils
 version: 1.0.0
 publish_to: "none"
-description: utilities for testing, mapping and api interactions.
+description: a package for global testing utilities.
 resolution: workspace
 environment:
   sdk: ">=3.5.0 <4.0.0"

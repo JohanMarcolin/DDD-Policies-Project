@@ -6,13 +6,12 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:global_utils/test/test_server_fixture.dart';
-import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:test_utils/auth/auth_header.dart';
+import 'package:test_utils/server/test_server_fixture.dart';
+import 'package:test_utils/user_test_fixture.dart';
 import 'api_test_server_fixture.dart';
-// ignore: depend_on_referenced_packages
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
-import 'utils/test_token_utils.dart';
 
 void main() {
   late UserTestFixture initiator;

@@ -1,10 +1,10 @@
-import 'package:global_utils/test/test_server_fixture.dart';
-import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:test_utils/user_test_fixture.dart';
+import 'package:http_api/http_api.dart';
+import 'package:test_utils/server/test_server_fixture.dart';
 
 import 'integration_test_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:global_utils/http_api/http_api.dart';
 
 /// Provides setup, teardown, and test data utilities for integration tests requiring a running backend server.
 ///

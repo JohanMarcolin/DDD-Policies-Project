@@ -1,5 +1,6 @@
 name: ddd_policies_project
 publish_to: "none"
+description: A Dart project template using DDD policies.
 version: 1.0.0
 
 environment:
@@ -8,7 +9,10 @@ workspace:
   - apps/client
   - apps/server
   - packages/domain
-  - packages/global_utils
+  - packages/error_codes
+  - packages/http_api
+  - packages/test_utils
+  - packages/mappers
 
 dev_dependencies:
   melos: ^7.3.0
@@ -17,9 +21,8 @@ dev_dependencies:
 melos:
   scripts:
     server_start: melos exec --scope=server "dart run lib/application/main.dart"
-    lint: melos exec -concurrency=4 "dart analyze"
-
-    # Tests
+    lint: melos exec --concurrency=4 "dart analyze"
+    format: melos exec --concurrency=16 "dart format . --line-length 120"
     domain_unit_test: melos exec --scope=domain "dart test"
     client_bloc_test: melos exec --scope=client --fail-fast "flutter test test/bloc"
     client_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test"

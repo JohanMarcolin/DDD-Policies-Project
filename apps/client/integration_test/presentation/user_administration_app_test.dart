@@ -5,10 +5,10 @@ import 'package:client/presentation/views/user_administration_view/user_administ
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:test_utils/mocks/mock_users.dart';
 
 import '../../test/bloc/infrastructure/auth_bloc_test.dart';
 import '../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
-import '../../test/bloc/utils/mock_users.dart';
 import '../utils/extensions/widget_finder_extensions.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
 

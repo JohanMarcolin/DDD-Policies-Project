@@ -4,9 +4,8 @@ import 'package:client/presentation/widgets/confirm_dialog.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:test_utils/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
-
 import '../integration_test_server_fixture.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
 

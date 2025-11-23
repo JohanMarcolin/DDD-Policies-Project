@@ -2,8 +2,8 @@ import 'package:client/presentation/views/user_administration_view/user_administ
 import 'package:domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:test_utils/mocks/mock_users.dart';
 
-import '../../../../../test/bloc/utils/mock_users.dart';
 import '../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../utils/extensions/widget_tester_extensions.dart';
 

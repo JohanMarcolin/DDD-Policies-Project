@@ -1,4 +1,4 @@
-import 'package:global_utils/error_codes.dart';
+import 'package:error_codes/error_codes.dart';
 
 /// Base class for HTTP request-related exceptions, carrying an [ErrorCode].
 ///

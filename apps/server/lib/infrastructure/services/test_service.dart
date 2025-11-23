@@ -3,7 +3,7 @@ import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:global_utils/error_codes.dart';
+import 'package:error_codes/error_codes.dart';
 import 'package:server/infrastructure/http/exceptions/request_exceptions.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/value_objects/email.dart';

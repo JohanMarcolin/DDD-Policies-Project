@@ -1,0 +1,10 @@
+name: mappers
+version: 1.0.0
+publish_to: "none"
+description: global data mappers.
+resolution: workspace
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+dependencies:
+  domain: ^1.0.0
+  test_utils: ^1.0.0

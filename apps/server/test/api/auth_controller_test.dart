@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:domain/value_objects/role.dart';
-import 'package:global_utils/test/user_test_fixture.dart';
+import 'package:test_utils/user_test_fixture.dart';
 import 'api_test_server_fixture.dart';
-// ignore: depend_on_referenced_packages
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 

@@ -1,5 +1,5 @@
 name: domain
-description: user administration business logic.
+description: user administration business logic for fullstack usage.
 version: 1.0.0
 publish_to: 'none'
 resolution: workspace

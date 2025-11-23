@@ -7,7 +7,10 @@ environment:
   sdk: ^3.9.2
 dependencies:
   domain: ^1.0.0
-  global_utils: ^1.0.0
+  error_codes: ^1.0.0
+  mappers: ^1.0.0
+  http_api: ^1.0.0
+  test_utils: ^1.0.0
   bloc_presentation: 1.1.1
   flutter:
     sdk: flutter

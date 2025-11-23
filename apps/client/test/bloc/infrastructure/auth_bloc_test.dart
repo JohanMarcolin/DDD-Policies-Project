@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:client/infrastructure/apis/auth_api.dart';
-import '../utils/mock_user_credentials.dart';
-import '../utils/mock_users.dart';
+import 'package:test_utils/mocks/mock_user_credentials.dart';
+import 'package:test_utils/mocks/mock_users.dart';
 
 class MockAuthApi extends Mock implements AuthApi {}
 
