@@ -3,7 +3,7 @@ import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import '../databases/in_memory_user_database.dart';
 import '../databases/in_memory_user_password_database.dart';
 import '../http/exceptions/request_exceptions.dart';

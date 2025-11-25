@@ -3,7 +3,7 @@ import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:http_api/http_api.dart';
 
@@ -29,7 +29,7 @@ class AuthApi extends HttpApi {
           );
           return UserMapper.toDomainUser(response.data['currentUser']);
         }
-        throw AuthApiException(response.errorCode);
+        throw AuthApiException(response.apiErrorCode);
       },
     );
   }
@@ -47,7 +47,7 @@ class AuthApi extends HttpApi {
         if (response.isSuccess) {
           return;
         }
-        throw AuthApiException(response.errorCode);
+        throw AuthApiException(response.apiErrorCode);
       },
     );
 
@@ -67,15 +67,13 @@ class AuthApi extends HttpApi {
           _authTokenService.setAccessToken(accessToken: response.data['accessToken']);
           return UserMapper.toDomainUser(response.data['currentUser']);
         }
-        throw AuthApiException(response.errorCode);
+        throw AuthApiException(response.apiErrorCode);
       },
     );
   }
 }
 
 /// Exception thrown for authentication API errors.
-class AuthApiException implements Exception {
-  final ErrorCode errorCode;
-
-  AuthApiException(String? errorCode) : errorCode = errorCodeFromString(errorCode);
+class AuthApiException extends ApiException {
+  AuthApiException(super.apiErrorCode);
 }

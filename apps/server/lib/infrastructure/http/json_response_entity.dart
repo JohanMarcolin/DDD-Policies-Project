@@ -28,14 +28,14 @@ class JsonResponseDeleted extends JsonResponseEntity {
 }
 
 class JsonResponseNotFound extends JsonResponseEntity {
-  static Response asShelfResponse(ErrorCode errorCode) => Response.notFound(
+  static Response asShelfResponse(ApiErrorCode errorCode) => Response.notFound(
         jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse([ErrorCode? errorCode, String? policyViolationDetails]) {
+  static Response asShelfResponse([ApiErrorCode? errorCode, String? policyViolationDetails]) {
     final body = <String, Object>{'isSuccess': false};
 
     if (errorCode != null) body['errorCode'] = errorCode.toString();
@@ -51,14 +51,14 @@ class JsonResponseForbidden extends JsonResponseEntity {
 }
 
 class JsonResponseBadRequest extends JsonResponseEntity {
-  static Response asShelfResponse(ErrorCode errorCode) => Response.badRequest(
+  static Response asShelfResponse(ApiErrorCode errorCode) => Response.badRequest(
         body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseUnauthorized extends JsonResponseEntity {
-  static Response asShelfResponse(ErrorCode errorCode) => Response(
+  static Response asShelfResponse(ApiErrorCode errorCode) => Response(
         401,
         body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
@@ -66,7 +66,7 @@ class JsonResponseUnauthorized extends JsonResponseEntity {
 }
 
 class JsonResponseServerError extends JsonResponseEntity {
-  static Response asShelfResponse(ErrorCode errorCode) => Response.internalServerError(
+  static Response asShelfResponse(ApiErrorCode errorCode) => Response.internalServerError(
         body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );

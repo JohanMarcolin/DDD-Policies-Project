@@ -1,5 +1,5 @@
 import 'package:domain/policies/policy_violation_exception.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'response_utils.dart';
 import 'exceptions/request_exceptions.dart';

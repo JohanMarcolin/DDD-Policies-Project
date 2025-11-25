@@ -5,7 +5,7 @@ import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 
 part 'components/login_app_bar.dart';
 part 'components/login_form.dart';
@@ -29,7 +29,7 @@ class _LoginViewState extends State<LoginView> {
           case Authenticated():
             ActionSnackBarHelper.show(message: 'Logged in as ${state.currentUser.email.value}');
           case Unauthenticated():
-            final message = switch (state.errorCode) {
+            final message = switch (state.apiErrorCode) {
               LoginMissingEmail() => 'Please enter your email.',
               LoginMissingPassword() => 'Please enter your password.',
               LoginUserNotFound() => 'Email not found.',

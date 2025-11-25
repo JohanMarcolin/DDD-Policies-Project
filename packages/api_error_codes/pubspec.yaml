@@ -1,4 +1,4 @@
-name: error_codes
+name: api_error_codes
 version: 1.0.0
 publish_to: "none"
 description: a package for global error codes to simplify client <-> server error handling.

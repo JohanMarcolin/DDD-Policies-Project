@@ -72,7 +72,10 @@ void main() {
             () => blocTestContext.mockApi.login(email: mockInvalidEmail, password: mockTooShortPassword),
           ).thenThrow(AuthApiException('INVALID_CREDENTIALS')),
           act: (bloc) => bloc.add(AuthLoginRequested(email: mockInvalidEmail, password: mockTooShortPassword)),
-          expect: () => [isA<AuthLoading>(), isA<Unauthenticated>().having((s) => s.errorCode, 'errorCode', isNotNull)],
+          expect: () => [
+            isA<AuthLoading>(),
+            isA<Unauthenticated>().having((s) => s.apiErrorCode, 'apiErrorCode', isNotNull),
+          ],
           verify: (bloc) => expect(bloc.state, isA<Unauthenticated>()),
         );
       });
@@ -94,7 +97,10 @@ void main() {
           stub: () =>
               when(() => blocTestContext.mockApi.refreshAccessToken()).thenThrow(AuthApiException('TOKEN_EXPIRED')),
           act: (bloc) => bloc.add(AuthRefreshRequested()),
-          expect: () => [isA<AuthLoading>(), isA<Unauthenticated>().having((s) => s.errorCode, 'errorCode', isNotNull)],
+          expect: () => [
+            isA<AuthLoading>(),
+            isA<Unauthenticated>().having((s) => s.apiErrorCode, 'apiErrorCode', isNotNull),
+          ],
           verify: (bloc) => expect(bloc.state, isA<Unauthenticated>()),
         );
       });

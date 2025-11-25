@@ -1,6 +1,6 @@
 import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/value_objects/id.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:server/infrastructure/databases/in_memory_user_password_database.dart';
 

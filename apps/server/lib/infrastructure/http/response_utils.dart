@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:shelf/shelf.dart';
 
 part 'json_response_entity.dart';
@@ -12,13 +12,13 @@ Response noContent() => JsonResponseNoContent.asShelfResponse();
 
 Response deleted() => JsonResponseDeleted.asShelfResponse();
 
-Response notFound(ErrorCode errorCode) => JsonResponseNotFound.asShelfResponse(errorCode);
+Response notFound(ApiErrorCode errorCode) => JsonResponseNotFound.asShelfResponse(errorCode);
 
-Response forbidden([ErrorCode? errorCode, String? policyViolationDetails]) =>
+Response forbidden([ApiErrorCode? errorCode, String? policyViolationDetails]) =>
     JsonResponseForbidden.asShelfResponse(errorCode, policyViolationDetails);
 
-Response badRequest(ErrorCode errorCode) => JsonResponseBadRequest.asShelfResponse(errorCode);
+Response badRequest(ApiErrorCode errorCode) => JsonResponseBadRequest.asShelfResponse(errorCode);
 
-Response unauthorized(ErrorCode errorCode) => JsonResponseUnauthorized.asShelfResponse(errorCode);
+Response unauthorized(ApiErrorCode errorCode) => JsonResponseUnauthorized.asShelfResponse(errorCode);
 
-Response serverError(ErrorCode errorCode) => JsonResponseServerError.asShelfResponse(errorCode);
+Response serverError(ApiErrorCode errorCode) => JsonResponseServerError.asShelfResponse(errorCode);

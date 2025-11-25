@@ -7,10 +7,10 @@ part of 'http_api.dart';
 class HttpApiResponse<TData> {
   final bool isSuccess;
   final TData? data;
-  final String? errorCode;
+  final String? apiErrorCode;
   final String? policyViolationDetails;
 
-  HttpApiResponse({required this.isSuccess, this.data, this.errorCode, this.policyViolationDetails});
+  HttpApiResponse({required this.isSuccess, this.data, this.apiErrorCode, this.policyViolationDetails});
 
   /// Constructs a [HttpApiResponse] from a decoded JSON [map].
   ///
@@ -22,7 +22,7 @@ class HttpApiResponse<TData> {
 
     final isSuccess = map['isSuccess'] == true;
     final hasData = isSuccess && map.containsKey('data');
-    final hasErrorCode = !isSuccess && map.containsKey('errorCode');
+    final hasApiErrorCode = !isSuccess && map.containsKey('apiErrorCode');
     final hasPolicyViolationDetails = !isSuccess && map.containsKey('policyViolationDetails');
 
     dynamic data = hasData ? map['data'] : null;
@@ -35,7 +35,7 @@ class HttpApiResponse<TData> {
     return HttpApiResponse(
       isSuccess: isSuccess,
       data: data,
-      errorCode: hasErrorCode ? map['errorCode'] as String? : null,
+      apiErrorCode: hasApiErrorCode ? map['apiErrorCode'] as String? : null,
       policyViolationDetails: hasPolicyViolationDetails ? map['policyViolationDetails'] as String? : null,
     );
   }
@@ -45,7 +45,7 @@ class HttpApiResponse<TData> {
     final buffer = StringBuffer('HttpApiResponse(');
     buffer.write('isSuccess: $isSuccess');
     if (data != null) buffer.write(', data: $data');
-    if (errorCode != null) buffer.write(', errorCode: $errorCode');
+    if (apiErrorCode != null) buffer.write(', apiErrorCode: $apiErrorCode');
     if (policyViolationDetails != null) {
       buffer.write(', policyViolationDetails: $policyViolationDetails');
     }

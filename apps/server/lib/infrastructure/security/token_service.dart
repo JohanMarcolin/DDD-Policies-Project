@@ -1,5 +1,5 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:uuid/uuid.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';

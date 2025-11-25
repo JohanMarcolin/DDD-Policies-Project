@@ -9,7 +9,7 @@ workspace:
   - apps/client
   - apps/server
   - packages/domain
-  - packages/error_codes
+  - packages/api_error_codes
   - packages/http_api
   - packages/test_utils
   - packages/mappers

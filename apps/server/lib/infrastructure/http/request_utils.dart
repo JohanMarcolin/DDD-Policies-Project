@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:domain/repositories/user_repository.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/value_objects/id.dart';

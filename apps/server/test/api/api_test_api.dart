@@ -1,5 +1,5 @@
 import 'package:domain/value_objects/role.dart';
-import 'package:error_codes/error_codes.dart';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_test_fixture_mapper.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'package:http_api/http_api.dart';
@@ -20,7 +20,7 @@ class ApiTestApi extends HttpApi {
         if (response.isSuccess) {
           return (response.data as List).map((json) => UserTestFixtureMapper.fromJson(json)).toList();
         }
-        throw ApiTestApiException(response.errorCode);
+        throw TestApiException(response.apiErrorCode);
       },
     );
   }
@@ -35,7 +35,7 @@ class ApiTestApi extends HttpApi {
         if (response.isSuccess) {
           return;
         }
-        throw ApiTestApiException(response.errorCode);
+        throw TestApiException(response.apiErrorCode);
       },
     );
   }
@@ -51,14 +51,12 @@ class ApiTestApi extends HttpApi {
         if (response.isSuccess) {
           return UserTestFixtureMapper.fromJson(response.data);
         }
-        throw ApiTestApiException(response.errorCode);
+        throw TestApiException(response.apiErrorCode);
       },
     );
   }
 }
 
-class ApiTestApiException implements Exception {
-  final ErrorCode errorCode;
-
-  ApiTestApiException(String? errorCode) : errorCode = errorCodeFromString(errorCode);
+class TestApiException extends ApiException {
+  TestApiException(super.apiErrorCode);
 }

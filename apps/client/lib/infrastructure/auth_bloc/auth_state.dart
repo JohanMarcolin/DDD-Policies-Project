@@ -13,13 +13,13 @@ class Authenticated extends AuthState {
 }
 
 class Unauthenticated extends AuthState {
-  Unauthenticated([this.errorCode]);
+  Unauthenticated([this.apiErrorCode]);
 
-  final ErrorCode? errorCode;
+  final ApiErrorCode? apiErrorCode;
 }
 
 class AuthFailure extends AuthState {
-  AuthFailure([this.errorCode]);
+  AuthFailure([this.apiErrorCode]);
 
-  final ErrorCode? errorCode;
+  final ApiErrorCode? apiErrorCode;
 }
