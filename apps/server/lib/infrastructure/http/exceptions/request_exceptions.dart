@@ -4,11 +4,11 @@ import 'package:api_error_codes/api_error_codes.dart';
 ///
 /// All custom request exceptions should extend this class to provide consistent error handling and reporting.
 sealed class RequestException implements Exception {
-  const RequestException(this.errorCode);
-  final ApiErrorCode errorCode;
+  const RequestException(this.apiErrorCode);
+  final ApiErrorCode apiErrorCode;
 
   @override
-  String toString() => '${runtimeType.toString()}: ${errorCode.toString()}';
+  String toString() => '${runtimeType.toString()}: ${apiErrorCode.toString()}';
 }
 
 class AuthenticatedUserNotFoundException extends RequestException {

@@ -87,8 +87,8 @@ sealed class ServerApiErrorCode extends ApiErrorCode {}
 
 final class ServerUnhandledServer extends ServerApiErrorCode {}
 
-ApiErrorCode apiErrorCodeFromString(String? errorCode) {
-  switch (errorCode) {
+ApiErrorCode apiErrorCodeFromString(String? apiErrorCode) {
+  switch (apiErrorCode) {
     case 'PayloadMissingRequestBody':
       return PayloadMissingRequestBody();
     case 'PayloadMissingUserId':

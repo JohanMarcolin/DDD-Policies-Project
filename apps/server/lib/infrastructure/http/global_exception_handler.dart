@@ -17,14 +17,14 @@ Middleware globalExceptionHandler() {
         print(e);
         // Map known exceptions to HTTP responses; fallback to server error for unknown exceptions.
         return switch (e) {
-          BadRequestException(:final errorCode) => badRequest(errorCode),
-          MalformedAuthorizationHeaderException(:final errorCode) => badRequest(errorCode),
-          NotFoundException(:final errorCode) => notFound(errorCode),
-          ForbiddenException(:final errorCode) => forbidden(errorCode),
-          InvalidAccessTokenException(:final errorCode) => unauthorized(errorCode),
-          InvalidRefreshTokenException(:final errorCode) => unauthorized(errorCode),
-          AuthenticatedUserNotFoundException(:final errorCode) => forbidden(errorCode),
-          ServerErrorException(:final errorCode) => serverError(errorCode),
+          BadRequestException(:final apiErrorCode) => badRequest(apiErrorCode),
+          MalformedAuthorizationHeaderException(:final apiErrorCode) => badRequest(apiErrorCode),
+          NotFoundException(:final apiErrorCode) => notFound(apiErrorCode),
+          ForbiddenException(:final apiErrorCode) => forbidden(apiErrorCode),
+          InvalidAccessTokenException(:final apiErrorCode) => unauthorized(apiErrorCode),
+          InvalidRefreshTokenException(:final apiErrorCode) => unauthorized(apiErrorCode),
+          AuthenticatedUserNotFoundException(:final apiErrorCode) => forbidden(apiErrorCode),
+          ServerErrorException(:final apiErrorCode) => serverError(apiErrorCode),
           PolicyViolationException(:final reason) => forbidden(null, reason.toString()),
           _ => serverError(ServerUnhandledServer()),
         };

@@ -28,17 +28,17 @@ class JsonResponseDeleted extends JsonResponseEntity {
 }
 
 class JsonResponseNotFound extends JsonResponseEntity {
-  static Response asShelfResponse(ApiErrorCode errorCode) => Response.notFound(
-        jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+  static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.notFound(
+        jsonEncode({'isSuccess': false, 'apiErrorCode': apiErrorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseForbidden extends JsonResponseEntity {
-  static Response asShelfResponse([ApiErrorCode? errorCode, String? policyViolationDetails]) {
+  static Response asShelfResponse([ApiErrorCode? apiErrorCode, String? policyViolationDetails]) {
     final body = <String, Object>{'isSuccess': false};
 
-    if (errorCode != null) body['errorCode'] = errorCode.toString();
+    if (apiErrorCode != null) body['apiErrorCode'] = apiErrorCode.toString();
 
     if (policyViolationDetails != null) {
       body['policyViolationDetails'] = policyViolationDetails;
@@ -51,23 +51,23 @@ class JsonResponseForbidden extends JsonResponseEntity {
 }
 
 class JsonResponseBadRequest extends JsonResponseEntity {
-  static Response asShelfResponse(ApiErrorCode errorCode) => Response.badRequest(
-        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+  static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.badRequest(
+        body: jsonEncode({'isSuccess': false, 'apiErrorCode': apiErrorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseUnauthorized extends JsonResponseEntity {
-  static Response asShelfResponse(ApiErrorCode errorCode) => Response(
+  static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response(
         401,
-        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+        body: jsonEncode({'isSuccess': false, 'apiErrorCode': apiErrorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }
 
 class JsonResponseServerError extends JsonResponseEntity {
-  static Response asShelfResponse(ApiErrorCode errorCode) => Response.internalServerError(
-        body: jsonEncode({'isSuccess': false, 'errorCode': errorCode.toString()}),
+  static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.internalServerError(
+        body: jsonEncode({'isSuccess': false, 'apiErrorCode': apiErrorCode.toString()}),
         headers: JsonResponseEntity.jsonHeaders,
       );
 }

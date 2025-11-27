@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'api_test_server_fixture.dart';
@@ -105,7 +106,7 @@ void main() {
           );
           expect(response.statusCode, equals(403));
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginInvalidPassword'));
+          expect(body['apiErrorCode'], equals(LoginInvalidPassword().toString()));
         });
 
         test('Login fails for missing email', () async {
@@ -117,7 +118,7 @@ void main() {
           );
           expect(response.statusCode, equals(400));
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginMissingEmail'));
+          expect(body['apiErrorCode'], equals(LoginMissingEmail().toString()));
         });
 
         test('Login fails for missing password', () async {
@@ -129,7 +130,7 @@ void main() {
           );
           expect(response.statusCode, equals(400));
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginMissingPassword'));
+          expect(body['apiErrorCode'], equals(LoginMissingPassword().toString()));
         });
 
         test('Login fails for user not found', () async {
@@ -139,7 +140,7 @@ void main() {
           );
           expect(response.statusCode, equals(404));
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginUserNotFound'));
+          expect(body['apiErrorCode'], equals(LoginUserNotFound().toString()));
         });
 
         test('Logout fails for invalid refresh token', () async {
@@ -148,7 +149,7 @@ void main() {
           );
           expect(response.statusCode, equals(401));
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('TokenInvalidRefreshToken'));
+          expect(body['apiErrorCode'], equals(TokenInvalidRefreshToken().toString()));
         });
       }
     });
@@ -161,7 +162,7 @@ void main() {
         );
         expect(response.statusCode, 400);
         final body = jsonDecode(response.body);
-        expect(body['errorCode'], equals('PayloadMissingRequestBody'));
+        expect(body['apiErrorCode'], equals(PayloadMissingRequestBody().toString()));
       });
 
       test('Missing email returns 400', () async {
@@ -172,7 +173,7 @@ void main() {
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginMissingEmail'));
+          expect(body['apiErrorCode'], equals(LoginMissingEmail().toString()));
         }
       });
 
@@ -184,7 +185,7 @@ void main() {
           );
           expect(response.statusCode, 400);
           final body = jsonDecode(response.body);
-          expect(body['errorCode'], equals('LoginMissingPassword'));
+          expect(body['apiErrorCode'], equals(LoginMissingPassword().toString()));
         }
       });
     });
