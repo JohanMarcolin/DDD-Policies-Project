@@ -47,6 +47,10 @@ class ForbiddenException extends RequestException {
   const ForbiddenException(super.errorcode);
 }
 
+class ConflictException extends RequestException {
+  const ConflictException(super.errorcode);
+}
+
 class ServerErrorException extends RequestException {
   const ServerErrorException(super.errorcode);
 }

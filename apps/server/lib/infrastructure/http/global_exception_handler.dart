@@ -21,11 +21,12 @@ Middleware globalExceptionHandler() {
           MalformedAuthorizationHeaderException(:final apiErrorCode) => badRequest(apiErrorCode),
           NotFoundException(:final apiErrorCode) => notFound(apiErrorCode),
           ForbiddenException(:final apiErrorCode) => forbidden(apiErrorCode),
+          PolicyViolationException(:final reason) => policyViolation(reason),
+          ConflictException(:final apiErrorCode) => conflict(apiErrorCode),
           InvalidAccessTokenException(:final apiErrorCode) => unauthorized(apiErrorCode),
           InvalidRefreshTokenException(:final apiErrorCode) => unauthorized(apiErrorCode),
           AuthenticatedUserNotFoundException(:final apiErrorCode) => forbidden(apiErrorCode),
           ServerErrorException(:final apiErrorCode) => serverError(apiErrorCode),
-          PolicyViolationException(:final reason) => forbidden(null, reason.toString()),
           _ => serverError(ServerUnhandledServer()),
         };
       }

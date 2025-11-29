@@ -8,7 +8,11 @@ class FetchUsersRequested extends FetchUsersEvent {}
 
 class FetchUsersSuccess extends FetchUsersEvent {}
 
-class FetchUsersFailure extends FetchUsersEvent {}
+class FetchUsersFailure extends FetchUsersEvent {
+  FetchUsersFailure([this.apiErrorCode]);
+
+  final ApiErrorCode? apiErrorCode;
+}
 
 sealed class DeleteUserEvent extends UserAdministrationViewEvent {}
 
@@ -21,7 +25,11 @@ class DeleteUserSuccess extends DeleteUserEvent {}
 
 class DeleteSelfSuccess extends DeleteUserEvent {}
 
-class DeleteUserFailure extends DeleteUserEvent {}
+class DeleteUserFailure extends DeleteUserEvent {
+  DeleteUserFailure([this.apiErrorCode]);
+
+  final ApiErrorCode? apiErrorCode;
+}
 
 sealed class UpdateUserEmailEvent extends UserAdministrationViewEvent {}
 
@@ -36,7 +44,11 @@ class UpdateUserEmailInvalid extends UpdateUserEmailEvent {
   final EmailInvalidReason reason;
 }
 
-class UpdateUserEmailFailure extends UpdateUserEmailEvent {}
+class UpdateUserEmailFailure extends UpdateUserEmailEvent {
+  UpdateUserEmailFailure([this.apiErrorCode]);
+
+  final ApiErrorCode? apiErrorCode;
+}
 
 class UpdateUserEmailSuccess extends UpdateUserEmailEvent {}
 
@@ -55,4 +67,8 @@ class UpdateUserPasswordInvalid extends UpdateUserPasswordEvent {
 
 class UpdateUserPasswordSuccess extends UpdateUserPasswordEvent {}
 
-class UpdateUserPasswordFailure extends UpdateUserPasswordEvent {}
+class UpdateUserPasswordFailure extends UpdateUserPasswordEvent {
+  UpdateUserPasswordFailure([this.apiErrorCode]);
+
+  final ApiErrorCode? apiErrorCode;
+}

@@ -12,4 +12,8 @@ class UserAdministrationViewLoaded extends UserAdministrationViewState {
   final List<User> users;
 }
 
-class UserAdministrationViewFailure extends UserAdministrationViewState {}
+class UserAdministrationViewFailure extends UserAdministrationViewState {
+  UserAdministrationViewFailure([this.apiErrorCode]);
+
+  final ApiErrorCode? apiErrorCode;
+}

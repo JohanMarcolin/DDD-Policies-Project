@@ -13,6 +13,10 @@ final class PayloadMissingRole extends PayloadApiErrorCode {}
 
 final class UpdateUserEmailMissingNewEmail extends PayloadApiErrorCode {}
 
+final class UpdateUserEmailTakenBySelf extends PayloadApiErrorCode {}
+
+final class UpdateUserEmailTakenByOther extends PayloadApiErrorCode {}
+
 final class PayloadMissingUserPassword extends PayloadApiErrorCode {}
 
 final class UpdateUserPasswordMissingNewPassword extends PayloadApiErrorCode {}
@@ -97,6 +101,10 @@ ApiErrorCode apiErrorCodeFromString(String? apiErrorCode) {
       return PayloadMissingRole();
     case 'UpdateUserEmailMissingNewEmail':
       return UpdateUserEmailMissingNewEmail();
+    case 'UpdateUserEmailTakenBySelf':
+      return UpdateUserEmailTakenBySelf();
+    case 'UpdateUserEmailTakenByOther':
+      return UpdateUserEmailTakenByOther();
     case 'PayloadMissingUserPassword':
       return PayloadMissingUserPassword();
     case 'UpdateUserPasswordMissingNewPassword':

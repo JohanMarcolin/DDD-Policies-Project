@@ -14,8 +14,12 @@ Response deleted() => JsonResponseDeleted.asShelfResponse();
 
 Response notFound(ApiErrorCode apiErrorCode) => JsonResponseNotFound.asShelfResponse(apiErrorCode);
 
-Response forbidden([ApiErrorCode? apiErrorCode, String? policyViolationDetails]) =>
-    JsonResponseForbidden.asShelfResponse(apiErrorCode, policyViolationDetails);
+Response forbidden(ApiErrorCode apiErrorCode) => JsonResponseForbidden.asShelfResponse(apiErrorCode);
+
+Response policyViolation<TPolicyViolationReason>(TPolicyViolationReason reason) =>
+    JsonResponsePolicyViolation.asShelfResponse(reason);
+
+Response conflict(ApiErrorCode apiErrorCode) => JsonResponseConflict.asShelfResponse(apiErrorCode);
 
 Response badRequest(ApiErrorCode apiErrorCode) => JsonResponseBadRequest.asShelfResponse(apiErrorCode);
 

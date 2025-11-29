@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
@@ -84,7 +85,7 @@ void main() {
               case Unauthorized(:final reason):
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], reason.toString());
+                expect(body['policyViolationReason'], reason.toString());
             }
           });
         });
@@ -110,7 +111,7 @@ void main() {
               case Unauthorized(:final reason):
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], reason.toString());
+                expect(body['policyViolationReason'], reason.toString());
             }
           });
         });
@@ -141,7 +142,7 @@ void main() {
               case Unauthorized(:final reason):
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], reason.toString());
+                expect(body['policyViolationReason'], reason.toString());
             }
           });
 
@@ -164,7 +165,47 @@ void main() {
               case Unauthorized():
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], EmailInvalidFormat().toString());
+                expect(body['policyViolationReason'], EmailInvalidFormat().toString());
+            }
+          });
+
+          test('should NOT update email if new email is already taken by self', () async {
+            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, initiator.user);
+            final currentEmail = initiator.email;
+
+            final response = await http.put(
+              Uri.parse('${TestServerFixture.baseUrl}/user/${initiator.userId.value}/email'),
+              headers: await getAuthHeader(initiator),
+              body: jsonEncode({'newEmail': currentEmail.value}),
+            );
+            final body = jsonDecode(response.body);
+
+            switch (updateUserEmail) {
+              case Authorized():
+              case Unauthorized():
+                expect(response.statusCode, 409);
+                expect(body['isSuccess'], isFalse);
+                expect(body['apiErrorCode'], UpdateUserEmailTakenBySelf().toString());
+            }
+          });
+
+          test('should NOT update email if new email is already taken by other user', () async {
+            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, target.user);
+            final takenEmail = initiator.email;
+
+            final response = await http.put(
+              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/email'),
+              headers: await getAuthHeader(initiator),
+              body: jsonEncode({'newEmail': takenEmail.value}),
+            );
+            final body = jsonDecode(response.body);
+
+            switch (updateUserEmail) {
+              case Authorized():
+              case Unauthorized():
+                expect(response.statusCode, 409);
+                expect(body['isSuccess'], isFalse);
+                expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
             }
           });
         });
@@ -195,7 +236,7 @@ void main() {
               case Unauthorized(:final reason):
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], reason.toString());
+                expect(body['policyViolationReason'], reason.toString());
             }
           });
 
@@ -218,7 +259,7 @@ void main() {
               case Unauthorized():
                 expect(response.statusCode, 403);
                 expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationDetails'], PasswordTooShort().toString());
+                expect(body['policyViolationReason'], PasswordTooShort().toString());
             }
           });
         });

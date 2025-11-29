@@ -9,12 +9,13 @@ class UpdateUserEmailIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<UserAdministrationViewBloc>();
     final updateEmail = bloc.authorizeUpdateEmail(user);
+    final isUserUpdatingSelf = bloc.isAdministratingSelf(user);
 
     return UserActionIcon<UpdateUserEmailUnauthorizedReason>(
       icon: Icons.email,
       isActionAuthorized: updateEmail is Authorized,
       dialogChildBuilder: (context, {required closeDialog}) => UpdateUserEmailDialogChild(
-        isUserUpdatingSelf: bloc.isAdministratingSelf(user),
+        isUserUpdatingSelf: isUserUpdatingSelf,
         onCancel: () async => await closeDialog(context),
         onConfirm: (value) {
           bloc.add(UpdateUserEmailRequested(targetUser: user, newEmail: Email(value)));
@@ -23,7 +24,11 @@ class UpdateUserEmailIcon extends StatelessWidget {
       closeDialogOnEvent: (event) => event is UpdateUserEmailSuccess,
       eventMessageMapper: (event) => switch (event) {
         UpdateUserEmailInvalid() => 'Invalid email format',
-        UpdateUserEmailFailure() => 'Failed to update email',
+        UpdateUserEmailFailure(:var apiErrorCode) => switch (apiErrorCode) {
+          UpdateUserEmailTakenBySelf() => 'This is your current email',
+          UpdateUserEmailTakenByOther() => 'This email is already taken',
+          _ => 'Failed to update email',
+        },
         UpdateUserEmailSuccess() => 'Email updated successfully',
         _ => '',
       },

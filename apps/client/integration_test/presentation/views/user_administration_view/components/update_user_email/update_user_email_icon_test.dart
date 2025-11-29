@@ -1,3 +1,5 @@
+import 'package:api_error_codes/api_error_codes.dart';
+import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/action_icon.dart';
 import 'package:client/presentation/widgets/action_snack_bar_helper.dart';
@@ -133,6 +135,39 @@ Future<void> main() async {
           expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
         });
       }
+      testWidgets('confirm with already taken email shows error snackbar and keeps dialog open', (
+        WidgetTester tester,
+      ) async {
+        final isUpdatingSelf = currentUser.isSameAs(targetUser);
+        final takenEmail = isUpdatingSelf ? currentUser.email : targetUser.email;
+
+        when(() => mockUserRepository.updateEmail(userId: targetUser.userId, newEmail: takenEmail)).thenThrow(
+          UserApiException(
+            isUpdatingSelf ? UpdateUserEmailTakenBySelf().toString() : UpdateUserEmailTakenByOther().toString(),
+          ),
+        );
+
+        await tester.renderUpdateUserEmailIcon(currentUser: currentUser, targetUser: targetUser);
+
+        final actionIcon = find.byType(ActionIcon);
+        await tester.tap(actionIcon);
+        await tester.pumpAndSettle();
+        expect(find.byType(UpdateUserEmailDialogChild), findsOne);
+        final emailField = find.byType(TextField);
+        await tester.enterText(emailField, takenEmail.value);
+        final confirmButton = find.text('Confirm');
+        await tester.tap(confirmButton);
+        await tester.pumpAndSettle();
+        expect(find.byType(UpdateUserEmailDialogChild), findsOne);
+
+        verify(() => mockUserRepository.updateEmail(userId: targetUser.userId, newEmail: takenEmail)).called(1);
+
+        if (isUpdatingSelf) {
+          expect(ActionSnackBarHelper.lastMessage, 'This is your current email');
+        } else {
+          expect(ActionSnackBarHelper.lastMessage, 'This email is already taken');
+        }
+      });
     },
     onUnauthorized: (currentUser, targetUser, reason) {
       testWidgets('should show greyed out action icon', (WidgetTester tester) async {

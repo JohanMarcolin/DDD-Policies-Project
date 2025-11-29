@@ -20,9 +20,6 @@ dev_dependencies:
 
 melos:
   scripts:
-    server: melos exec --scope=server "dart run lib/application/main.dart"
-    client: cd apps/client && flutter run
-
     lint: melos exec --concurrency=4 "dart analyze"
     format: melos exec --concurrency=16 "dart format . --line-length 120"
 

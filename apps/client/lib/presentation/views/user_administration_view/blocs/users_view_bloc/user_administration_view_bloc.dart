@@ -1,5 +1,7 @@
+import 'package:api_error_codes/api_error_codes.dart';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_presentation/bloc_presentation.dart';
+import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
@@ -44,6 +46,8 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
     try {
       final users = await userAdministrationService.viewUsers(initiator: _currentUser);
       emit(UserAdministrationViewLoaded(users));
+    } on UserApiException catch (e) {
+      emit(UserAdministrationViewFailure(e.apiErrorCode));
     } catch (e) {
       emit(UserAdministrationViewFailure());
     }
@@ -59,6 +63,8 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
         emitPresentation(DeleteUserSuccess());
       }
       add(FetchUsersRequested());
+    } on UserApiException catch (e) {
+      emitPresentation(DeleteUserFailure(e.apiErrorCode));
     } catch (e) {
       emitPresentation(DeleteUserFailure());
     }
@@ -81,6 +87,8 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
           );
           emitPresentation(UpdateUserEmailSuccess());
           add(FetchUsersRequested());
+        } on UserApiException catch (e) {
+          emitPresentation(UpdateUserEmailFailure(e.apiErrorCode));
         } catch (e) {
           emitPresentation(UpdateUserEmailFailure());
         }
@@ -104,6 +112,8 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
           );
           emitPresentation(UpdateUserPasswordSuccess());
           add(FetchUsersRequested());
+        } on UserApiException catch (e) {
+          emitPresentation(UpdateUserPasswordFailure(e.apiErrorCode));
         } catch (e) {
           emitPresentation(UpdateUserPasswordFailure());
         }

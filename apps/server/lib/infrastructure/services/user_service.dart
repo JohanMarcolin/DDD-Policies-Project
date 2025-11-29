@@ -58,7 +58,7 @@ class UserService {
 
   /// Updates the [Email] for the target [User], if authorized.
   ///
-  /// Throws [BadRequestException] if the new email is missing or invalid.
+  /// Throws [BadRequestException] if the new email is missing or invalid, or [ConflictException] if the new email is already taken.
   Future<Response> updateEmail(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 
@@ -68,7 +68,22 @@ class UserService {
     if (newEmail == null || newEmail.isEmpty) {
       throw BadRequestException(UpdateUserEmailMissingNewEmail());
     }
+
     final email = Email(newEmail);
+
+    final isUpdatingSelf = req.currentUser.isSameAs(targetUser);
+
+    final isEmailTakenBySelf = isUpdatingSelf && targetUser.email == email;
+
+    if (isEmailTakenBySelf) {
+      throw ConflictException(UpdateUserEmailTakenBySelf());
+    }
+
+    final isEmailTakenByOther = await _userRepository.getByEmail(email: email) != null;
+
+    if (isEmailTakenByOther) {
+      throw ConflictException(UpdateUserEmailTakenByOther());
+    }
 
     await _userAdministrationService.updateUserEmail(initiator: req.currentUser, target: targetUser, newEmail: email);
 

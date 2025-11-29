@@ -8,9 +8,9 @@ class HttpApiResponse<TData> {
   final bool isSuccess;
   final TData? data;
   final String? apiErrorCode;
-  final String? policyViolationDetails;
+  final String? policyViolationReason;
 
-  HttpApiResponse({required this.isSuccess, this.data, this.apiErrorCode, this.policyViolationDetails});
+  HttpApiResponse({required this.isSuccess, this.data, this.apiErrorCode, this.policyViolationReason});
 
   /// Constructs a [HttpApiResponse] from a decoded JSON [map].
   ///
@@ -23,7 +23,7 @@ class HttpApiResponse<TData> {
     final isSuccess = map['isSuccess'] == true;
     final hasData = isSuccess && map.containsKey('data');
     final hasApiErrorCode = !isSuccess && map.containsKey('apiErrorCode');
-    final hasPolicyViolationDetails = !isSuccess && map.containsKey('policyViolationDetails');
+    final hasPolicyViolationDetails = !isSuccess && map.containsKey('policyViolationReason');
 
     dynamic data = hasData ? map['data'] : null;
     if (data is List) {
@@ -36,7 +36,7 @@ class HttpApiResponse<TData> {
       isSuccess: isSuccess,
       data: data,
       apiErrorCode: hasApiErrorCode ? map['apiErrorCode'] as String? : null,
-      policyViolationDetails: hasPolicyViolationDetails ? map['policyViolationDetails'] as String? : null,
+      policyViolationReason: hasPolicyViolationDetails ? map['policyViolationReason'] as String? : null,
     );
   }
 
@@ -46,8 +46,8 @@ class HttpApiResponse<TData> {
     buffer.write('isSuccess: $isSuccess');
     if (data != null) buffer.write(', data: $data');
     if (apiErrorCode != null) buffer.write(', apiErrorCode: $apiErrorCode');
-    if (policyViolationDetails != null) {
-      buffer.write(', policyViolationDetails: $policyViolationDetails');
+    if (policyViolationReason != null) {
+      buffer.write(', policyViolationReason: $policyViolationReason');
     }
     buffer.write(')');
     return buffer.toString();
