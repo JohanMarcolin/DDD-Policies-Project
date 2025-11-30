@@ -6,8 +6,7 @@ import 'package:http_api/http_api.dart';
 
 /// API for managing test user fixtures in integration tests.
 ///
-/// Provides methods to create and delete user fixtures server-side, enabling
-/// repeatable and isolated integration test scenarios.
+/// Use for repeatable and isolated integration test scenarios.
 class IntegrationTestApi extends HttpApi {
   /// Creates user fixtures for all [Role.values].
   ///
@@ -27,7 +26,7 @@ class IntegrationTestApi extends HttpApi {
 
   /// Deletes all user fixtures server-side.
   ///
-  /// Use this to ensure a clean state between integration tests. Throws [IntegrationTestApiException] on failure.
+  /// Use to ensure a clean state between integration tests. Throws [IntegrationTestApiException] on failure.
   Future<void> deleteAllUserFixtures() async {
     await callDelete<void>(
       endpoint: '/test/delete-all-user-fixtures',

@@ -34,8 +34,8 @@ class UpdateUserEmailIcon extends StatelessWidget {
       },
       unauthorizedReason: updateEmail is Unauthorized ? updateEmail.reason as UpdateUserEmailUnauthorizedReason : null,
       unauthorizedMessageMapper: (reason) => switch (reason) {
-        CannotUpdateEmailOnAnalyst() => 'You cannot update the email of an analyst.',
-        CanOnlyUpdateEmailOnSelf() => 'You can only update your own email.',
+        CannotUpdateEmailOnAnalyst() => 'You cannot update the email of an analyst',
+        CanOnlyUpdateEmailOnSelf() => 'You can only update your own email',
       },
     );
   }

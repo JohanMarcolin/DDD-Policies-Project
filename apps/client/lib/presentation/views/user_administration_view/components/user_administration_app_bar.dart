@@ -14,9 +14,9 @@ class UserAdministrationAppBar extends StatelessWidget implements PreferredSizeW
         BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthFailure) {
-              ActionSnackBarHelper.show(message: 'Logout failed. Please log in again or try again later.');
+              ActionSnackBarHelper.show(message: 'Logout failed. Please log in again or try again later');
             } else {
-              ActionSnackBarHelper.show(message: 'Logged out successfully.');
+              ActionSnackBarHelper.show(message: 'Logged out successfully');
             }
           },
           builder: (context, state) {

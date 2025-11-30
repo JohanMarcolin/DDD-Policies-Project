@@ -80,11 +80,11 @@ void main() {
         );
       });
 
-      group('{AuthRefreshRequested}', () {
+      group('{AuthRefreshAccessTokenRequested}', () {
         _blocTest(
           description: 'should emit AuthLoading and Authenticated on successful refresh',
           stub: () => when(() => blocTestContext.mockApi.refreshAccessToken()).thenAnswer((_) async => mockUser),
-          act: (bloc) => bloc.add(AuthRefreshRequested()),
+          act: (bloc) => bloc.add(AuthRefreshAccessTokenRequested()),
           expect: () => [
             isA<AuthLoading>(),
             isA<Authenticated>().having((s) => s.currentUser, 'currentUser', mockUser),
@@ -96,7 +96,7 @@ void main() {
           description: 'should not authenticate on refresh failure',
           stub: () =>
               when(() => blocTestContext.mockApi.refreshAccessToken()).thenThrow(AuthApiException('TOKEN_EXPIRED')),
-          act: (bloc) => bloc.add(AuthRefreshRequested()),
+          act: (bloc) => bloc.add(AuthRefreshAccessTokenRequested()),
           expect: () => [
             isA<AuthLoading>(),
             isA<Unauthenticated>().having((s) => s.apiErrorCode, 'apiErrorCode', isNotNull),

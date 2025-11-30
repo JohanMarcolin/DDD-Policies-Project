@@ -71,10 +71,10 @@ Future<void> main() async {
 
         final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserUpdatingSelf ? 'Update Your Email' : 'Update User Email';
+        final expectedTitle = isUserUpdatingSelf ? 'Update your email' : 'Update user email';
         expect(find.text(expectedTitle), findsOne);
 
-        final expectedLabel = 'New Email';
+        final expectedLabel = 'New email';
         expect(find.text(expectedLabel), findsOne);
       });
 
@@ -197,9 +197,9 @@ Future<void> main() async {
         expect(updateEmailDialogChild, findsNothing);
         switch (reason as UpdateUserEmailUnauthorizedReason) {
           case CannotUpdateEmailOnAnalyst():
-            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the email of an analyst.');
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the email of an analyst');
           case CanOnlyUpdateEmailOnSelf():
-            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own email.');
+            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own email');
         }
       });
     },

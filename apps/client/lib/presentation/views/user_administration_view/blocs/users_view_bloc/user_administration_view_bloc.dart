@@ -48,7 +48,7 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
       emit(UserAdministrationViewLoaded(users));
     } on UserApiException catch (e) {
       emit(UserAdministrationViewFailure(e.apiErrorCode));
-    } catch (e) {
+    } catch (_) {
       emit(UserAdministrationViewFailure());
     }
   }
@@ -65,7 +65,7 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
       add(FetchUsersRequested());
     } on UserApiException catch (e) {
       emitPresentation(DeleteUserFailure(e.apiErrorCode));
-    } catch (e) {
+    } catch (_) {
       emitPresentation(DeleteUserFailure());
     }
   }
@@ -89,7 +89,7 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
           add(FetchUsersRequested());
         } on UserApiException catch (e) {
           emitPresentation(UpdateUserEmailFailure(e.apiErrorCode));
-        } catch (e) {
+        } catch (_) {
           emitPresentation(UpdateUserEmailFailure());
         }
     }
@@ -114,7 +114,7 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
           add(FetchUsersRequested());
         } on UserApiException catch (e) {
           emitPresentation(UpdateUserPasswordFailure(e.apiErrorCode));
-        } catch (e) {
+        } catch (_) {
           emitPresentation(UpdateUserPasswordFailure());
         }
     }

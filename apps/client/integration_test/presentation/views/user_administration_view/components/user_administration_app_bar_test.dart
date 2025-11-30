@@ -45,7 +45,7 @@ Future<void> main() async {
     testWidgets('does not show logout icon when unauthenticated', (WidgetTester tester) async {
       await tester.renderUserAdministrationAppBar();
 
-      tester.authBlocWithStubs.add(AuthRefreshRequested());
+      tester.authBlocWithStubs.add(AuthRefreshAccessTokenRequested());
 
       await tester.pumpAndSettle();
 
@@ -60,7 +60,7 @@ Future<void> main() async {
 
       await tester.renderUserAdministrationAppBar();
 
-      tester.authBlocWithStubs.add(AuthRefreshRequested());
+      tester.authBlocWithStubs.add(AuthRefreshAccessTokenRequested());
 
       await tester.pumpAndSettle();
 
@@ -80,7 +80,7 @@ Future<void> main() async {
 
       await tester.renderUserAdministrationAppBar();
 
-      tester.authBlocWithStubs.add(AuthRefreshRequested());
+      tester.authBlocWithStubs.add(AuthRefreshAccessTokenRequested());
 
       await tester.pumpAndSettle();
 
@@ -90,7 +90,7 @@ Future<void> main() async {
 
       verify(() => mockAuthApi.logout()).called(1);
 
-      expect(ActionSnackBarHelper.lastMessage, 'Logout failed. Please log in again or try again later.');
+      expect(ActionSnackBarHelper.lastMessage, 'Logout failed. Please log in again or try again later');
     });
   });
 }

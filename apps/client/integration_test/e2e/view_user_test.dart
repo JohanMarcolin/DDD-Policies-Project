@@ -20,21 +20,23 @@ void main() {
 
     final viewUserPolicy = ViewUserPolicy();
 
-    for (final role in Role.values) {
-      testWidgets('${role.name} viewing self scenario', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: role);
+    for (final initiatorRole in Role.values) {
+      final initiatorRoleName = initiatorRole.name;
+
+      testWidgets('$initiatorRoleName viewing self scenario', (WidgetTester tester) async {
+        final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
         final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
           case Authorized():
             await _assertViewUserSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertViewUserBlocked(tester: tester, initiator: self, target: self);
+            await _assertViewUserIsBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets('${role.name} viewing ${targetRole.name} scenario', (WidgetTester tester) async {
-          final initiator = await IntegrationTestServerFixture.createUserFixture(role: role);
+        testWidgets('$initiatorRoleName viewing ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
           final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
@@ -42,7 +44,7 @@ void main() {
             case Authorized():
               await _assertViewUserSucceeds(tester: tester, initiator: initiator, target: target);
             case Unauthorized():
-              await _assertViewUserBlocked(tester: tester, initiator: initiator, target: target);
+              await _assertViewUserIsBlocked(tester: tester, initiator: initiator, target: target);
           }
         });
       }
@@ -58,7 +60,7 @@ Future<void> _assertViewUserSucceeds({
   await _assertViewUser(tester: tester, initiator: initiator, target: target, shouldFind: true);
 }
 
-Future<void> _assertViewUserBlocked({
+Future<void> _assertViewUserIsBlocked({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
@@ -72,8 +74,6 @@ Future<void> _assertViewUser({
   required UserTestFixture target,
   required bool shouldFind,
 }) async {
-  final targetUserRole = target.user.role.name;
-
   await tester.startApp();
   await tester.login(email: initiator.email, password: initiator.password);
 
@@ -86,6 +86,9 @@ Future<void> _assertViewUser({
   final targetUserTile = userList.findDescendantMatching(
     find.byWidgetPredicate((widget) => widget is UserTile && widget.user.isSameAs(target.user)),
   );
+
+  final targetUserRole = target.user.role.name;
+
   expect(
     targetUserTile,
     shouldFind ? findsOne : findsNothing,

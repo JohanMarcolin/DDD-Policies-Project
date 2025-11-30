@@ -6,18 +6,17 @@ import 'integration_test_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:domain/value_objects/role.dart';
 
-/// Provides setup, teardown, and test data utilities for integration tests requiring a running backend server.
+/// Provides setup, teardown, and test data utilities for e2e integration tests.
 ///
-/// This fixture is intended exclusively for integration tests. It manages the lifecycle of the test server,
-/// configures API endpoints, and exposes helpers for creating user fixtures. All methods are static for
-/// convenient use in test setup/teardown blocks.
+/// This fixture should be used only for e2e integration tests. It manages the lifecycle of the test server,
+/// configures API endpoints, and exposes helpers for creating user fixtures.
 class IntegrationTestServerFixture {
   static late IntegrationTestApi _integrationTestApi;
   static late AuthTokenService _authTokenService;
 
-  /// Starts the integration test server and initializes API clients.
+  /// Starts the server and initializes API clients.
   ///
-  /// Call this in your test's `setUp` method before any test logic that requires backend access.
+  /// Call this in your test's `setUp` method.
   static Future<void> setup() async {
     await TestServerFixture.start(exposeTestRoutes: true);
     HttpApi.baseUrl = TestServerFixture.baseUrl;
@@ -34,16 +33,16 @@ class IntegrationTestServerFixture {
     await TestServerFixture.stop();
   }
 
-  /// Creates a user fixture with the specified [role] on the backend test server.
+  /// Creates a user fixture with the specified [role] server-side.
   ///
-  /// Returns a [UserTestFixture] containing user credentials and metadata for use in integration tests.
+  /// Returns a [UserTestFixture].
   static Future<UserTestFixture> createUserFixture({required Role role}) async {
     return await _integrationTestApi.createUserFixture(role: role);
   }
 
-  /// Creates user fixtures for all roles defined in the domain model.
+  /// Creates user fixtures for all [Role.values].
   ///
-  /// Returns a list of [UserTestFixture] objects for comprehensive role-based integration testing.
+  /// Returns a list of [UserTestFixture]:s.
   static Future<List<UserTestFixture>> createAllUserFixtures() async {
     return await _integrationTestApi.createAllUserFixtures();
   }

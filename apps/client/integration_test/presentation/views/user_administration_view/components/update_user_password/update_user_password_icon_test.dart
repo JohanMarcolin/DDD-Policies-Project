@@ -69,10 +69,10 @@ Future<void> main() async {
 
         final isUserUpdatingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserUpdatingSelf ? 'Update Your Password' : 'Update User Password';
+        final expectedTitle = isUserUpdatingSelf ? 'Update your password' : 'Update user password';
         expect(find.text(expectedTitle), findsOne);
 
-        final expectedLabel = 'New Password';
+        final expectedLabel = 'New password';
         expect(find.text(expectedLabel), findsOne);
       });
 
@@ -183,9 +183,9 @@ Future<void> main() async {
         expect(updatePasswordDialogChild, findsNothing);
         switch (reason as UpdateUserPasswordUnauthorizedReason) {
           case CannotUpdatePasswordOnAnalyst():
-            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the password of an analyst.');
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot update the password of an analyst');
           case CanOnlyUpdatePasswordOnSelf():
-            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own password.');
+            expect(ActionSnackBarHelper.lastMessage, 'You can only update your own password');
         }
       });
     },

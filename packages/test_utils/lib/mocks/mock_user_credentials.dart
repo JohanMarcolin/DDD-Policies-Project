@@ -4,6 +4,10 @@ import 'package:domain/value_objects/password.dart';
 
 Email mockValidEmail = Email('new_email@example.com');
 
+Email mockAnyEmail = Email('anyEmail');
+Email mockEmptyEmail = Email('');
+Email mockUnknownEmail = Email('unknownEmail');
+
 Email mockInvalidEmail = Email('invalid_email');
 Email mockMissingAtEmail = Email('invalidemail.com');
 Email mockMissingDomainEmail = Email('invalid@');
@@ -24,6 +28,10 @@ List<Email> mockInvalidEmails = [
 
 Password mockValidPassword = PasswordValidationPolicy.generatePassword();
 
+Password mockAnyPassword = Password('anyPassword');
+Password mockEmptyPassword = Password('');
+
+Password mockInvalidPassword = Password('invalidPassword');
 Password mockTooShortPassword = Password('p' * (PasswordValidationPolicy.minLength - 1));
 Password mockTooLongPassword = Password('p' * (PasswordValidationPolicy.maxLength + 1));
 Password mockMissingUppercasePassword = Password('password1!');

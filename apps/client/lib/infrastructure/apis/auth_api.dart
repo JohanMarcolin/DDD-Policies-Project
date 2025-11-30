@@ -23,7 +23,7 @@ class AuthApi extends HttpApi {
       data: jsonEncode({'email': email.value, 'password': password.value}),
       map: (response) {
         if (response.isSuccess) {
-          _authTokenService.saveTokens(
+          _authTokenService.storeTokens(
             accessToken: response.data['accessToken'],
             refreshToken: response.data['refreshToken'],
           );
@@ -34,7 +34,7 @@ class AuthApi extends HttpApi {
     );
   }
 
-  /// Logs out the current user, invalidating the refresh token and clearing local tokens.
+  /// Logs out the current user, invalidating the refresh token server-side and clearing local tokens.
   ///
   /// Throws [AuthApiException] on failure.
   Future<void> logout() async {

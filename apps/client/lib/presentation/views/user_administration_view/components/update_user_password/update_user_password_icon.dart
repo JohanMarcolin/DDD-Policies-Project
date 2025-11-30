@@ -38,8 +38,8 @@ class UpdateUserPasswordIcon extends StatelessWidget {
           ? updatePassword.reason as UpdateUserPasswordUnauthorizedReason
           : null,
       unauthorizedMessageMapper: (reason) => switch (reason) {
-        CannotUpdatePasswordOnAnalyst() => 'You cannot update the password of an analyst.',
-        CanOnlyUpdatePasswordOnSelf() => 'You can only update your own password.',
+        CannotUpdatePasswordOnAnalyst() => 'You cannot update the password of an analyst',
+        CanOnlyUpdatePasswordOnSelf() => 'You can only update your own password',
       },
     );
   }

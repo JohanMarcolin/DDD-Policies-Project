@@ -98,7 +98,6 @@ class Server {
   Future<void> stop() async {
     await _server?.close(force: true);
     _server = null;
-    exit(0);
   }
 }
 

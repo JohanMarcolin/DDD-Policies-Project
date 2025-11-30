@@ -10,7 +10,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required AuthApi authApi}) : _authApi = authApi, super(AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
-    on<AuthRefreshRequested>(_onRefreshRequested);
+    on<AuthRefreshAccessTokenRequested>(_onRefreshAccessTokenRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRevokeAuthentication>(_onRevokeAuthentication);
   }
@@ -24,19 +24,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Authenticated(currentUser: currentUser));
     } on AuthApiException catch (e) {
       emit(Unauthenticated(e.apiErrorCode));
-    } catch (e) {
+    } catch (_) {
       emit(AuthFailure());
     }
   }
 
-  Future<void> _onRefreshRequested(AuthRefreshRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onRefreshAccessTokenRequested(AuthRefreshAccessTokenRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final currentUser = await _authApi.refreshAccessToken();
       emit(Authenticated(currentUser: currentUser));
     } on AuthApiException catch (e) {
       emit(Unauthenticated(e.apiErrorCode));
-    } catch (e) {
+    } catch (_) {
       emit(AuthFailure());
     }
   }
@@ -48,7 +48,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Unauthenticated());
     } on AuthApiException catch (e) {
       emit(AuthFailure(e.apiErrorCode));
-    } catch (e) {
+    } catch (_) {
       emit(AuthFailure());
     }
   }

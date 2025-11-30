@@ -61,7 +61,7 @@ Future<void> main() async {
       final userAdministrationApp = find.byType(UserAdministrationApp);
       expect(userAdministrationApp, findsOne);
 
-      tester.authBlocWithStubs.add(AuthRefreshRequested());
+      tester.authBlocWithStubs.add(AuthRefreshAccessTokenRequested());
 
       await tester.pump();
 

@@ -35,9 +35,9 @@ class DeleteUserIcon extends StatelessWidget {
         },
         unauthorizedReason: deleteUser is Unauthorized ? deleteUser.reason as DeleteUserUnauthorizedReason : null,
         unauthorizedMessageMapper: (reason) => switch (reason) {
-          CannotDeleteSelf() => 'You cannot delete yourself.',
-          CannotDeleteAnalyst() => 'You cannot delete an analyst.',
-          CanOnlyDeleteSelf() => 'You can only delete your own account.',
+          CannotDeleteSelf() => 'You cannot delete yourself',
+          CannotDeleteAnalyst() => 'You cannot delete an analyst',
+          CanOnlyDeleteSelf() => 'You can only delete your own account',
         },
       ),
     );

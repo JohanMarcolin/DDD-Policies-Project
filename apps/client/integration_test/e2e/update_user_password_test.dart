@@ -11,22 +11,24 @@ import 'package:integration_test/integration_test.dart';
 import '../integration_test_server_fixture.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
 
-/// Entry point for Update User Password integration tests.
+/// Entry point for Update user password integration tests.
 ///
 /// Covers all scenarios for updating password on self and other users based on the [ViewUserPolicy] and [UpdateUserPasswordPolicy].
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Update User Password Scenario', () {
+  group('Update user password Scenario', () {
     setUp(() async => await IntegrationTestServerFixture.setup());
     tearDown(() async => await IntegrationTestServerFixture.teardown());
 
     final viewUserPolicy = ViewUserPolicy();
     final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
 
-    for (final role in Role.values) {
-      testWidgets('${role.name} updating password on self scenario', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: role);
+    for (final initiatorRole in Role.values) {
+      final initiatorRoleName = initiatorRole.name;
+
+      testWidgets('$initiatorRoleName updating password on self scenario', (WidgetTester tester) async {
+        final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
         final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
@@ -42,12 +44,12 @@ void main() {
           case Authorized():
             await _assertUpdatePasswordSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertUpdatePasswordBlocked(tester: tester, initiator: self, target: self);
+            await _assertUpdatePasswordIsBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets('${role.name} updating password on ${targetRole.name} scenario', (WidgetTester tester) async {
-          final initiator = await IntegrationTestServerFixture.createUserFixture(role: role);
+        testWidgets('$initiatorRoleName updating password on ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
           final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
@@ -64,7 +66,7 @@ void main() {
             case Authorized():
               await _assertUpdatePasswordSucceeds(tester: tester, initiator: initiator, target: target);
             case Unauthorized():
-              await _assertUpdatePasswordBlocked(tester: tester, initiator: initiator, target: target);
+              await _assertUpdatePasswordIsBlocked(tester: tester, initiator: initiator, target: target);
           }
         });
       }
@@ -128,20 +130,17 @@ Future<void> _assertUpdatePasswordSucceeds({
   expect(find.byType(UserAdministrationView), findsOne, reason: 'Login should succeed with new password');
 }
 
-Future<void> _assertUpdatePasswordBlocked({
+Future<void> _assertUpdatePasswordIsBlocked({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
 }) async {
-  var targetUserId = target.user.userId;
-  var targetUserRole = target.user.role.name;
-
   await tester.startApp();
 
   await tester.login(email: initiator.email, password: initiator.password);
 
-  final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
+  final targetUserTile = tester.findUserTileByUserId(target.user.userId);
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for ${target.user.role.name} target');
 
   final updatePasswordIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserPasswordIcon));
 

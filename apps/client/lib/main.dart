@@ -15,12 +15,11 @@ import 'presentation/views/user_administration_view/blocs/users_view_bloc/user_a
 import 'presentation/views/user_administration_view/user_administration_view.dart';
 
 void main() {
-  AuthBloc setupAuthBloc() => AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()));
+  final authBloc = AuthBloc(authApi: AuthApi(authTokenService: AuthTokenService()));
 
-  final authBloc = setupAuthBloc();
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider<AuthBloc>(create: (_) => authBloc..add(AuthRefreshRequested()))],
+      providers: [BlocProvider<AuthBloc>(create: (_) => authBloc..add(AuthRefreshAccessTokenRequested()))],
       child: const UserAdministrationApp(),
     ),
   );

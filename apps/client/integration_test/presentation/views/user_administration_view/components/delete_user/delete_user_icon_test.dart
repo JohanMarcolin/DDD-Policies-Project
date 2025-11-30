@@ -66,7 +66,7 @@ Future<void> main() async {
 
         final isUserDeletingSelf = currentUser.isSameAs(targetUser);
 
-        final expectedTitle = isUserDeletingSelf ? 'Delete Your Account' : 'Delete User Account';
+        final expectedTitle = isUserDeletingSelf ? 'Delete your account' : 'Delete user account';
         expect(find.text(expectedTitle), findsOne);
 
         final expectedLabel = isUserDeletingSelf
@@ -138,11 +138,11 @@ Future<void> main() async {
         expect(deleteUserDialogChild, findsNothing);
         switch (reason as DeleteUserUnauthorizedReason) {
           case CannotDeleteSelf():
-            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete yourself.');
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete yourself');
           case CannotDeleteAnalyst():
-            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete an analyst.');
+            expect(ActionSnackBarHelper.lastMessage, 'You cannot delete an analyst');
           case CanOnlyDeleteSelf():
-            expect(ActionSnackBarHelper.lastMessage, 'You can only delete your own account.');
+            expect(ActionSnackBarHelper.lastMessage, 'You can only delete your own account');
         }
       });
     },

@@ -14,7 +14,7 @@ class DeleteUserDialogChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = isUserDeletingSelf ? 'Delete Your Account' : 'Delete User Account';
+    final title = isUserDeletingSelf ? 'Delete your account' : 'Delete user account';
     final label = isUserDeletingSelf
         ? 'Are you sure you want to delete your own account?'
         : 'Are you sure you want to delete this user?';

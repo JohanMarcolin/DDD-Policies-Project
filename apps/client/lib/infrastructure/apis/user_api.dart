@@ -16,9 +16,9 @@ class UserApi extends HttpApi {
   final AuthApi authApi;
   final AuthTokenService authTokenService;
 
-  /// Retrieves all users from the backend.
+  /// Retrieves all users from the server.
   ///
-  /// Returns a list of [User] objects. Throws [UserApiException].
+  /// Returns a list of [User]:s. Throws [UserApiException].
   Future<List<User>> get users async {
     return await callGet<List<User>>(
       endpoint: '/user/all',
@@ -35,7 +35,7 @@ class UserApi extends HttpApi {
 
   /// Retrieves a user by [userId].
   ///
-  /// Returns a [User] object if found, or null if not found. Throws [UserApiException].
+  /// Returns a [User] if found, otherwise `null`. Throws [UserApiException].
   Future<User?> get({required UserId userId}) async {
     return await callGet<User?>(
       endpoint: '/user/${userId.value}',

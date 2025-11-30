@@ -30,17 +30,17 @@ class _LoginViewState extends State<LoginView> {
             ActionSnackBarHelper.show(message: 'Logged in as ${state.currentUser.email.value}');
           case Unauthenticated():
             final message = switch (state.apiErrorCode) {
-              LoginMissingEmail() => 'Please enter your email.',
-              LoginMissingPassword() => 'Please enter your password.',
-              LoginUserNotFound() => 'Email not found.',
-              LoginInvalidPassword() => 'Invalid password.',
-              RefreshMissingRefreshToken() => 'Missing refresh token. Please log in again.',
-              RefreshUserNotFound() => 'User ID not found. Please log in again.',
+              LoginMissingEmail() => 'Please enter your email',
+              LoginMissingPassword() => 'Please enter your password',
+              LoginUserNotFound() => 'Email not found',
+              LoginInvalidPassword() => 'Invalid password',
+              RefreshMissingRefreshToken() => 'Missing refresh token. Please log in again',
+              RefreshUserNotFound() => 'User ID not found. Please log in again',
               _ => null,
             };
             if (message != null) ActionSnackBarHelper.show(message: message);
           case AuthFailure():
-            ActionSnackBarHelper.show(message: 'Authentication failed. Please try again.');
+            ActionSnackBarHelper.show(message: 'Authentication failed. Please try again');
         }
       },
       child: Scaffold(appBar: const LoginAppBar(), body: LoginForm()),

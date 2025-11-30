@@ -14,11 +14,11 @@ class UpdateUserPasswordDialogChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = isUserUpdatingSelf ? 'Update Your Password' : 'Update User Password';
+    final title = isUserUpdatingSelf ? 'Update your password' : 'Update user password';
 
     return ConfirmInputDialog(
       title: title,
-      label: 'New Password',
+      label: 'New password',
       isTextObscured: true,
       onCancel: onCancel,
       onConfirm: onConfirm,

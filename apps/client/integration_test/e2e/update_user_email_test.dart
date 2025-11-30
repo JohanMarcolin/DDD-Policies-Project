@@ -10,22 +10,22 @@ import 'package:integration_test/integration_test.dart';
 import '../integration_test_server_fixture.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
 
-/// Entry point for Update User Email integration tests.
+/// Entry point for Update user email integration tests.
 ///
 /// Covers all scenarios for updating email on self and other users based on the [ViewUserPolicy] and [UpdateUserEmailPolicy].
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Update User Email Scenario', () {
+  group('Update user email Scenario', () {
     setUp(() async => await IntegrationTestServerFixture.setup());
     tearDown(() async => await IntegrationTestServerFixture.teardown());
 
     final viewUserPolicy = ViewUserPolicy();
     final updateUserEmailPolicy = UpdateUserEmailPolicy();
 
-    for (final role in Role.values) {
-      testWidgets('${role.name} updating email on self scenario', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: role);
+    for (final initiatorRole in Role.values) {
+      testWidgets('${initiatorRole.name} updating email on self scenario', (WidgetTester tester) async {
+        final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
         final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
@@ -41,12 +41,12 @@ void main() {
           case Authorized():
             await _assertUpdateEmailSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertUpdateEmailBlocked(tester: tester, initiator: self, target: self);
+            await _assertUpdateEmailIsBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets('${role.name} updating email on ${targetRole.name} scenario', (WidgetTester tester) async {
-          final initiator = await IntegrationTestServerFixture.createUserFixture(role: role);
+        testWidgets('${initiatorRole.name} updating email on ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
           final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
@@ -63,7 +63,7 @@ void main() {
             case Authorized():
               await _assertUpdateEmailSucceeds(tester: tester, initiator: initiator, target: target);
             case Unauthorized():
-              await _assertUpdateEmailBlocked(tester: tester, initiator: initiator, target: target);
+              await _assertUpdateEmailIsBlocked(tester: tester, initiator: initiator, target: target);
           }
         });
       }
@@ -149,20 +149,17 @@ Future<void> _assertUpdateEmailSucceeds({
   await tester.logout();
 }
 
-Future<void> _assertUpdateEmailBlocked({
+Future<void> _assertUpdateEmailIsBlocked({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
 }) async {
-  var targetUserId = target.user.userId;
-  var targetUserRole = target.user.role.name;
-
   await tester.startApp();
 
   await tester.login(email: initiator.email, password: initiator.password);
 
-  final targetUserTile = tester.findUserTileByUserId(targetUserId);
-  expect(targetUserTile, findsOne, reason: 'UserTile should be found for $targetUserRole target');
+  final targetUserTile = tester.findUserTileByUserId(target.user.userId);
+  expect(targetUserTile, findsOne, reason: 'UserTile should be found for ${target.user.role.name} target');
 
   final updateEmailIcon = find.descendant(of: targetUserTile, matching: find.byType(UpdateUserEmailIcon));
 

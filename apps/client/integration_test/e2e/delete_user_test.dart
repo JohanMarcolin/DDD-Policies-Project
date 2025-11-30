@@ -22,9 +22,9 @@ void main() {
     final viewUserPolicy = ViewUserPolicy();
     final deleteUserPolicy = DeleteUserPolicy();
 
-    for (final role in Role.values) {
-      testWidgets('${role.name} deleting self scenario', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: role);
+    for (final initiatorRole in Role.values) {
+      testWidgets('${initiatorRole.name} deleting self scenario', (WidgetTester tester) async {
+        final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
         final viewSelf = viewUserPolicy.authorize(self.user, self.user);
         switch (viewSelf) {
@@ -40,12 +40,12 @@ void main() {
           case Authorized():
             await _assertDeleteUserSucceeds(tester: tester, initiator: self, target: self);
           case Unauthorized():
-            await _assertDeleteUserBlocked(tester: tester, initiator: self, target: self);
+            await _assertDeleteUserIsBlocked(tester: tester, initiator: self, target: self);
         }
       });
       for (final targetRole in Role.values) {
-        testWidgets('${role.name} deleting ${targetRole.name} scenario', (WidgetTester tester) async {
-          final initiator = await IntegrationTestServerFixture.createUserFixture(role: role);
+        testWidgets('${initiatorRole.name} deleting ${targetRole.name} scenario', (WidgetTester tester) async {
+          final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
           final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
@@ -62,7 +62,7 @@ void main() {
             case Authorized():
               await _assertDeleteUserSucceeds(tester: tester, initiator: initiator, target: target);
             case Unauthorized():
-              await _assertDeleteUserBlocked(tester: tester, initiator: initiator, target: target);
+              await _assertDeleteUserIsBlocked(tester: tester, initiator: initiator, target: target);
           }
         });
       }
@@ -75,7 +75,6 @@ Future<void> _assertDeleteUserSucceeds({
   required UserTestFixture initiator,
   required UserTestFixture target,
 }) async {
-  final isDeletingSelf = initiator.user.isSameAs(target.user);
   final targetUserRole = target.user.role.name;
 
   await tester.startApp();
@@ -100,6 +99,8 @@ Future<void> _assertDeleteUserSucceeds({
   await tester.tap(confirmButton);
   await tester.pumpAndSettle();
 
+  final isDeletingSelf = initiator.user.isSameAs(target.user);
+
   if (isDeletingSelf) {
     expect(
       find.byType(LoginView),
@@ -118,7 +119,7 @@ Future<void> _assertDeleteUserSucceeds({
   }
 }
 
-Future<void> _assertDeleteUserBlocked({
+Future<void> _assertDeleteUserIsBlocked({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
