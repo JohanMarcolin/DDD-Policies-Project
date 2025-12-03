@@ -4,7 +4,7 @@ import 'package:shelf/shelf.dart';
 import 'response_utils.dart';
 import 'exceptions/request_exceptions.dart';
 
-/// Shelf middleware for global exception handling in HTTP requests.
+/// Shelf middleware for global exception handling for HTTP requests.
 ///
 /// Catches exceptions thrown by downstream handlers and maps them to appropriate HTTP responses.
 /// Handles domain, authentication, and server errors, ensuring consistent error reporting.

@@ -11,7 +11,7 @@ import '../http/exceptions/request_exceptions.dart' show NotFoundException, Serv
 
 /// In-memory implementation of [UserRepository] for managing [User] entities.
 ///
-/// Uses [UserDatabase] and [UserPasswordDatabase] for non-persistent storage and password management.
+/// Uses [UserDatabase] and [UserPasswordDatabase] for in-memory storage.
 class InMemoryUserRepository implements UserRepository {
   InMemoryUserRepository({
     required InMemoryUserDatabase userDatabase,

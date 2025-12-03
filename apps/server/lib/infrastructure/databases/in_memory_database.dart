@@ -1,30 +1,39 @@
-import 'package:domain/value_objects/id.dart';
+/// A simple asynchronous in-memory key-value database.
+///
+/// Stores values of type [TValue] indexed by keys of type [TKey].
+base class InMemoryDatabase<TKey, TValue> {
+  final Map<TKey, TValue> _map = {};
 
-/// Generic base class for an in-memory database of type [TItem], keyed by [TId].
-abstract class InMemoryDatabase<TId extends Id, TItem> {
-  final Map<TId, TItem> _items = {};
+  /// Provides direct access to the underlying map.
+  Map<TKey, TValue> get map => _map;
 
-  /// Retrieves an item by its [id].
-  Future<TItem?> get(TId id) async {
+  /// Retrieves the value associated with [key], or null if not found.
+  ///
+  /// Rethrows any unexpected errors.
+  Future<TValue?> get(TKey key) async {
     try {
-      return _items[id];
+      return _map[key];
     } catch (_) {
-      return null;
+      rethrow;
     }
   }
 
-  /// Returns a list of all items currently stored in the database.
-  Future<List<TItem>> getAll() async => _items.values.toList();
+  /// Returns a list of all values currently stored in the map.
+  Future<List<TValue>> getAll() async => _map.values.toList();
 
-  /// Inserts or updates an item with the given [id] and [value].
-  Future<void> put(TId id, TItem value) async {
-    _items[id] = value;
+  /// Inserts or updates the [value] for the given [key].
+  ///
+  /// Overwrites any existing value for [key].
+  Future<void> put(TKey key, TValue value) async {
+    _map[key] = value;
   }
 
-  /// Deletes the item with the given [id] from the database.
-  Future<void> delete(TId id) async {
+  /// Deletes the value associated with [key], if it exists.
+  ///
+  /// Rethrows any unexpected errors.
+  Future<void> delete(TKey key) async {
     try {
-      _items.remove(id);
+      _map.remove(key);
     } catch (_) {
       rethrow;
     }

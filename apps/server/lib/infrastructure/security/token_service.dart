@@ -97,8 +97,10 @@ class TokenService {
   /// Revokes the [RefreshToken] for the given [user] by deleting it from the database.
   Future<void> revokeRefreshToken(User user) async => await _refreshTokenDatabase.delete(user.userId);
 
+  /// Signs the [token] with the secret key and sets the [expiration].
   String _signToken(JWT token, Duration expiration) => token.sign(_key, expiresIn: expiration);
 
+  /// Verifies the [token] using the secret key and returns the decoded [JWT], or `null` if verification fails.
   JWT? _verifyToken(String token) => JWT.tryVerify(token, _key);
 
   /// Extracts the [UserId] from the [token] claims.

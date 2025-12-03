@@ -4,30 +4,23 @@ import '../security/password_hasher.dart';
 import 'in_memory_database.dart';
 
 /// Provides an in-memory database for user passwords associated with [UserId]s.
-class InMemoryUserPasswordDatabase implements InMemoryDatabase<UserId, Password> {
+final class InMemoryUserPasswordDatabase extends InMemoryDatabase<UserId, Password> {
   InMemoryUserPasswordDatabase({required PasswordHasher passwordHasher}) : _passwordHasher = passwordHasher;
 
   final PasswordHasher _passwordHasher;
 
-  final Map<UserId, Password> _passwords = {};
-
+  /// Hashes the provided [value] and stores it for the given [key].
+  ///
+  /// Overwrites any existing password for [key].
   @override
-  Future<Password?> get(UserId id) async => _passwords[id];
+  Future<void> put(UserId key, Password value) async => map[key] = _passwordHasher.hash(value);
 
-  @override
-  Future<List<Password>> getAll() async => _passwords.values.toList();
-
-  @override
-  Future<void> put(UserId id, Password password) async => _passwords[id] = _passwordHasher.hash(password);
-
-  @override
-  Future<void> delete(UserId id) async => _passwords.remove(id);
-
-  Future<bool> isPasswordVerified(UserId id, Password password) async {
-    final storedPassword = _passwords[id];
-    if (storedPassword == null) {
-      return false;
-    }
-    return _passwordHasher.isVerified(password, storedPassword);
+  /// Verifies whether the provided [value] matches the stored hash for [key].
+  ///
+  /// Returns `false` if no password is stored for [key], or if the verification fails.
+  Future<bool> isPasswordVerified(UserId key, Password value) async {
+    final storedValue = map[key];
+    if (storedValue == null) return false;
+    return _passwordHasher.isVerified(value, storedValue);
   }
 }

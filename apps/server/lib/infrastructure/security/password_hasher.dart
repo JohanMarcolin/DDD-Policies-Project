@@ -10,6 +10,6 @@ class PasswordHasher {
   Password hash(Password password) => Password(BCrypt.hashpw(password.value, BCrypt.gensalt()));
 
   /// Verifies that the [password] matches the [hashedPassword] using bcrypt.
-  /// Returns true if the password is valid, false otherwise.
+  /// Returns `true` if the password is valid, `false` otherwise.
   bool isVerified(Password password, Password hashedPassword) => BCrypt.checkpw(password.value, hashedPassword.value);
 }

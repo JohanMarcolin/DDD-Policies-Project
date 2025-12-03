@@ -2,7 +2,7 @@ import 'package:api_error_codes/api_error_codes.dart';
 
 /// Base class for HTTP request-related exceptions, carrying an [ApiErrorCode].
 ///
-/// All custom request exceptions should extend this class to provide consistent error handling and reporting.
+/// `Note`: All custom request exceptions should extend this class.
 sealed class RequestException implements Exception {
   const RequestException(this.apiErrorCode);
   final ApiErrorCode apiErrorCode;
