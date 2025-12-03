@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
 
-import '../../../../../test/bloc/infrastructure/auth_bloc_test.dart';
-import '../../../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
 import '../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../utils/extensions/widget_tester_extensions.dart';
+import '../../../../../test_utils/mock_auth_api.dart';
 
 late MockAuthApi mockAuthApi;
 late MockUserRepository mockUserRepository;

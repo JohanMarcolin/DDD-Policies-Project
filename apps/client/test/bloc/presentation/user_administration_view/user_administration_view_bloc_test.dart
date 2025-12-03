@@ -14,13 +14,13 @@ import 'package:test_utils/user_test_runner.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../bloc_test_context.dart';
-import 'mock_user_administration_view_bloc_factory.dart';
+import 'mock_user_administration_view_bloc_builder.dart';
 
 final blocTestContext =
-    BlocTestContext<User, MockUserAdministrationViewBlocFactory, UserAdministrationViewBloc, domain.UserRepository>(
-      factoryBuilder: (currentUser) => MockUserAdministrationViewBlocFactory(currentUser: currentUser),
-      getBloc: (factory) => factory.mockBloc,
-      getRepo: (factory) => factory.mockServiceRepository,
+    BlocTestContext<User, MockUserAdministrationViewBlocBuilder, UserAdministrationViewBloc, domain.UserRepository>(
+      blocBuilder: (currentUser) => MockUserAdministrationViewBlocBuilder(currentUser: currentUser),
+      getBloc: (builder) => builder.mockBloc,
+      getRepo: (builder) => builder.mockRepository,
     );
 
 void _blocTest({
@@ -69,7 +69,7 @@ void _blocPresentationTest({
 
 void main() {
   tearDown(() {
-    blocTestContext.factory.dispose();
+    blocTestContext.builder.dispose();
   });
 
   group('UserAdministrationViewBloc', () {

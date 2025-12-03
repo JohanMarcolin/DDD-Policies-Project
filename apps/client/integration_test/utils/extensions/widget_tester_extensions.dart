@@ -1,3 +1,4 @@
+import 'package:client/infrastructure/apis/auth_api.dart';
 import 'package:client/infrastructure/auth_bloc/auth_bloc.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
@@ -13,11 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/main.dart' as app;
+import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
 import 'package:test_utils/user_test_fixture.dart';
 
-import '../../../test/bloc/infrastructure/auth_bloc_test.dart';
-import '../../../test/bloc/presentation/user_administration_view/mock_user_administration_view_bloc_factory.dart';
+import '../../../test_utils/mock_auth_api.dart';
 import 'widget_finder_extensions.dart';
 
 /// Extension on [WidgetTester] providing utilities to render widgets with stubbed [AuthBloc]
@@ -49,7 +50,7 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
     final userRepository = mockUserRepository ?? MockUserRepository();
     final authApi = mockAuthApi ?? MockAuthApi();
 
-    _authBlocWithStubs = AuthBloc(authApi: authApi);
+    _authBlocWithStubs = AuthBloc(authApi: authApi as AuthApi);
 
     final stubbedUserAdministrationService = _getStubbedUserAdministrationService(userRepository);
 
