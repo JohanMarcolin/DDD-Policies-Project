@@ -13,6 +13,18 @@ import '../../../test_utils/mock_auth_api.dart';
 late MockAuthApi mockApi;
 late AuthBloc bloc;
 
+/// Runs an [AuthBloc] test with a fresh state for each invocation.
+
+/// Lifecycle:
+/// - setup: Initializes [mockApi] and [bloc] for the test.
+/// - build: Returns the [bloc] instance.
+
+/// Parameters:
+/// - [description]: Description of the test case.
+/// - [stub]: Use to stub [mockApi] for this test case.
+/// - [act]: Use to dispatch events to the bloc.
+/// - [expect]: Use to specify expected state transitions.
+/// - [verify]: Use to assert final [bloc] state.
 void _blocTest({
   required String description,
   void Function()? stub,
