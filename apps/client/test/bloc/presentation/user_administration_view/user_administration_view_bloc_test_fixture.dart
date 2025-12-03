@@ -9,15 +9,30 @@ import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 
-/// Utility for setting up and managing UserAdministrationViewBloc test dependencies.
+/// Test fixture for orchestrating [UserAdministrationViewBloc] tests.
 ///
-/// Intended for use with [blocTest] and [blocPresentationTest] for [UserAdministrationViewBloc] only.
-/// Provides a structured way to initialize the Bloc and its repository for user administration tests.
+/// Encapsulates setup, dependency management, and teardown logic for [UserAdministrationViewBloc] tests.
+///
+/// Usage:
+/// - Use [mockBloc], e.g., to dispatch events or check state.
+/// - Use [mockRepository], e.g., to stub or verify that repository methods were called.
+/// - Call [dispose] to clean up resources after each test.
+/// - Call [test] to run a [blocTest].
+/// - Call [testPresentation] to run a [blocPresentationTest].
 class UserAdministrationViewBlocTestFixture {
   late UserAdministrationViewBloc mockBloc;
   late MockUserRepository mockRepository;
-  late void Function() dispose;
+  late void Function() dispose = () => mockBloc.close();
 
+  /// Runs a [blocTest] with all dependencies set up.
+  ///
+  /// - [description]: Test case description.
+  /// - [currentUser]: The acting user within the test context.
+  /// - [targetUser]: The user being acted upon.
+  /// - [stub]: Optional function to stub [mockRepository] methods.
+  /// - [act]: Optional function to dispatch [mockBloc] events.
+  /// - [expect]: Optional function for ensuring expected state transitions.
+  /// - [verify]: Required function to verify final [mockBloc] state.
   void test({
     required String description,
     required User currentUser,
@@ -40,6 +55,15 @@ class UserAdministrationViewBlocTestFixture {
     );
   }
 
+  /// Runs a [blocPresentationTest] with all dependencies set up.
+  ///
+  /// - [description]: Test case description.
+  /// - [currentUser]: The acting user within the test context.
+  /// - [targetUser]: The user being acted upon.
+  /// - [stub]: Optional function to stub [mockRepository] methods.
+  /// - [event]: The event to dispatch to the bloc.
+  /// - [expectPresentation]: Function returning expected presentation outputs.
+  /// - [verify]: Required function to verify final [mockBloc] state.
   void testPresentation({
     required String description,
     required User currentUser,
@@ -62,21 +86,20 @@ class UserAdministrationViewBlocTestFixture {
     );
   }
 
-  /// Initializes the builder, Bloc, and repository for the given [currentUser].
+  /// Sets up new instances of [mockBloc] and [mockRepository] for the given [currentUser].
   ///
-  /// Call this in your test setup to prepare all dependencies for the UserAdministrationViewBloc.
+  /// This method is called internally by the fixture before every test case.
+  /// It ensures that each test runs in an isolated environment, with new instances of the bloc and repository.
   void _setup(User currentUser) {
     final builder = _UserAdministrationViewBlocBuilder(currentUser: currentUser);
     mockBloc = builder.mockBloc;
     mockRepository = builder.mockRepository;
-    dispose = builder.dispose;
   }
 }
 
-/// Builder for creating a [UserAdministrationViewBloc] and its stubbed dependencies for testing purposes.
+/// Internal builder for creating a [UserAdministrationViewBloc] and its stubbed dependencies for tests.
 ///
-/// Use this builder to set up a mock [UserRepository] and a [UserAdministrationViewBloc] for [blocTest] and [blocPresentationTest].
-/// Provides direct access to the mock repository and bloc, and a [dispose] method to clean up resources after tests.
+/// Used by [UserAdministrationViewBlocTestFixture] to provide fresh bloc and repository instances per test.
 class _UserAdministrationViewBlocBuilder {
   _UserAdministrationViewBlocBuilder._(this.mockRepository, this.mockBloc);
 
@@ -85,9 +108,6 @@ class _UserAdministrationViewBlocBuilder {
 
   /// The [UserAdministrationViewBloc] instance created for testing.
   final UserAdministrationViewBloc mockBloc;
-
-  /// Disposes the bloc and releases resources after tests.
-  void dispose() => mockBloc.close();
 
   /// Provides the builder for a given [currentUser].
   ///
@@ -104,7 +124,7 @@ class _UserAdministrationViewBlocBuilder {
   /// Instantiates a mock [UserRepository].
   static MockUserRepository _createMockRepository() => MockUserRepository();
 
-  /// Instantiates a [UserAdministrationService] with its required policies.
+  /// Instantiates a [UserAdministrationService] for the given [mockRepository] with its required policies.
   static UserAdministrationService _createMockService(MockUserRepository mockRepository) {
     return UserAdministrationService(
       userRepository: mockRepository,
