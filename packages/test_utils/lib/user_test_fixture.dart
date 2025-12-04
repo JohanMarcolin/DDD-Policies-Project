@@ -4,6 +4,7 @@ import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
 
+/// Represents a test fixture containing a [User] and associated [Password] for testing purposes.
 class UserTestFixture {
   UserTestFixture({required this.user, required this.password});
 

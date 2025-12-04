@@ -4,6 +4,10 @@ import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 
+/// Provides mock [User], [Admin], and [Analyst] objects for testing purposes.
+///
+/// Includes user pairs for simulating various test scenarios.
+
 final mockUser = User(userId: UserId("user_id_1"), email: Email('user_email_11@example.com'));
 
 final otherMockUser = User(userId: UserId("user_id_2"), email: Email('user_email_12@example.com'));

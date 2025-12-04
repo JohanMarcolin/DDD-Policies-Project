@@ -2,6 +2,10 @@ import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 
+/// Provides mock [Email] and [Password] values for testing purposes.
+///
+/// Includes valid, invalid, and edge-case credentials for different test scenarios.
+
 Email mockValidEmail = Email('new_email@example.com');
 
 Email mockAnyEmail = Email('anyEmail');

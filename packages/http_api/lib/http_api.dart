@@ -8,17 +8,16 @@ class _UnauthorizedException implements Exception {}
 
 /// Abstract base class for making HTTP API calls.
 ///
-/// Provides generic methods for GET, POST, PUT, and DELETE requests, with support for authentication and token refresh.
+/// Provides generic methods for CRUD requests, with support for authentication and token refresh.
 abstract class HttpApi {
-  /// Creates a new [HttpApi].
-  const HttpApi();
-
-  static String _baseUrl = 'http://10.0.2.2:8080';
+  static String _baseUrl = 'http://0.0.0.0:8080';
 
   /// Sets the base URL for all API requests.
+  ///
+  /// Useful for configuring different environments (e.g., development and e2e testing).
   static set baseUrl(String url) => _baseUrl = url;
 
-  /// Performs a GET request to [endpoint] and maps the response using [map].
+  /// Performs a `GET` request to [endpoint] and maps the response using [map].
   /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callGet<T>({
     required String endpoint,
@@ -35,7 +34,7 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
-  /// Performs a POST request to [endpoint] with [data] and maps the response using [map].
+  /// Performs a `POST` request to [endpoint] with [data] and maps the response using [map].
   /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callPost<T>({
     required String endpoint,
@@ -54,7 +53,7 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
-  /// Performs a PUT request to [endpoint] with [data] and maps the response using [map].
+  /// Performs a `PUT` request to [endpoint] with [data] and maps the response using [map].
   /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callPut<T>({
     required String endpoint,
@@ -73,7 +72,7 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
-  /// Performs a DELETE request to [endpoint] and maps the response using [map].
+  /// Performs a `DELETE` request to [endpoint] and maps the response using [map].
   /// Optionally includes [accessToken] for authentication and [refreshAccessToken] for token refresh.
   Future<T> callDelete<T>({
     required String endpoint,
@@ -117,7 +116,7 @@ abstract class HttpApi {
     throw Exception('Invalid response format: expected a JSON object');
   }
 
-  /// Performs a plain (unauthenticated) HTTP request.
+  /// Performs an unauthenticated HTTP request.
   Future<http.Response> _doPlainRequest({required HttpMethod method, required String endpoint, Object? data}) async {
     final uri = _buildUri(endpoint);
     return switch (method) {
@@ -161,7 +160,7 @@ abstract class HttpApi {
     return {'Authorization': 'Bearer $accessToken'};
   }
 
-  /// Handles authentication retry logic for requests that return 401 Unauthorized.
+  /// Handles authentication retry logic for requests that return `401` Unauthorized.
   Future<http.Response> _withAuthRetry(
     Future<http.Response> Function(String token) req,
     String accessToken,

@@ -42,14 +42,11 @@ class HttpApiResponse<TData> {
 
   @override
   String toString() {
-    final buffer = StringBuffer('HttpApiResponse(');
-    buffer.write('isSuccess: $isSuccess');
-    if (data != null) buffer.write(', data: $data');
-    if (apiErrorCode != null) buffer.write(', apiErrorCode: $apiErrorCode');
-    if (policyViolationReason != null) {
-      buffer.write(', policyViolationReason: $policyViolationReason');
-    }
-    buffer.write(')');
-    return buffer.toString();
+    return 'HttpApiResponse('
+        'isSuccess: $isSuccess'
+        '${data != null ? ', data: $data' : ''}'
+        '${apiErrorCode != null ? ', apiErrorCode: $apiErrorCode' : ''}'
+        '${policyViolationReason != null ? ', policyViolationReason: $policyViolationReason' : ''}'
+        ')';
   }
 }

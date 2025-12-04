@@ -1,4 +1,8 @@
+/// Base class for all API error codes.
+///
+/// Extend this class to define specific error code categories for API responses.
 sealed class ApiErrorCode {
+  /// Returns the string representation of the error code type.
   @override
   String toString() => runtimeType.toString();
 }
@@ -91,6 +95,9 @@ sealed class ServerApiErrorCode extends ApiErrorCode {}
 
 final class ServerUnhandledServer extends ServerApiErrorCode {}
 
+/// Converts a string to the corresponding [ApiErrorCode] instance.
+///
+/// Returns [ServerUnhandledServer] if the string does not match any known error code.
 ApiErrorCode apiErrorCodeFromString(String? apiErrorCode) {
   switch (apiErrorCode) {
     case 'PayloadMissingRequestBody':
@@ -166,8 +173,10 @@ ApiErrorCode apiErrorCodeFromString(String? apiErrorCode) {
   }
 }
 
+/// Exception type for API errors, wrapping an [ApiErrorCode].
 class ApiException implements Exception {
   final ApiErrorCode apiErrorCode;
 
+  /// Constructs an [ApiException] from a string api error code.
   ApiException(String? apiErrorCode) : apiErrorCode = apiErrorCodeFromString(apiErrorCode);
 }
