@@ -12,4 +12,4 @@ final class DummyAlwaysUnauthorizedActionAuthorizationPolicy
       : super(authorize: (String initiator, String target) => Unauthorized(reason: DummyUnauthorizedReason()));
 }
 
-class DummyUnauthorizedReason {}
+final class DummyUnauthorizedReason extends ActionUnauthorizedReason {}

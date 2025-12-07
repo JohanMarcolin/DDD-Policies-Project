@@ -26,8 +26,8 @@ final class UpdateUserEmailPolicy extends UserAdministrationPolicy<UpdateUserEma
   }
 }
 
-sealed class UpdateUserEmailUnauthorizedReason {}
+sealed class UpdateUserEmailUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
-class CannotUpdateEmailOnAnalyst implements UpdateUserEmailUnauthorizedReason {}
+final class CannotUpdateEmailOnAnalyst extends UpdateUserEmailUnauthorizedReason {}
 
-class CanOnlyUpdateEmailOnSelf implements UpdateUserEmailUnauthorizedReason {}
+final class CanOnlyUpdateEmailOnSelf extends UpdateUserEmailUnauthorizedReason {}

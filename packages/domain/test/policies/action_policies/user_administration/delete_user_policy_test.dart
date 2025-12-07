@@ -10,7 +10,9 @@ void main() {
     test('analyst can delete others but not self', () {
       expect(policy.isAuthorized(analyst, otherUser), isTrue);
       expect(policy.isAuthorized(analyst, analyst), isFalse);
-      policy.apply(analyst, analyst,
+      policy.apply(
+          actor: analyst,
+          resource: analyst,
           onAuthorized: () => fail('Analyst should not be able to delete self'),
           onUnauthorized: (reason) => expect(reason, isA<CannotDeleteSelf>()));
     });
@@ -18,7 +20,9 @@ void main() {
     test('admin can delete non-analyst, not analyst', () {
       expect(policy.isAuthorized(admin, user), isTrue);
       expect(policy.isAuthorized(admin, analyst), isFalse);
-      policy.apply(admin, analyst,
+      policy.apply(
+          actor: admin,
+          resource: analyst,
           onAuthorized: () => fail('Admin should not be able to delete analyst'),
           onUnauthorized: (reason) => expect(reason, isA<CannotDeleteAnalyst>()));
     });
@@ -26,7 +30,9 @@ void main() {
     test('user can only delete self', () {
       expect(policy.isAuthorized(user, user), isTrue);
       expect(policy.isAuthorized(user, otherUser), isFalse);
-      policy.apply(user, otherUser,
+      policy.apply(
+          actor: user,
+          resource: otherUser,
           onAuthorized: () => fail('User should not be able to delete other users'),
           onUnauthorized: (reason) => expect(reason, isA<CanOnlyDeleteSelf>()));
     });

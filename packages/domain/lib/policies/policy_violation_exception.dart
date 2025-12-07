@@ -1,16 +1,12 @@
-sealed class PolicyViolationException<TPolicyViolationReason> implements Exception {
+base class PolicyViolationException<TPolicyViolationReason> implements Exception {
   PolicyViolationException(this.reason);
 
   final TPolicyViolationReason reason;
+
   @override
-  String toString() => 'PolicyViolationException: reason:${reason.runtimeType.toString()}';
+  String toString() => '${runtimeType.toString()}: reason:${reason.runtimeType.toString()}';
 }
 
-class ActionAuthorizationPolicyViolationException<TUnauthorizedReason>
-    extends PolicyViolationException<TUnauthorizedReason> {
-  ActionAuthorizationPolicyViolationException(super.reason);
-}
-
-class ValidationPolicyViolationException extends PolicyViolationException {
+final class ValidationPolicyViolationException extends PolicyViolationException {
   ValidationPolicyViolationException(super.reason);
 }

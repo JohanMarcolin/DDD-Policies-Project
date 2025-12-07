@@ -26,8 +26,8 @@ final class UpdateUserPasswordPolicy extends UserAdministrationPolicy<UpdateUser
   }
 }
 
-sealed class UpdateUserPasswordUnauthorizedReason {}
+sealed class UpdateUserPasswordUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
-class CannotUpdatePasswordOnAnalyst implements UpdateUserPasswordUnauthorizedReason {}
+final class CannotUpdatePasswordOnAnalyst extends UpdateUserPasswordUnauthorizedReason {}
 
-class CanOnlyUpdatePasswordOnSelf implements UpdateUserPasswordUnauthorizedReason {}
+final class CanOnlyUpdatePasswordOnSelf extends UpdateUserPasswordUnauthorizedReason {}

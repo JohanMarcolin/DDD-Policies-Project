@@ -25,7 +25,7 @@ void main() {
       final policy = DummyAlwaysUnauthorizedActionAuthorizationPolicy();
       expect(
         () => policy.enforce('initiator', 'target', onAuthorized: () => 'should not reach'),
-        throwsA(isA<ActionAuthorizationPolicyViolationException>()),
+        throwsA(isA<PolicyViolationException>()),
       );
     });
   });

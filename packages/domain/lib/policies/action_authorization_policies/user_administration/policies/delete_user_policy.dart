@@ -29,10 +29,10 @@ final class DeleteUserPolicy extends UserAdministrationPolicy<DeleteUserUnauthor
   }
 }
 
-sealed class DeleteUserUnauthorizedReason {}
+sealed class DeleteUserUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
-class CannotDeleteSelf implements DeleteUserUnauthorizedReason {}
+final class CannotDeleteSelf extends DeleteUserUnauthorizedReason {}
 
-class CannotDeleteAnalyst implements DeleteUserUnauthorizedReason {}
+final class CannotDeleteAnalyst extends DeleteUserUnauthorizedReason {}
 
-class CanOnlyDeleteSelf implements DeleteUserUnauthorizedReason {}
+final class CanOnlyDeleteSelf extends DeleteUserUnauthorizedReason {}

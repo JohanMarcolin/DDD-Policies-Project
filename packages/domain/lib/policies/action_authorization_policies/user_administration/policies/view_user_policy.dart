@@ -18,6 +18,6 @@ final class ViewUserPolicy extends UserAdministrationPolicy<ViewUserUnauthorized
   }
 }
 
-sealed class ViewUserUnauthorizedReason {}
+sealed class ViewUserUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
-class CannotViewAnalyst implements ViewUserUnauthorizedReason {}
+final class CannotViewAnalyst extends ViewUserUnauthorizedReason {}

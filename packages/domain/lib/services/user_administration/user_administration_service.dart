@@ -49,7 +49,7 @@ class UserAdministrationService {
     required TReturn Function() onAuthorized,
     required TReturn Function(ViewUserUnauthorizedReason) onUnauthorized,
   }) {
-    return _authorizeUserAction(initiator, target,
+    return _authorizeUserAdministrationAction(initiator, target,
         policy: _viewUserPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
@@ -64,7 +64,7 @@ class UserAdministrationService {
     required TReturn Function() onAuthorized,
     required TReturn Function(DeleteUserUnauthorizedReason) onUnauthorized,
   }) {
-    return _authorizeUserAction(initiator, target,
+    return _authorizeUserAdministrationAction(initiator, target,
         policy: _deleteUserPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
@@ -81,7 +81,7 @@ class UserAdministrationService {
     required TReturn Function() onAuthorized,
     required TReturn Function(UpdateUserEmailUnauthorizedReason) onUnauthorized,
   }) {
-    return _authorizeUserAction(initiator, target,
+    return _authorizeUserAdministrationAction(initiator, target,
         policy: _updateUserEmailPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
@@ -99,11 +99,11 @@ class UserAdministrationService {
     required TReturn Function() onAuthorized,
     required TReturn Function(UpdateUserPasswordUnauthorizedReason) onUnauthorized,
   }) {
-    return _authorizeUserAction(initiator, target,
+    return _authorizeUserAdministrationAction(initiator, target,
         policy: _updateUserPasswordPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
-  TReturn _authorizeUserAction<TReturn, TUnauthorizedReason>(
+  TReturn _authorizeUserAdministrationAction<TReturn, TUnauthorizedReason>(
     User initiator,
     User target, {
     required UserAdministrationPolicy policy,
@@ -111,10 +111,10 @@ class UserAdministrationService {
     required TReturn Function(TUnauthorizedReason) onUnauthorized,
   }) {
     return policy.apply(
-      initiator,
-      target,
+      actor: initiator,
+      resource: target,
       onAuthorized: onAuthorized,
-      onUnauthorized: (reason) => onUnauthorized(reason),
+      onUnauthorized: (reason) => onUnauthorized(reason as TUnauthorizedReason),
     );
   }
 }
