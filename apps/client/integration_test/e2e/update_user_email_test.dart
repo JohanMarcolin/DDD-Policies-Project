@@ -1,10 +1,12 @@
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
+import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
 import '../integration_test_server_fixture.dart';
@@ -20,51 +22,62 @@ void main() {
     setUp(() async => await IntegrationTestServerFixture.setup());
     tearDown(() async => await IntegrationTestServerFixture.teardown());
 
-    final viewUserPolicy = ViewUserPolicy();
-    final updateUserEmailPolicy = UpdateUserEmailPolicy();
+    final UserAdministrationService userAdministrationService = createStubbedUserAdministrationService();
 
     for (final initiatorRole in Role.values) {
       testWidgets('${initiatorRole.name} updating email on self scenario', (WidgetTester tester) async {
         final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
-        final viewSelf = viewUserPolicy.authorize(self.user, self.user);
-        switch (viewSelf) {
-          case Authorized():
+        final canViewSelf = await userAdministrationService.authorizeViewUser(
+          initiator: self.user,
+          target: self.user,
+          onAuthorized: () async {
             await tester.assertUserTileIsVisible(initiator: self, target: self);
-          case Unauthorized():
+            return true;
+          },
+          onUnauthorized: (_) async {
             await tester.assertUserTileIsNotVisible(initiator: self, target: self);
-            return;
-        }
+            return false;
+          },
+        );
 
-        final updateEmailOnSelf = updateUserEmailPolicy.authorize(self.user, self.user);
-        switch (updateEmailOnSelf) {
-          case Authorized():
-            await _assertUpdateEmailSucceeds(tester: tester, initiator: self, target: self);
-          case Unauthorized():
-            await _assertUpdateEmailIsBlocked(tester: tester, initiator: self, target: self);
-        }
+        if (!canViewSelf) return;
+
+        await userAdministrationService.authorizeUpdateUserEmail(
+          initiator: self.user,
+          target: self.user,
+          onAuthorized: () async => await _assertUpdateEmailSucceeds(tester: tester, initiator: self, target: self),
+          onUnauthorized: (_) async => await _assertUpdateEmailIsBlocked(tester: tester, initiator: self, target: self),
+        );
       });
       for (final targetRole in Role.values) {
         testWidgets('${initiatorRole.name} updating email on ${targetRole.name} scenario', (WidgetTester tester) async {
           final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
-          final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
-          switch (viewTarget) {
-            case Authorized():
+          final canViewTarget = await userAdministrationService.authorizeViewUser(
+            initiator: initiator.user,
+            target: target.user,
+            onAuthorized: () async {
               await tester.assertUserTileIsVisible(initiator: initiator, target: target);
-            case Unauthorized():
+              return true;
+            },
+            onUnauthorized: (_) async {
               await tester.assertUserTileIsNotVisible(initiator: initiator, target: target);
-              return;
-          }
+              return false;
+            },
+          );
 
-          final updateEmailOfTarget = updateUserEmailPolicy.authorize(initiator.user, target.user);
-          switch (updateEmailOfTarget) {
-            case Authorized():
-              await _assertUpdateEmailSucceeds(tester: tester, initiator: initiator, target: target);
-            case Unauthorized():
-              await _assertUpdateEmailIsBlocked(tester: tester, initiator: initiator, target: target);
-          }
+          if (!canViewTarget) return;
+
+          await userAdministrationService.authorizeUpdateUserEmail(
+            initiator: initiator.user,
+            target: target.user,
+            onAuthorized: () async =>
+                await _assertUpdateEmailSucceeds(tester: tester, initiator: initiator, target: target),
+            onUnauthorized: (_) async =>
+                await _assertUpdateEmailIsBlocked(tester: tester, initiator: initiator, target: target),
+          );
         });
       }
     }

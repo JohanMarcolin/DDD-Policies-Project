@@ -6,8 +6,9 @@ sealed class PolicyViolationException<TPolicyViolationReason> implements Excepti
   String toString() => 'PolicyViolationException: reason:${reason.runtimeType.toString()}';
 }
 
-class ActionPolicyViolationException extends PolicyViolationException {
-  ActionPolicyViolationException(super.reason);
+class ActionAuthorizationPolicyViolationException<TUnauthorizedReason>
+    extends PolicyViolationException<TUnauthorizedReason> {
+  ActionAuthorizationPolicyViolationException(super.reason);
 }
 
 class ValidationPolicyViolationException extends PolicyViolationException {

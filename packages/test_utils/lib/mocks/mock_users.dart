@@ -22,4 +22,6 @@ final otherMockAnalyst = Analyst(userId: UserId("analyst_id_2"), email: Email('a
 
 final mockUserPair = [mockUser, otherMockUser];
 
+final distinctMockUsers = [mockUser, mockAdmin, mockAnalyst];
+
 final allMockUserPairs = [mockUser, otherMockUser, mockAdmin, otherMockAdmin, mockAnalyst, otherMockAnalyst];

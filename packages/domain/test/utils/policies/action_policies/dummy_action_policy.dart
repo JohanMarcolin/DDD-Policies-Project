@@ -1,12 +1,15 @@
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/action_authorization_policy.dart';
 
-final class DummyAlwaysAuthorizedActionPolicy extends ActionPolicy<String, String> {
-  DummyAlwaysAuthorizedActionPolicy() : super(authorize: (String initiator, String target) => Authorized());
+final class DummyAlwaysAuthorizedActionAuthorizationPolicy
+    extends ActionAuthorizationPolicy<String, String, DummyUnauthorizedReason> {
+  DummyAlwaysAuthorizedActionAuthorizationPolicy()
+      : super(authorize: (String initiator, String target) => Authorized());
 }
 
-final class DummyAlwaysUnauthorizedActionPolicy extends ActionPolicy<String, String> {
-  DummyAlwaysUnauthorizedActionPolicy()
-      : super(authorize: (String initiator, String target) => Unauthorized(reason: DummyIsAlwaysUnauthorized()));
+final class DummyAlwaysUnauthorizedActionAuthorizationPolicy
+    extends ActionAuthorizationPolicy<String, String, DummyUnauthorizedReason> {
+  DummyAlwaysUnauthorizedActionAuthorizationPolicy()
+      : super(authorize: (String initiator, String target) => Unauthorized(reason: DummyUnauthorizedReason()));
 }
 
-class DummyIsAlwaysUnauthorized {}
+class DummyUnauthorizedReason {}

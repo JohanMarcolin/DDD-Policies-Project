@@ -1,4 +1,4 @@
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';

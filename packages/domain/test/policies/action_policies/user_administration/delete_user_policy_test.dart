@@ -1,4 +1,4 @@
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:test/test.dart';
 
 import '../../../utils/users.dart' show analyst, admin, user, otherUser;
@@ -10,25 +10,25 @@ void main() {
     test('analyst can delete others but not self', () {
       expect(policy.isAuthorized(analyst, otherUser), isTrue);
       expect(policy.isAuthorized(analyst, analyst), isFalse);
-      final result = policy.authorize(analyst, analyst);
-      expect(result, isA<Unauthorized>());
-      expect((result as Unauthorized).reason, isA<CannotDeleteSelf>());
+      policy.apply(analyst, analyst,
+          onAuthorized: () => fail('Analyst should not be able to delete self'),
+          onUnauthorized: (reason) => expect(reason, isA<CannotDeleteSelf>()));
     });
 
     test('admin can delete non-analyst, not analyst', () {
       expect(policy.isAuthorized(admin, user), isTrue);
       expect(policy.isAuthorized(admin, analyst), isFalse);
-      final result = policy.authorize(admin, analyst);
-      expect(result, isA<Unauthorized>());
-      expect((result as Unauthorized).reason, isA<CannotDeleteAnalyst>());
+      policy.apply(admin, analyst,
+          onAuthorized: () => fail('Admin should not be able to delete analyst'),
+          onUnauthorized: (reason) => expect(reason, isA<CannotDeleteAnalyst>()));
     });
 
     test('user can only delete self', () {
       expect(policy.isAuthorized(user, user), isTrue);
       expect(policy.isAuthorized(user, otherUser), isFalse);
-      final result = policy.authorize(user, otherUser);
-      expect(result, isA<Unauthorized>());
-      expect((result as Unauthorized).reason, isA<CanOnlyDeleteSelf>());
+      policy.apply(user, otherUser,
+          onAuthorized: () => fail('User should not be able to delete other users'),
+          onUnauthorized: (reason) => expect(reason, isA<CanOnlyDeleteSelf>()));
     });
   });
 }

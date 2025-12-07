@@ -2,7 +2,7 @@ import 'package:client/presentation/views/user_administration_view/user_administ
 import 'package:domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/mocks/mock_users.dart';
-import 'package:test_utils/user_test_runner.dart';
+import 'package:test_utils/user_pair_test_util.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../../../../utils/extensions/widget_finder_extensions.dart';
@@ -21,17 +21,17 @@ extension on WidgetTester {
 /// Covers presentation scenarios for user tile display.
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  UserTestRunner.forEachUserPair(
+  UserPairTestUtil.forEachUserPair(
     users: allMockUserPairs,
-    onUserPairCase: (actor, subject) {
+    onUserPair: (initiator, target) {
       testWidgets('displays user tile with all required components', (WidgetTester tester) async {
-        await tester.renderUserTile(currentUser: actor, targetUser: subject);
+        await tester.renderUserTile(currentUser: initiator, targetUser: target);
 
         final userTile = find.byType(UserTile);
         expect(userTile, findsOne);
 
-        expect(find.text(subject.role.name), findsOne);
-        expect(find.text(subject.email.value), findsOne);
+        expect(find.text(target.role.name), findsOne);
+        expect(find.text(target.email.value), findsOne);
 
         expect(userTile.findDescendant(UpdateUserEmailIcon), findsOne);
         expect(userTile.findDescendant(UpdateUserPasswordIcon), findsOne);

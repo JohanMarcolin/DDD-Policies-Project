@@ -3,7 +3,7 @@ import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:client/infrastructure/services/auth_token_service.dart';
 import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:flutter/material.dart';

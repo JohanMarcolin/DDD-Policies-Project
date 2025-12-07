@@ -1,7 +1,8 @@
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
 import '../integration_test_server_fixture.dart';
@@ -18,7 +19,7 @@ void main() {
     setUp(() async => await IntegrationTestServerFixture.setup());
     tearDown(() async => await IntegrationTestServerFixture.teardown());
 
-    final viewUserPolicy = ViewUserPolicy();
+    final userAdministrationService = createStubbedUserAdministrationService();
 
     for (final initiatorRole in Role.values) {
       final initiatorRoleName = initiatorRole.name;
@@ -26,26 +27,29 @@ void main() {
       testWidgets('$initiatorRoleName viewing self scenario', (WidgetTester tester) async {
         final self = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
 
-        final viewSelf = viewUserPolicy.authorize(self.user, self.user);
-        switch (viewSelf) {
-          case Authorized():
-            await _assertViewUserSucceeds(tester: tester, initiator: self, target: self);
-          case Unauthorized():
+        await userAdministrationService.authorizeViewUser(
+          initiator: self.user,
+          target: self.user,
+          onAuthorized: () async => await _assertViewUserSucceeds(tester: tester, initiator: self, target: self),
+          onUnauthorized: (_) async {
             await _assertViewUserIsBlocked(tester: tester, initiator: self, target: self);
-        }
+            return;
+          },
+        );
       });
       for (final targetRole in Role.values) {
         testWidgets('$initiatorRoleName viewing ${targetRole.name} scenario', (WidgetTester tester) async {
           final initiator = await IntegrationTestServerFixture.createUserFixture(role: initiatorRole);
           final target = await IntegrationTestServerFixture.createUserFixture(role: targetRole);
 
-          final viewTarget = viewUserPolicy.authorize(initiator.user, target.user);
-          switch (viewTarget) {
-            case Authorized():
-              await _assertViewUserSucceeds(tester: tester, initiator: initiator, target: target);
-            case Unauthorized():
-              await _assertViewUserIsBlocked(tester: tester, initiator: initiator, target: target);
-          }
+          await userAdministrationService.authorizeViewUser(
+            initiator: initiator.user,
+            target: target.user,
+            onAuthorized: () async =>
+                await _assertViewUserSucceeds(tester: tester, initiator: initiator, target: target),
+            onUnauthorized: (_) async =>
+                await _assertViewUserIsBlocked(tester: tester, initiator: initiator, target: target),
+          );
         });
       }
     }

@@ -1,5 +1,6 @@
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
+
 import '../../entities/user.dart';
-import '../../policies/action_policies/action_policy.dart';
 import '../../policies/validation_policies/validation_policy.dart';
 import '../../repositories/user_repository.dart';
 import '../../../value_objects/email.dart';
@@ -9,27 +10,29 @@ import '../../../value_objects/password.dart';
 class UserAdministrationService {
   UserAdministrationService({
     required UserRepository userRepository,
-    required this.viewUserPolicy,
-    required this.updateUserEmailPolicy,
-    required this.updateUserPasswordPolicy,
-    required this.deleteUserPolicy,
+    required ViewUserPolicy viewUserPolicy,
+    required UpdateUserEmailPolicy updateUserEmailPolicy,
+    required UpdateUserPasswordPolicy updateUserPasswordPolicy,
+    required DeleteUserPolicy deleteUserPolicy,
     required this.emailValidationPolicy,
     required this.passwordValidationPolicy,
-  }) : _userRepository = userRepository;
+  })  : _userRepository = userRepository,
+        _viewUserPolicy = viewUserPolicy,
+        _updateUserEmailPolicy = updateUserEmailPolicy,
+        _updateUserPasswordPolicy = updateUserPasswordPolicy,
+        _deleteUserPolicy = deleteUserPolicy;
 
   final UserRepository _userRepository;
-
-  final ViewUserPolicy viewUserPolicy;
-  final UpdateUserEmailPolicy updateUserEmailPolicy;
-  final UpdateUserPasswordPolicy updateUserPasswordPolicy;
-  final DeleteUserPolicy deleteUserPolicy;
-
+  final ViewUserPolicy _viewUserPolicy;
+  final UpdateUserEmailPolicy _updateUserEmailPolicy;
+  final UpdateUserPasswordPolicy _updateUserPasswordPolicy;
+  final DeleteUserPolicy _deleteUserPolicy;
   final EmailValidationPolicy emailValidationPolicy;
   final PasswordValidationPolicy passwordValidationPolicy;
 
   Future<List<User>> viewUsers({required User initiator}) async {
     final users = await _userRepository.users;
-    return users.where((targetUser) => viewUserPolicy.isAuthorized(initiator, targetUser)).toList();
+    return users.where((user) => _viewUserPolicy.isAuthorized(initiator, user)).toList();
   }
 
   Future<User?> viewUser({required User initiator, required UserId userId}) async {
@@ -37,26 +40,81 @@ class UserAdministrationService {
 
     if (user == null) return null;
 
-    return viewUserPolicy.requireAuthorization(initiator, user, onAuthorized: () => user);
+    return _viewUserPolicy.enforce(initiator, user, onAuthorized: () => user);
+  }
+
+  TReturn authorizeViewUser<TReturn>({
+    required User initiator,
+    required User target,
+    required TReturn Function() onAuthorized,
+    required TReturn Function(ViewUserUnauthorizedReason) onUnauthorized,
+  }) {
+    return _authorizeUserAction(initiator, target,
+        policy: _viewUserPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
   Future<void> deleteUser({required User initiator, required User target}) async {
-    return deleteUserPolicy.requireAuthorization(initiator, target,
+    return _deleteUserPolicy.enforce(initiator, target,
         onAuthorized: () => _userRepository.delete(userId: target.userId));
   }
 
-  Future<void> updateUserEmail({required User initiator, required User target, required Email newEmail}) async {
-    emailValidationPolicy.enforce(newEmail);
+  TReturn authorizeDeleteUser<TReturn>({
+    required User initiator,
+    required User target,
+    required TReturn Function() onAuthorized,
+    required TReturn Function(DeleteUserUnauthorizedReason) onUnauthorized,
+  }) {
+    return _authorizeUserAction(initiator, target,
+        policy: _deleteUserPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
+  }
 
-    return updateUserEmailPolicy.requireAuthorization(initiator, target,
-        onAuthorized: () => _userRepository.updateEmail(userId: target.userId, newEmail: newEmail));
+  Future<void> updateUserEmail({required User initiator, required User target, required Email newEmail}) async {
+    return _updateUserEmailPolicy.enforce(initiator, target, onAuthorized: () {
+      emailValidationPolicy.enforce(newEmail);
+      return _userRepository.updateEmail(userId: target.userId, newEmail: newEmail);
+    });
+  }
+
+  TReturn authorizeUpdateUserEmail<TReturn>({
+    required User initiator,
+    required User target,
+    required TReturn Function() onAuthorized,
+    required TReturn Function(UpdateUserEmailUnauthorizedReason) onUnauthorized,
+  }) {
+    return _authorizeUserAction(initiator, target,
+        policy: _updateUserEmailPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
   }
 
   Future<void> updateUserPassword(
       {required User initiator, required User target, required Password newPassword}) async {
-    passwordValidationPolicy.enforce(newPassword);
+    return _updateUserPasswordPolicy.enforce(initiator, target, onAuthorized: () {
+      passwordValidationPolicy.enforce(newPassword);
+      return _userRepository.updatePassword(userId: target.userId, newPassword: newPassword);
+    });
+  }
 
-    return updateUserPasswordPolicy.requireAuthorization(initiator, target,
-        onAuthorized: () => _userRepository.updatePassword(userId: target.userId, newPassword: newPassword));
+  TReturn authorizeUpdateUserPassword<TReturn>({
+    required User initiator,
+    required User target,
+    required TReturn Function() onAuthorized,
+    required TReturn Function(UpdateUserPasswordUnauthorizedReason) onUnauthorized,
+  }) {
+    return _authorizeUserAction(initiator, target,
+        policy: _updateUserPasswordPolicy, onAuthorized: onAuthorized, onUnauthorized: onUnauthorized);
+  }
+
+  TReturn _authorizeUserAction<TReturn, TUnauthorizedReason>(
+    User initiator,
+    User target, {
+    required UserAdministrationPolicy policy,
+    required TReturn Function() onAuthorized,
+    required TReturn Function(TUnauthorizedReason) onUnauthorized,
+  }) {
+    return policy.apply(
+      initiator,
+      target,
+      onAuthorized: onAuthorized,
+      onUnauthorized: (reason) => onUnauthorized(reason),
+    );
   }
 }

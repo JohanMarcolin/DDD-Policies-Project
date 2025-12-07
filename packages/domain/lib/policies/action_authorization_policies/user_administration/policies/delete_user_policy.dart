@@ -1,9 +1,9 @@
-part of '../action_policy.dart';
+part of '../user_administration_policy.dart';
 
-final class DeleteUserPolicy extends ActionPolicy<User, User> {
-  const DeleteUserPolicy() : super(authorize: _authorizeDeleteUser);
+final class DeleteUserPolicy extends UserAdministrationPolicy<DeleteUserUnauthorizedReason> {
+  DeleteUserPolicy() : super(authorize: _authorizeDeleteUser);
 
-  static ActionPolicyResult _authorizeDeleteUser(User initiator, User target) {
+  static ActionAuthorizationResult<DeleteUserUnauthorizedReason> _authorizeDeleteUser(User initiator, User target) {
     final isDeletingSelf = initiator.isSameAs(target);
 
     switch (initiator.role) {

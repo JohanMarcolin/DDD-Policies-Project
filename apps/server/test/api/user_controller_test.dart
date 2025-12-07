@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:test_utils/auth/auth_header.dart';
+import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/server/test_server_fixture.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'api_test_server_fixture.dart';
@@ -15,7 +15,10 @@ import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
+  final userAdministrationService = createStubbedUserAdministrationService();
+
   late UserTestFixture initiator;
+  late List<UserTestFixture> initiators;
   late UserTestFixture target;
 
   setUp(() async {
@@ -30,30 +33,38 @@ void main() {
     for (final initiatorRole in Role.values) {
       group('_getAllUsers', () {
         setUp(() async {
-          initiator = await ApiTestServerFixture.createUserFixture(role: initiatorRole);
+          initiators = await ApiTestServerFixture.createAllUserFixtures();
         });
         test('should get users authorized for viewing', () async {
-          final response = await http.get(
-            Uri.parse('${TestServerFixture.baseUrl}/user/all'),
-            headers: await getAuthHeader(initiator),
-          );
-          final body = jsonDecode(response.body);
+          for (final initiator in initiators) {
+            final response = await http.get(
+              Uri.parse('${TestServerFixture.baseUrl}/user/all'),
+              headers: await getAuthHeader(initiator),
+            );
+            final body = jsonDecode(response.body);
 
-          expect(response.statusCode, 200);
-          expect(body['isSuccess'], isTrue);
-          final users = body['data'];
+            expect(response.statusCode, 200);
+            expect(body['isSuccess'], isTrue);
+            final users = body['data'];
 
-          for (final user in users) {
-            final userId = UserId(user['userId']);
-            final email = Email(user['email']);
-            final role = Role.values.firstWhere((role) => role.name == user['role']);
+            for (final user in users) {
+              final userId = UserId(user['userId']);
+              final email = Email(user['email']);
+              final role = Role.values.firstWhere((role) => role.name == user['role']);
 
-            expect(userId, isNotNull);
-            expect(email, isNotNull);
-            expect(role, isNotNull);
+              expect(userId, isNotNull);
+              expect(email, isNotNull);
+              expect(role, isNotNull);
 
-            expect(ViewUserPolicy().authorize(initiator.user, User(userId: userId, email: email, role: role)),
-                isA<Authorized>());
+              userAdministrationService.authorizeViewUser(
+                initiator: initiator.user,
+                target: User(userId: userId, email: email, role: role),
+                onAuthorized: () {},
+                onUnauthorized: (reason) {
+                  fail('User ${initiator.user.role.name} is NOT authorized to see ${role.name}, reason: $reason');
+                },
+              );
+            }
           }
         });
       });
@@ -65,28 +76,29 @@ void main() {
           });
 
           test('should get user by id if authorized, otherwise NOT', () async {
-            final viewUser = ViewUserPolicy().authorize(initiator.user, target.user);
             final response = await http.get(
               Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}'),
               headers: await getAuthHeader(initiator),
             );
             final body = jsonDecode(response.body);
 
-            switch (viewUser) {
-              case Authorized():
-                final user = body['data'];
+            userAdministrationService.authorizeViewUser(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  final user = body['data'];
 
-                expect(response.statusCode, 200);
-                expect(body['isSuccess'], isTrue);
-                expect(user['userId'], target.userId.value);
-                expect(user['email'], target.email.value);
-                expect(user['role'], target.user.role.name);
-
-              case Unauthorized(:final reason):
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], reason.toString());
-            }
+                  expect(response.statusCode, 200);
+                  expect(body['isSuccess'], isTrue);
+                  expect(user['userId'], target.userId.value);
+                  expect(user['email'], target.email.value);
+                  expect(user['role'], target.user.role.name);
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
         });
 
@@ -97,22 +109,24 @@ void main() {
           });
 
           test('should delete user by id if authorized, otherwise NOT', () async {
-            final deleteUser = DeleteUserPolicy().authorize(initiator.user, target.user);
             final response = await http.delete(
               Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}'),
               headers: await getAuthHeader(initiator),
             );
             final body = jsonDecode(response.body);
 
-            switch (deleteUser) {
-              case Authorized():
-                expect(body['isSuccess'], isTrue);
-                expect(response.statusCode, 200);
-              case Unauthorized(:final reason):
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], reason.toString());
-            }
+            userAdministrationService.authorizeDeleteUser(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(body['isSuccess'], isTrue);
+                  expect(response.statusCode, 200);
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
         });
 
@@ -122,7 +136,6 @@ void main() {
             target = await ApiTestServerFixture.createUserFixture(role: targetRole);
           });
           test('should update email with valid email if authorized, otherwise NOT', () async {
-            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, target.user);
             final email = Email('valid@example.com');
 
             expect(EmailValidationPolicy().isValid(email), isTrue);
@@ -135,19 +148,21 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserEmail) {
-              case Authorized():
-                expect(body['isSuccess'], isTrue);
-                expect(response.statusCode, 200);
-              case Unauthorized(:final reason):
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], reason.toString());
-            }
+            userAdministrationService.authorizeUpdateUserEmail(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(body['isSuccess'], isTrue);
+                  expect(response.statusCode, 200);
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
 
           test('should NOT update email with invalid email', () async {
-            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, target.user);
             final email = Email('invalid-email');
 
             expect(EmailValidationPolicy().isValid(email), isFalse);
@@ -160,17 +175,22 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserEmail) {
-              case Authorized():
-              case Unauthorized():
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], EmailInvalidFormat().toString());
-            }
+            userAdministrationService.authorizeUpdateUserEmail(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], EmailInvalidFormat().toString());
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
 
           test('should NOT update email if new email is already taken by self', () async {
-            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, initiator.user);
             final currentEmail = initiator.email;
 
             final response = await http.put(
@@ -180,17 +200,22 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserEmail) {
-              case Authorized():
-              case Unauthorized():
-                expect(response.statusCode, 409);
-                expect(body['isSuccess'], isFalse);
-                expect(body['apiErrorCode'], UpdateUserEmailTakenBySelf().toString());
-            }
+            userAdministrationService.authorizeUpdateUserEmail(
+                initiator: initiator.user,
+                target: initiator.user,
+                onAuthorized: () {
+                  expect(response.statusCode, 409);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['apiErrorCode'], UpdateUserEmailTakenBySelf().toString());
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 409);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['apiErrorCode'], reason.toString());
+                });
           });
 
           test('should NOT update email if new email is already taken by other user', () async {
-            final updateUserEmail = UpdateUserEmailPolicy().authorize(initiator.user, target.user);
             final takenEmail = initiator.email;
 
             final response = await http.put(
@@ -200,13 +225,19 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserEmail) {
-              case Authorized():
-              case Unauthorized():
-                expect(response.statusCode, 409);
-                expect(body['isSuccess'], isFalse);
-                expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
-            }
+            userAdministrationService.authorizeUpdateUserEmail(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(response.statusCode, 409);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
+                },
+                onUnauthorized: (_) {
+                  expect(response.statusCode, 409);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
+                });
           });
         });
 
@@ -216,7 +247,6 @@ void main() {
             target = await ApiTestServerFixture.createUserFixture(role: targetRole);
           });
           test('should update password with valid password if authorized, otherwise NOT', () async {
-            final updateUserPassword = UpdateUserPasswordPolicy().authorize(initiator.user, target.user);
             final password = PasswordValidationPolicy.generatePassword();
 
             expect(PasswordValidationPolicy().isValid(password), isTrue);
@@ -229,19 +259,21 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserPassword) {
-              case Authorized():
-                expect(body['isSuccess'], isTrue);
-                expect(response.statusCode, 200);
-              case Unauthorized(:final reason):
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], reason.toString());
-            }
+            userAdministrationService.authorizeUpdateUserPassword(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(body['isSuccess'], isTrue);
+                  expect(response.statusCode, 200);
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
 
           test('should NOT update password with invalid password', () async {
-            final updateUserPassword = UpdateUserPasswordPolicy().authorize(initiator.user, target.user);
             final password = Password('short');
 
             expect(PasswordValidationPolicy().isValid(password), isFalse);
@@ -254,13 +286,19 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            switch (updateUserPassword) {
-              case Authorized():
-              case Unauthorized():
-                expect(response.statusCode, 403);
-                expect(body['isSuccess'], isFalse);
-                expect(body['policyViolationReason'], PasswordTooShort().toString());
-            }
+            userAdministrationService.authorizeUpdateUserPassword(
+                initiator: initiator.user,
+                target: target.user,
+                onAuthorized: () {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], PasswordTooShort().toString());
+                },
+                onUnauthorized: (reason) {
+                  expect(response.statusCode, 403);
+                  expect(body['isSuccess'], isFalse);
+                  expect(body['policyViolationReason'], reason.toString());
+                });
           });
         });
       }

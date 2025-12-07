@@ -4,8 +4,6 @@ import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/blocs/users_view_bloc/user_administration_view_bloc.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
@@ -14,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/main.dart' as app;
+import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
 import 'package:test_utils/user_test_fixture.dart';
@@ -52,7 +51,7 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
 
     _authBlocWithStubs = AuthBloc(authApi: authApi as AuthApi);
 
-    final stubbedUserAdministrationService = _getStubbedUserAdministrationService(userRepository);
+    final stubbedUserAdministrationService = createStubbedUserAdministrationService(userRepository);
 
     _userAdministrationViewBlocWithStubs = _getStubbedUserAdministrationViewBloc(
       currentUser,
@@ -77,18 +76,6 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
     return UserAdministrationViewBloc(
       currentUser: currentUser,
       userAdministrationService: stubbedUserAdministrationService,
-    );
-  }
-
-  UserAdministrationService _getStubbedUserAdministrationService(MockUserRepository mockUserRepository) {
-    return UserAdministrationService(
-      userRepository: mockUserRepository,
-      viewUserPolicy: ViewUserPolicy(),
-      updateUserEmailPolicy: UpdateUserEmailPolicy(),
-      updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
-      deleteUserPolicy: DeleteUserPolicy(),
-      emailValidationPolicy: EmailValidationPolicy(),
-      passwordValidationPolicy: PasswordValidationPolicy(),
     );
   }
 }

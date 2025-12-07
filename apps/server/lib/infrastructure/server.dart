@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:domain/entities/user.dart';
+import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
@@ -9,7 +10,6 @@ import 'package:test_utils/user_test_fixture.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
-import 'package:domain/policies/action_policies/action_policy.dart';
 import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'controllers/test_controller.dart';

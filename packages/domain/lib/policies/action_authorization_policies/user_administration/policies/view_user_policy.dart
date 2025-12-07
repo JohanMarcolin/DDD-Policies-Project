@@ -1,9 +1,9 @@
-part of '../action_policy.dart';
+part of '../user_administration_policy.dart';
 
-final class ViewUserPolicy extends ActionPolicy<User, User> {
-  const ViewUserPolicy() : super(authorize: _authorizeViewUser);
+final class ViewUserPolicy extends UserAdministrationPolicy<ViewUserUnauthorizedReason> {
+  ViewUserPolicy() : super(authorize: _authorizeViewUser);
 
-  static ActionPolicyResult _authorizeViewUser(User initiator, User target) {
+  static ActionAuthorizationResult<ViewUserUnauthorizedReason> _authorizeViewUser(User initiator, User target) {
     switch (initiator.role) {
       case Role.analyst:
         return Authorized();
