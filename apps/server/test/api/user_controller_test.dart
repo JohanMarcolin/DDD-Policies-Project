@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
+import 'package:server/infrastructure/policy_registry.dart';
 import 'package:test_utils/auth/auth_header.dart';
 import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/server/test_server_fixture.dart';
@@ -138,7 +139,7 @@ void main() {
           test('should update email with valid email if authorized, otherwise NOT', () async {
             final email = Email('valid@example.com');
 
-            expect(EmailValidationPolicy().isValid(email), isTrue);
+            expect(PolicyRegistry.userEmailValidationPolicy.isValid(email), isTrue);
             final validEmail = email;
 
             final response = await http.put(
@@ -165,7 +166,7 @@ void main() {
           test('should NOT update email with invalid email', () async {
             final email = Email('invalid-email');
 
-            expect(EmailValidationPolicy().isValid(email), isFalse);
+            expect(PolicyRegistry.userEmailValidationPolicy.isValid(email), isFalse);
             final invalidEmail = email;
 
             final response = await http.put(
@@ -247,9 +248,9 @@ void main() {
             target = await ApiTestServerFixture.createUserFixture(role: targetRole);
           });
           test('should update password with valid password if authorized, otherwise NOT', () async {
-            final password = PasswordValidationPolicy.generatePassword();
+            final password = PolicyRegistry.userPasswordValidationPolicy.generateRandomPassword();
 
-            expect(PasswordValidationPolicy().isValid(password), isTrue);
+            expect(PolicyRegistry.userPasswordValidationPolicy.isValid(password), isTrue);
             final validPassword = password;
 
             final response = await http.put(
@@ -276,7 +277,7 @@ void main() {
           test('should NOT update password with invalid password', () async {
             final password = Password('short');
 
-            expect(PasswordValidationPolicy().isValid(password), isFalse);
+            expect(UserPasswordValidationPolicy().isValid(password), isFalse);
             final invalidPassword = password;
 
             final response = await http.put(

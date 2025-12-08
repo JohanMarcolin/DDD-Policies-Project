@@ -4,7 +4,7 @@ import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:client/infrastructure/apis/user_api.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
@@ -61,11 +61,6 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
     onUnauthorized: (reason) => onUnauthorized(reason),
   );
 
-  ValidationPolicyResult validateEmail(Email email) => _userAdministrationService.emailValidationPolicy.validate(email);
-
-  ValidationPolicyResult validatePassword(Password password) =>
-      _userAdministrationService.passwordValidationPolicy.validate(password);
-
   Future<void> _onFetchRequested(FetchUsersRequested event, Emitter<UserAdministrationViewState> emit) async {
     emit(UserAdministrationViewLoading());
     try {
@@ -99,11 +94,12 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
     UpdateUserEmailRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    switch (validateEmail(event.newEmail)) {
-      case Invalid(:final reason as EmailInvalidReason):
-        emitPresentation(UpdateUserEmailInvalid(reason: reason));
-        return;
-      case Valid():
+    _userAdministrationService.validateUserEmail(
+      event.newEmail,
+      onInvalid: (EmailInvalidReason reason) {
+        return emitPresentation(UpdateUserEmailInvalid(reason: reason));
+      },
+      onValid: () async {
         try {
           await _userAdministrationService.updateUserEmail(
             initiator: _currentUser,
@@ -117,18 +113,17 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
         } catch (_) {
           emitPresentation(UpdateUserEmailFailure());
         }
-    }
+      },
+    );
   }
 
   Future<void> _onUpdatePasswordRequested(
     UpdateUserPasswordRequested event,
     Emitter<UserAdministrationViewState> emit,
   ) async {
-    switch (validatePassword(event.newPassword)) {
-      case Invalid(:final reason as PasswordInvalidReason):
-        emitPresentation(UpdateUserPasswordInvalid(reason: reason));
-        return;
-      case Valid():
+    _userAdministrationService.validateUserPassword(
+      event.newPassword,
+      onValid: () async {
         try {
           await _userAdministrationService.updateUserPassword(
             initiator: _currentUser,
@@ -142,6 +137,10 @@ class UserAdministrationViewBloc extends Bloc<UserAdministrationViewEvent, UserA
         } catch (_) {
           emitPresentation(UpdateUserPasswordFailure());
         }
-    }
+      },
+      onInvalid: (PasswordInvalidReason reason) {
+        return emitPresentation(UpdateUserPasswordInvalid(reason: reason));
+      },
+    );
   }
 }

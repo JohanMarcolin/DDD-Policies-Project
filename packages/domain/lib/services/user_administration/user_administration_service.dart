@@ -1,7 +1,6 @@
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
-
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import '../../entities/user.dart';
-import '../../policies/validation_policies/validation_policy.dart';
 import '../../repositories/user_repository.dart';
 import '../../../value_objects/email.dart';
 import '../../../value_objects/id.dart';
@@ -14,21 +13,23 @@ class UserAdministrationService {
     required UpdateUserEmailPolicy updateUserEmailPolicy,
     required UpdateUserPasswordPolicy updateUserPasswordPolicy,
     required DeleteUserPolicy deleteUserPolicy,
-    required this.emailValidationPolicy,
-    required this.passwordValidationPolicy,
+    required UserEmailValidationPolicy userEmailValidationPolicy,
+    required UserPasswordValidationPolicy userPasswordValidationPolicy,
   })  : _userRepository = userRepository,
         _viewUserPolicy = viewUserPolicy,
         _updateUserEmailPolicy = updateUserEmailPolicy,
         _updateUserPasswordPolicy = updateUserPasswordPolicy,
-        _deleteUserPolicy = deleteUserPolicy;
+        _deleteUserPolicy = deleteUserPolicy,
+        _userEmailValidationPolicy = userEmailValidationPolicy,
+        _userPasswordValidationPolicy = userPasswordValidationPolicy;
 
   final UserRepository _userRepository;
   final ViewUserPolicy _viewUserPolicy;
   final UpdateUserEmailPolicy _updateUserEmailPolicy;
   final UpdateUserPasswordPolicy _updateUserPasswordPolicy;
   final DeleteUserPolicy _deleteUserPolicy;
-  final EmailValidationPolicy emailValidationPolicy;
-  final PasswordValidationPolicy passwordValidationPolicy;
+  final UserEmailValidationPolicy _userEmailValidationPolicy;
+  final UserPasswordValidationPolicy _userPasswordValidationPolicy;
 
   Future<List<User>> viewUsers({required User initiator}) async {
     final users = await _userRepository.users;
@@ -70,9 +71,22 @@ class UserAdministrationService {
 
   Future<void> updateUserEmail({required User initiator, required User target, required Email newEmail}) async {
     return _updateUserEmailPolicy.enforce(initiator, target, onAuthorized: () {
-      emailValidationPolicy.enforce(newEmail);
-      return _userRepository.updateEmail(userId: target.userId, newEmail: newEmail);
+      _userEmailValidationPolicy.enforce(newEmail, onValid: () {
+        return _userRepository.updateEmail(userId: target.userId, newEmail: newEmail);
+      });
     });
+  }
+
+  TReturn validateUserEmail<TReturn>(
+    Email email, {
+    required TReturn Function() onValid,
+    required TReturn Function(EmailInvalidReason) onInvalid,
+  }) {
+    return _userEmailValidationPolicy.apply(
+      value: email,
+      onValid: onValid,
+      onInvalid: (reason) => onInvalid(reason),
+    );
   }
 
   TReturn authorizeUpdateUserEmail<TReturn>({
@@ -88,9 +102,26 @@ class UserAdministrationService {
   Future<void> updateUserPassword(
       {required User initiator, required User target, required Password newPassword}) async {
     return _updateUserPasswordPolicy.enforce(initiator, target, onAuthorized: () {
-      passwordValidationPolicy.enforce(newPassword);
-      return _userRepository.updatePassword(userId: target.userId, newPassword: newPassword);
+      _userPasswordValidationPolicy.enforce(newPassword, onValid: () {
+        return _userRepository.updatePassword(userId: target.userId, newPassword: newPassword);
+      });
     });
+  }
+
+  TReturn validateUserPassword<TReturn>(
+    Password password, {
+    required TReturn Function() onValid,
+    required TReturn Function(PasswordInvalidReason) onInvalid,
+  }) {
+    return _userPasswordValidationPolicy.apply(
+      value: password,
+      onValid: onValid,
+      onInvalid: (reason) => onInvalid(reason),
+    );
+  }
+
+  Password generateUserPassword() {
+    return _userPasswordValidationPolicy.generateRandomPassword();
   }
 
   TReturn authorizeUpdateUserPassword<TReturn>({

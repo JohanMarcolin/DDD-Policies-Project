@@ -2,8 +2,8 @@ import 'package:client/presentation/views/login_view/login_view.dart';
 import 'package:client/presentation/views/user_administration_view/user_administration_view.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
+import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -49,7 +49,12 @@ void main() {
         await userAdministrationService.authorizeUpdateUserPassword(
           initiator: self.user,
           target: self.user,
-          onAuthorized: () async => await _assertUpdatePasswordSucceeds(tester: tester, initiator: self, target: self),
+          onAuthorized: () async => await _assertUpdatePasswordSucceeds(
+            tester: tester,
+            initiator: self,
+            target: self,
+            newPassword: userAdministrationService.generateUserPassword(),
+          ),
           onUnauthorized: (_) async =>
               await _assertUpdatePasswordIsBlocked(tester: tester, initiator: self, target: self),
         );
@@ -77,8 +82,12 @@ void main() {
           await userAdministrationService.authorizeUpdateUserPassword(
             initiator: initiator.user,
             target: target.user,
-            onAuthorized: () async =>
-                await _assertUpdatePasswordSucceeds(tester: tester, initiator: initiator, target: target),
+            onAuthorized: () async => await _assertUpdatePasswordSucceeds(
+              tester: tester,
+              initiator: initiator,
+              target: target,
+              newPassword: userAdministrationService.generateUserPassword(),
+            ),
             onUnauthorized: (_) async =>
                 await _assertUpdatePasswordIsBlocked(tester: tester, initiator: initiator, target: target),
           );
@@ -92,6 +101,7 @@ Future<void> _assertUpdatePasswordSucceeds({
   required WidgetTester tester,
   required UserTestFixture initiator,
   required UserTestFixture target,
+  required Password newPassword,
 }) async {
   var targetUserRole = target.user.role.name;
 
@@ -115,8 +125,6 @@ Future<void> _assertUpdatePasswordSucceeds({
   expect(confirmInputDialog, findsOne, reason: 'Confirm input dialog should be shown');
 
   final passwordField = find.descendant(of: confirmInputDialog, matching: find.byType(TextField));
-
-  final newPassword = PasswordValidationPolicy.generatePassword();
 
   await tester.enterText(passwordField, newPassword.value);
 

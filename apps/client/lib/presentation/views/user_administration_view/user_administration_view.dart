@@ -8,7 +8,7 @@ import 'package:client/presentation/widgets/confirm_dialog.dart';
 import 'package:client/presentation/widgets/confirm_input_dialog.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:flutter/material.dart';

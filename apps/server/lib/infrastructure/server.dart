@@ -1,16 +1,15 @@
 import 'dart:io';
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/repositories/user_repository.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
+import 'package:server/infrastructure/policy_registry.dart';
 import 'package:test_utils/user_test_fixture.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'controllers/test_controller.dart';
 import 'databases/in_memory_user_password_database.dart';
@@ -65,7 +64,10 @@ class Server {
         tokenService: tokenService);
 
     if (exposeTestRoutes) {
-      final testService = TestService(userDatabase: userDatabase, userPasswordDatabase: userPasswordDatabase);
+      final testService = TestService(
+          userDatabase: userDatabase,
+          userPasswordDatabase: userPasswordDatabase,
+          passwordValidationPolicy: PolicyRegistry.userPasswordValidationPolicy);
       final testController = TestController(testService: testService);
       router.mount('/test/', testController.handler);
     }
@@ -114,20 +116,14 @@ void _setupControllers(
     userPasswordDatabase: userPasswordDatabase,
     tokenService: tokenService,
   );
-  final viewUserPolicy = ViewUserPolicy();
-  final updateUserEmailPolicy = UpdateUserEmailPolicy();
-  final updateUserPasswordPolicy = UpdateUserPasswordPolicy();
-  final deleteUserPolicy = DeleteUserPolicy();
-  final emailValidationPolicy = EmailValidationPolicy();
-  final passwordValidationPolicy = PasswordValidationPolicy();
   final userAdministrationService = UserAdministrationService(
     userRepository: userRepository,
-    viewUserPolicy: viewUserPolicy,
-    updateUserEmailPolicy: updateUserEmailPolicy,
-    updateUserPasswordPolicy: updateUserPasswordPolicy,
-    deleteUserPolicy: deleteUserPolicy,
-    emailValidationPolicy: emailValidationPolicy,
-    passwordValidationPolicy: passwordValidationPolicy,
+    viewUserPolicy: PolicyRegistry.viewUserPolicy,
+    updateUserEmailPolicy: PolicyRegistry.updateUserEmailPolicy,
+    updateUserPasswordPolicy: PolicyRegistry.updateUserPasswordPolicy,
+    deleteUserPolicy: PolicyRegistry.deleteUserPolicy,
+    userEmailValidationPolicy: PolicyRegistry.userEmailValidationPolicy,
+    userPasswordValidationPolicy: PolicyRegistry.userPasswordValidationPolicy,
   );
   final userService = UserService(
     userRepository: userRepository,

@@ -1,7 +1,7 @@
-part of '../validation_policy.dart';
+part of '../user_credential_policy.dart';
 
-final class PasswordValidationPolicy extends ValidationPolicy<Password> {
-  PasswordValidationPolicy() : super(validate: _validatePassword);
+final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, PasswordInvalidReason> {
+  UserPasswordValidationPolicy() : super(validate: _validatePassword);
 
   static const minLength = 8;
   static const maxLength = 64;
@@ -10,7 +10,7 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
   static const includeNumbers = true;
   static const includeSpecialCharacters = true;
 
-  static ValidationPolicyResult _validatePassword(Password password) {
+  static ValidationResult<PasswordInvalidReason> _validatePassword(Password password) {
     final value = password.value;
 
     if (value.length < minLength) {
@@ -34,7 +34,7 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
     return Valid();
   }
 
-  static Password generatePassword({
+  Password generateRandomPassword({
     int length = 10,
     bool includeUppercase = true,
     bool includeLowercase = true,
@@ -57,26 +57,23 @@ final class PasswordValidationPolicy extends ValidationPolicy<Password> {
       final candidate = Password(
         List.generate(length, (_) => chars[random.nextInt(chars.length)]).join(),
       );
-      if (PasswordValidationPolicy().validate(candidate) is Valid) {
+      if (UserPasswordValidationPolicy._validatePassword(candidate) is Valid) {
         return candidate;
       }
     }
   }
 }
 
-sealed class PasswordInvalidReason {
-  @override
-  String toString() => runtimeType.toString();
-}
+sealed class PasswordInvalidReason extends UserCredentialInvalidReason {}
 
-class PasswordTooShort implements PasswordInvalidReason {}
+final class PasswordTooShort extends PasswordInvalidReason {}
 
-class PasswordTooLong implements PasswordInvalidReason {}
+final class PasswordTooLong extends PasswordInvalidReason {}
 
-class PasswordMissingUppercase implements PasswordInvalidReason {}
+final class PasswordMissingUppercase extends PasswordInvalidReason {}
 
-class PasswordMissingLowercase implements PasswordInvalidReason {}
+final class PasswordMissingLowercase extends PasswordInvalidReason {}
 
-class PasswordMissingNumber implements PasswordInvalidReason {}
+final class PasswordMissingNumber extends PasswordInvalidReason {}
 
-class PasswordMissingSpecialCharacter implements PasswordInvalidReason {}
+final class PasswordMissingSpecialCharacter extends PasswordInvalidReason {}

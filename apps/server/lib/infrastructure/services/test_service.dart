@@ -1,5 +1,5 @@
 import 'package:domain/entities/user.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
@@ -19,11 +19,14 @@ class TestService {
   TestService({
     required InMemoryUserDatabase userDatabase,
     required InMemoryUserPasswordDatabase userPasswordDatabase,
+    required UserPasswordValidationPolicy passwordValidationPolicy,
   })  : _userDatabase = userDatabase,
-        _userPasswordDatabase = userPasswordDatabase;
+        _userPasswordDatabase = userPasswordDatabase,
+        _passwordValidationPolicy = passwordValidationPolicy;
 
   final InMemoryUserDatabase _userDatabase;
   final InMemoryUserPasswordDatabase _userPasswordDatabase;
+  final UserPasswordValidationPolicy _passwordValidationPolicy;
 
   Map<String, dynamic> _userFixtureMap(User user, Password password) => {
         'userId': user.userId.value,
@@ -72,7 +75,7 @@ class TestService {
     final userId = UserId.generate();
     final email = Email('${role.name}_${Uuid().v4().substring(0, 4)}@test.com');
     final user = User(email: email, userId: userId, role: role);
-    final password = PasswordValidationPolicy.generatePassword();
+    final password = _passwordValidationPolicy.generateRandomPassword();
 
     _userDatabase.put(user.userId, user);
     _userPasswordDatabase.put(user.userId, password);

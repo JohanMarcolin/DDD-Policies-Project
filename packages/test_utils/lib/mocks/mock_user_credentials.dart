@@ -1,4 +1,5 @@
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
+import 'package:domain/policies/value_validation_policies/value_validation_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 
@@ -29,15 +30,15 @@ List<Email> mockInvalidEmails = [
   mockSpaceInEmail,
   mockSpecialCharEmail,
 ];
-
-Password mockValidPassword = PasswordValidationPolicy.generatePassword();
+  
+Password mockValidPassword = UserPasswordValidationPolicy().generateRandomPassword();
 
 Password mockAnyPassword = Password('anyPassword');
 Password mockEmptyPassword = Password('');
 
 Password mockInvalidPassword = Password('invalidPassword');
-Password mockTooShortPassword = Password('p' * (PasswordValidationPolicy.minLength - 1));
-Password mockTooLongPassword = Password('p' * (PasswordValidationPolicy.maxLength + 1));
+Password mockTooShortPassword = Password('p' * (UserPasswordValidationPolicy.minLength - 1));
+Password mockTooLongPassword = Password('p' * (UserPasswordValidationPolicy.maxLength + 1));
 Password mockMissingUppercasePassword = Password('password1!');
 Password mockMissingLowercasePassword = Password('PASSWORD1!');
 Password mockMissingNumberPassword = Password('Password!');

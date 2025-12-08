@@ -1,5 +1,5 @@
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
-import 'package:domain/policies/validation_policies/validation_policy.dart';
+import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:test_utils/mocks/mock_user_repository.dart';
 
@@ -12,7 +12,7 @@ UserAdministrationService createStubbedUserAdministrationService([MockUserReposi
     updateUserEmailPolicy: UpdateUserEmailPolicy(),
     updateUserPasswordPolicy: UpdateUserPasswordPolicy(),
     deleteUserPolicy: DeleteUserPolicy(),
-    emailValidationPolicy: EmailValidationPolicy(),
-    passwordValidationPolicy: PasswordValidationPolicy(),
+    userEmailValidationPolicy: UserEmailValidationPolicy(),
+    userPasswordValidationPolicy: UserPasswordValidationPolicy(),
   );
 }
