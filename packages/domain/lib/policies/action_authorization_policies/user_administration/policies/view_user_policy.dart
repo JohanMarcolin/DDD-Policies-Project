@@ -1,5 +1,6 @@
 part of '../user_administration_policy.dart';
 
+/// Policy for determining if a [User] is authorized to view another [User].
 final class ViewUserPolicy extends UserAdministrationPolicy<ViewUserUnauthorizedReason> {
   ViewUserPolicy() : super(authorize: _authorizeViewUser);
 

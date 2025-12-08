@@ -1,5 +1,6 @@
 part of '../user_administration_policy.dart';
 
+/// Policy for determining if a [User] is authorized to delete themselves or another [User].
 final class DeleteUserPolicy extends UserAdministrationPolicy<DeleteUserUnauthorizedReason> {
   DeleteUserPolicy() : super(authorize: _authorizeDeleteUser);
 

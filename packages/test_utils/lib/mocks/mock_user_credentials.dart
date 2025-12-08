@@ -1,5 +1,4 @@
 import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
-import 'package:domain/policies/value_validation_policies/value_validation_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
 

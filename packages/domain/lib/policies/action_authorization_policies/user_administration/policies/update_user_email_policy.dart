@@ -1,11 +1,12 @@
 part of '../user_administration_policy.dart';
 
+/// Policy for determining if a [User] is authorized to update their own email or another [User]'s email.
 final class UpdateUserEmailPolicy extends UserAdministrationPolicy<UpdateUserEmailUnauthorizedReason> {
   UpdateUserEmailPolicy() : super(authorize: _authorizeUpdateUserEmail);
 
   static ActionAuthorizationResult<UpdateUserEmailUnauthorizedReason> _authorizeUpdateUserEmail(
       User initiator, User target) {
-    final isModifyingSelf = initiator.isSameAs(target);
+    final isUpdatingOwnEmail = initiator.isSameAs(target);
 
     switch (initiator.role) {
       case Role.analyst:
@@ -17,7 +18,7 @@ final class UpdateUserEmailPolicy extends UserAdministrationPolicy<UpdateUserEma
           return Unauthorized(reason: CannotUpdateEmailOnAnalyst());
         }
       case Role.user:
-        if (isModifyingSelf) {
+        if (isUpdatingOwnEmail) {
           return Authorized();
         } else {
           return Unauthorized(reason: CanOnlyUpdateEmailOnSelf());

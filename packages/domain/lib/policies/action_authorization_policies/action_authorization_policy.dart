@@ -1,30 +1,33 @@
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:equatable/equatable.dart';
 
-/// Function signature for performing an authorization check.
+/// Defines a function that checks if an [actor] is authorized to perform an action on a [resource].
+/// Returns [Authorized] if permitted, or [Unauthorized] with a reason.
 typedef Authorize<TActor, TResource, TReason extends ActionUnauthorizedReason> = ActionAuthorizationResult<TReason>
     Function(TActor actor, TResource resource);
 
 /// Callback invoked when authorization succeeds.
+/// [TReturn] is the callback's return type, supports sync and async.
 typedef OnAuthorized<TReturn> = TReturn Function();
 
-/// Callback invoked when authorization fails, with an unauthorized reason.
+/// Callback invoked when authorization fails, providing the reason.
+/// [TReturn] is the callback's return type, supports sync and async.
 typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TReturn Function(TReason reason);
 
-/// Abstract base for action authorization policies.
+/// Base class for policies that determine if an [actor] is authorized to perform an action on a [resource] based on the implementing policy.
+/// Provides methods to apply or enforce authorization logic, invoking the appropriate callbacks.
 ///
-/// Provides functionality for checking if an [actor] is authorized to perform an action on a [resource], as determined by the policy.
-/// [TActor] is the type of the actor (e.g., [Admin]).
-/// [TResource] is the type of the resource being acted upon (e.g., [User]).
-/// [TReason] describes why the action is unauthorized based on the policy.
-/// [TReturn] can be any type, including a [Future], enabling both sync and async callbacks.
+/// [TActor]: actor type (e.g., User, Admin)
+/// [TResource]: resource type (e.g., Document, Account)
+/// [TReason]: reason type for unauthorized actions (extends [ActionUnauthorizedReason])
+/// [TReturn]: callback return type, supports sync/async
 ///
-/// ### Example:
+/// Example:
 /// ```dart
-/// // Define a concrete policy, e.g., a policy for updating user settings.
+/// // Define a policy involving an action that should be authorized, e.g., a policy for updating user settings.
 /// class UpdateUserSettingsPolicy extends ActionAuthorizationPolicy<User, User, UpdateUserSettingsUnauthorizedReason> {
 ///   UpdateUserSettingsPolicy()
-///     : super(authorize: (User actor, User resource) {
+///     : super(authorize: (actor, resource) {
 ///         if (actor.id == resource.id) {
 ///           return Authorized();
 ///         } else {
@@ -35,7 +38,7 @@ typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TRet
 ///
 /// // Define reasons why an action might be unauthorized.
 /// sealed class UpdateUserSettingsUnauthorizedReason extends ActionUnauthorizedReason {}
-///
+/// 
 /// final class CanOnlyUpdateOwnSettings extends UpdateUserSettingsUnauthorizedReason {}
 ///
 /// // Using the policy:
@@ -50,7 +53,7 @@ typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TRet
 ///   onUnauthorized: (reason) => 'unauthorized: ${reason.toString()}',
 /// );
 ///
-/// print(result); // 'allowed'
+/// // result1 == 'allowed'
 ///
 /// /// final result2 = policy.apply(
 ///   actor: user1,
@@ -58,8 +61,7 @@ typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TRet
 ///   onAuthorized: () => 'allowed',
 ///   onUnauthorized: (reason) => 'unauthorized: ${reason.toString()}',
 /// );
-///
-/// print(result); // 'unauthorized: CanOnlyUpdateOwnSettings'
+/// // result2 == 'unauthorized: CanOnlyUpdateOwnSettings'
 /// ```
 abstract base class ActionAuthorizationPolicy<TActor, TResource, TReason extends ActionUnauthorizedReason> {
   const ActionAuthorizationPolicy({
@@ -71,11 +73,11 @@ abstract base class ActionAuthorizationPolicy<TActor, TResource, TReason extends
   /// Returns `true` if the [actor] is authorized to perform an action on the [resource], otherwise `false`.
   bool isAuthorized(TActor actor, TResource resource) => _authorize(actor, resource) is Authorized;
 
-  /// Applies the policy to the context of the given [actor] and [resource].
+  /// Applies the policy to the given [actor] and [resource].
   ///
-  /// If [Authorized], calls [onAuthorized].
-  /// If [Unauthorized], calls [onUnauthorized] and provides a [TReason].
-  /// Returns [TReturn] from the invoked callback, which can be synchronous or asynchronous.
+  /// If the action is authorized, calls [onAuthorized].
+  /// If unauthorized, calls [onUnauthorized] with the [TReason].
+  /// Returns [TReturn] from the invoked callback.
   TReturn apply<TReturn>({
     required TActor actor,
     required TResource resource,
@@ -88,10 +90,10 @@ abstract base class ActionAuthorizationPolicy<TActor, TResource, TReason extends
     };
   }
 
-  /// Enforces the policy on the context of the given [actor] and [resource].
+  /// Enforces the policy for the given [actor] and [resource].
   ///
-  /// If [Authorized], calls [onAuthorized].
-  /// If [Unauthorized], throws [ActionAuthorizationPolicyViolationException] and provides a [TReason].
+  /// If authorized, calls [onAuthorized].
+  /// If unauthorized, throws [PolicyViolationException] with the [TReason].
   TReturn enforce<TReturn>(
     TActor actor,
     TResource resource, {
@@ -106,23 +108,25 @@ abstract base class ActionAuthorizationPolicy<TActor, TResource, TReason extends
   }
 }
 
-/// Base class for the result of an action authorization check.
+/// Represents the result of an action authorization check.
 sealed class ActionAuthorizationResult<TReason> extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-/// Indicates the action is authorized.
+/// Indicates that the action is authorized.
 class Authorized extends ActionAuthorizationResult<Never> {}
 
-/// Indicates the action is unauthorized and provides the reason.
+/// Indicates that the action is unauthorized and provides the reason.
 class Unauthorized<TReason> extends ActionAuthorizationResult<TReason> {
   Unauthorized({required this.reason});
 
   final TReason reason;
 }
 
-/// Base class for unauthorized reasons in action authorization policies.
+/// Base class for reasons why an action was unauthorized.
+///
+/// Extend this class to define specific reasons for unauthorized actions in your policies.
 base class ActionUnauthorizedReason extends Equatable {
   @override
   List<Object?> get props => [];
