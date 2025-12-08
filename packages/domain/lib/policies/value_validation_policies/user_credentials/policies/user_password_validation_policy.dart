@@ -1,5 +1,6 @@
 part of '../user_credential_policy.dart';
 
+/// Policy for determining if a [Password] is valid for user credentials.
 final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, PasswordInvalidReason> {
   UserPasswordValidationPolicy() : super(validate: _validatePassword);
 
@@ -10,6 +11,7 @@ final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, 
   static const includeNumbers = true;
   static const includeSpecialCharacters = true;
 
+  /// Validates a [Password] against policy requirements.
   static ValidationResult<PasswordInvalidReason> _validatePassword(Password password) {
     final value = password.value;
 
@@ -34,6 +36,7 @@ final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, 
     return Valid();
   }
 
+  /// Generates a random [Password] that satisfies the policy requirements.
   Password generateRandomPassword({
     int length = 10,
     bool includeUppercase = true,

@@ -1,46 +1,61 @@
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:equatable/equatable.dart';
 
-/// Function signature for performing a validation check.
+/// Defines a function that checks if a [value] is valid according to the policy.
+/// Returns [Valid] if permitted, or [Invalid] with a reason.
 typedef Validate<TValue, TReason extends ValueInvalidReason> = ValidationResult<TReason> Function(TValue value);
 
 /// Callback invoked when validation succeeds.
+/// [TReturn] is the callback's return type, support sync and async.
 typedef OnValid<TReturn> = TReturn Function();
 
-/// Callback invoked when validation fails, with a failure reason.
+/// Callback invoked when validation fails, providing the reason.
+/// [TReturn] is the callback's return type, support sync and async.
 typedef OnInvalid<TReturn, TReason extends ValueInvalidReason> = TReturn Function(TReason reason);
 
-/// Abstract base for validation policies.
+/// Base class for policies that determine if a [value] is valid according to the implementing policy.
+/// Provides methods to apply or enforce validation logic, invoking the appropriate callbacks.
 ///
-/// Provides functionality for checking if a [value] is valid according to the policy.
-/// [TValue] is the type being validated (e.g., String, Email).
-/// [TReason] describes why the value is invalid, must extend [ValueInvalidReason].
-/// [TReturn] can be any type, including a [Future], enabling both sync and async callbacks.
-///
-/// ### Example:
+/// [TValue]: type being validated (e.g., String, Email)
+/// [TReason]: reason type for invalid values (extends [ValueInvalidReason])
+/// [TReturn]: callback return type, supports both sync and async
+/// 
+/// Use for defining validation rules for value objects in the domain.
+/// 
+/// Example:
 /// ```dart
-/// // Define a domain-specific failure reason:
-/// class EmailValidationFailure extends ValueInvalidReason {
-///   final String message;
-///   EmailValidationFailure(this.message);
-///   @override
-///   List<Object?> get props => [message];
+/// // Define a policy for a value that needs validation, e.g., a validation policy for emails:
+/// final class EmailValidationPolicy extends ValueValidationPolicy<String, EmailInvalidReason> {
+///   EmailValidationPolicy() : super(validate: _validateEmail);
+///
+///   static ValidationResult<EmailInvalidReason> _validateEmail(String email) {
+///     if (email.contains('@')) {
+///       return Valid();
+///     }
+///     return Invalid(reason: EmailMissingAtSign());
+///   }
 /// }
 ///
-/// // Define a concrete policy:
-/// final policy = ValueValidationPolicy<String, EmailValidationFailure>(
-///   validate: (email) =>
-///     email.contains('@')
-///       ? Valid()
-///       : Invalid(reason: EmailValidationFailure('Missing @')),
-/// );
+/// // Define reasons why an email might be invalid.
+/// sealed class EmailInvalidReason extends ValueInvalidReason {}
 ///
-/// final result = policy.apply(
-///   value: 'testexample.com',
+/// final class EmailMissingAtSign extends EmailInvalidReason {}
+///
+/// // Usage:
+/// final policy = EmailValidationPolicy();
+/// final result1 = policy.apply(
+///   value: 'valid@example.com',
 ///   onValid: () => 'valid',
-///   onInvalid: (reason) => 'invalid: ${reason.message}',
+///   onInvalid: (reason) => 'invalid',
 /// );
-/// print(result); // 'invalid: Missing @'
+/// // result1 == 'valid'
+///
+/// final result2 = policy.apply(
+///   value: 'invalid-example',
+///   onValid: () => 'valid',
+///   onInvalid: (reason) => 'invalid: $reason.toString()',
+/// );
+/// // result2 == 'invalid: EmailMissingAtSign'
 /// ```
 abstract base class ValueValidationPolicy<TValue, TReason extends ValueInvalidReason> {
   ValueValidationPolicy({
@@ -55,8 +70,8 @@ abstract base class ValueValidationPolicy<TValue, TReason extends ValueInvalidRe
   /// Applies the policy to the given [value].
   ///
   /// If valid, calls [onValid].
-  /// If invalid, calls [onInvalid] with the failure reason ([TReason]).
-  /// Returns [TReturn] from the invoked callback, which can be synchronous or asynchronous.
+  /// If invalid, calls [onInvalid] with the reason ([TReason]).
+  /// Returns [TReturn] from the invoked callback.
   TReturn apply<TReturn>({
     required TValue value,
     required OnValid<TReturn> onValid,
@@ -71,7 +86,7 @@ abstract base class ValueValidationPolicy<TValue, TReason extends ValueInvalidRe
   /// Enforces the policy for the given [value].
   ///
   /// If valid, calls [onValid].
-  /// If invalid, throws [PolicyViolationException] with the failure reason ([TReason]).
+  /// If invalid, throws [PolicyViolationException] with the reason ([TReason]).
   TReturn enforce<TReturn>(
     TValue value, {
     required OnValid<TReturn> onValid,
@@ -84,7 +99,7 @@ abstract base class ValueValidationPolicy<TValue, TReason extends ValueInvalidRe
   }
 }
 
-/// Base class for the result of a validation check.
+/// Represents the result of a validation check.
 sealed class ValidationResult<TReason> extends Equatable {
   @override
   List<Object?> get props => [];
@@ -93,17 +108,16 @@ sealed class ValidationResult<TReason> extends Equatable {
 /// Indicates the value is valid.
 class Valid extends ValidationResult<Never> {}
 
-/// Indicates the value is invalid and provides the failure reason.
+/// Indicates the value is invalid and provides the reason.
 class Invalid<TReason> extends ValidationResult<TReason> {
   /// The domain-specific failure reason for the invalid value.
   Invalid({required this.reason});
   final TReason reason;
 }
 
-/// Base class for failure reasons in validation policies.
+/// Base class for reasons why a value was invalid in validation policies.
 ///
-/// Extend this class to define domain-specific failure reason types, e.g. `EmailValidationFailure`.
-/// Use as the generic type for [Invalid] and policy exceptions to provide structured, type-safe reasons.
+/// Extend this class to define domain-specific reason types, e.g. `EmailValidationFailure`.
 base class ValueInvalidReason extends Equatable {
   @override
   List<Object?> get props => [];
