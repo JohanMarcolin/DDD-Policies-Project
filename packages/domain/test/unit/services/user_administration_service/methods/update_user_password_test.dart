@@ -2,7 +2,6 @@ import 'package:domain/policies/action_authorization_policies/user_administratio
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
-import 'package:domain/value_objects/password.dart';
 import 'package:test/test.dart';
 import 'package:test_utils/mocks/mock_user_credentials.dart';
 import 'package:test_utils/mocks/mock_users.dart';

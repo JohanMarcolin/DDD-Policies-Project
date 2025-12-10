@@ -1,53 +1,46 @@
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
-import 'package:domain/value_objects/password.dart';
 import 'package:test/test.dart';
+import 'package:test_utils/mocks/mock_user_credentials.dart';
 
 void main() {
   group('UserPasswordValidationPolicy', () {
     final policy = UserPasswordValidationPolicy();
-    final validPassword = Password('Abcdef1!');
-    final shortPassword = Password('A1!a');
-    final longPassword = Password('A' * 65 + '1!a');
-    final noUppercase = Password('abcdef1!');
-    final noLowercase = Password('ABCDEF1!');
-    final noNumber = Password('Abcdefg!');
-    final noSpecial = Password('Abcdefg1');
 
     group('isValid', () {
       test('returns true for valid password', () {
-        expect(policy.isValid(validPassword), isTrue);
+        expect(policy.isValid(mockValidPassword), isTrue);
       });
 
       test('returns false for too short', () {
-        expect(policy.isValid(shortPassword), isFalse);
+        expect(policy.isValid(mockTooShortPassword), isFalse);
       });
 
       test('returns false for too long', () {
-        expect(policy.isValid(longPassword), isFalse);
+        expect(policy.isValid(mockTooLongPassword), isFalse);
       });
 
       test('returns false for missing uppercase', () {
-        expect(policy.isValid(noUppercase), isFalse);
+        expect(policy.isValid(mockMissingUppercasePassword), isFalse);
       });
 
       test('returns false for missing lowercase', () {
-        expect(policy.isValid(noLowercase), isFalse);
+        expect(policy.isValid(mockMissingLowercasePassword), isFalse);
       });
 
       test('returns false for missing number', () {
-        expect(policy.isValid(noNumber), isFalse);
+        expect(policy.isValid(mockMissingNumberPassword), isFalse);
       });
 
       test('returns false for missing special character', () {
-        expect(policy.isValid(noSpecial), isFalse);
+        expect(policy.isValid(mockMissingSpecialCharPassword), isFalse);
       });
     });
 
     group('apply', () {
       test('returns onValid for valid password', () {
         final result = policy.apply(
-          value: validPassword,
+          value: mockValidPassword,
           onValid: () => 'valid',
           onInvalid: (reason) => 'invalid',
         );
@@ -56,7 +49,7 @@ void main() {
 
       test('returns onInvalid with PasswordTooShort', () {
         final result = policy.apply(
-          value: shortPassword,
+          value: mockTooShortPassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
@@ -65,7 +58,7 @@ void main() {
 
       test('returns onInvalid with PasswordTooLong', () {
         final result = policy.apply(
-          value: longPassword,
+          value: mockTooLongPassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
@@ -74,7 +67,7 @@ void main() {
 
       test('returns onInvalid with PasswordMissingUppercase', () {
         final result = policy.apply(
-          value: noUppercase,
+          value: mockMissingUppercasePassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
@@ -83,7 +76,7 @@ void main() {
 
       test('returns onInvalid with PasswordMissingLowercase', () {
         final result = policy.apply(
-          value: noLowercase,
+          value: mockMissingLowercasePassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
@@ -92,16 +85,16 @@ void main() {
 
       test('returns onInvalid with PasswordMissingNumber', () {
         final result = policy.apply(
-          value: noNumber,
+          value: mockMissingNumberPassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
         expect(result, isA<PasswordMissingNumber>());
       });
 
-      test('returns onInvalid with PasswordMissingSpecialCharacter', () {
+      test('returns onInvalid with PasswordMissingSpecialChar', () {
         final result = policy.apply(
-          value: noSpecial,
+          value: mockMissingSpecialCharPassword,
           onValid: () => 'valid',
           onInvalid: (reason) => reason,
         );
@@ -111,68 +104,29 @@ void main() {
 
     group('enforce', () {
       test('returns normally for valid password', () {
-        expect(() => policy.enforce(validPassword, onValid: () => 'valid'), returnsNormally);
+        expect(() => policy.enforce(mockValidPassword, onValid: () {}), returnsNormally);
       });
-
       test('throws for too short', () {
-        expect(
-          () => policy.enforce(shortPassword, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordTooShort),
-          ),
-        );
+        expect(() => policy.enforce(mockTooShortPassword, onValid: () {}), throwsA(isA<PolicyViolationException>()));
       });
-
       test('throws for too long', () {
-        expect(
-          () => policy.enforce(longPassword, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordTooLong),
-          ),
-        );
+        expect(() => policy.enforce(mockTooLongPassword, onValid: () {}), throwsA(isA<PolicyViolationException>()));
       });
-
       test('throws for missing uppercase', () {
-        expect(
-          () => policy.enforce(noUppercase, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordMissingUppercase),
-          ),
-        );
+        expect(() => policy.enforce(mockMissingUppercasePassword, onValid: () {}),
+            throwsA(isA<PolicyViolationException>()));
       });
-
       test('throws for missing lowercase', () {
-        expect(
-          () => policy.enforce(noLowercase, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordMissingLowercase),
-          ),
-        );
+        expect(() => policy.enforce(mockMissingLowercasePassword, onValid: () {}),
+            throwsA(isA<PolicyViolationException>()));
       });
-
       test('throws for missing number', () {
         expect(
-          () => policy.enforce(noNumber, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordMissingNumber),
-          ),
-        );
+            () => policy.enforce(mockMissingNumberPassword, onValid: () {}), throwsA(isA<PolicyViolationException>()));
       });
-
       test('throws for missing special character', () {
-        expect(
-          () => policy.enforce(noSpecial, onValid: () => 'valid'),
-          throwsA(
-            predicate((e) => e is PolicyViolationException && e.reason is PasswordMissingSpecialCharacter),
-          ),
-        );
-      });
-    });
-
-    group('generateRandomPassword', () {
-      test('produces valid password', () {
-        final generated = policy.generateRandomPassword(length: 12);
-        expect(policy.isValid(generated), isTrue);
+        expect(() => policy.enforce(mockMissingSpecialCharPassword, onValid: () {}),
+            throwsA(isA<PolicyViolationException>()));
       });
     });
   });

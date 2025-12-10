@@ -9,10 +9,12 @@ void main() {
 
     group('isValid', () {
       test('returns true for alwaysValidPolicy', () {
-        expect(alwaysValidPolicy.isValid('value'), isTrue);
+        expect(alwaysValidPolicy.isValid('value'), isTrue,
+            reason: 'Should be valid for DummyAlwaysValidValidationPolicy');
       });
       test('returns false for alwaysInvalidPolicy', () {
-        expect(alwaysInvalidPolicy.isValid('value'), isFalse);
+        expect(alwaysInvalidPolicy.isValid('value'), isFalse,
+            reason: 'Should not be valid for DummyAlwaysInvalidValidationPolicy');
       });
     });
 
@@ -23,7 +25,7 @@ void main() {
           onValid: () => 'valid',
           onInvalid: (reason) => 'invalid',
         );
-        expect(result, equals('valid'));
+        expect(result, equals('valid'), reason: 'Should call onValid for DummyAlwaysValidValidationPolicy');
       });
       test('calls onInvalid for alwaysInvalidPolicy', () {
         final result = alwaysInvalidPolicy.apply(
@@ -31,16 +33,18 @@ void main() {
           onValid: () => {},
           onInvalid: (reason) => reason,
         );
-        expect(result, isA<DummyIsAlwaysInvalid>());
+        expect(result, isA<DummyIsAlwaysInvalid>(), reason: 'Should call onInvalid and return DummyIsAlwaysInvalid');
       });
     });
 
     group('enforce', () {
       test('returns normally for alwaysValidPolicy', () {
-        expect(() => alwaysValidPolicy.enforce('any', onValid: () {}), returnsNormally);
+        expect(() => alwaysValidPolicy.enforce('any', onValid: () {}), returnsNormally,
+            reason: 'Should not throw for DummyAlwaysValidValidationPolicy');
       });
       test('throws for alwaysInvalidPolicy', () {
-        expect(() => alwaysInvalidPolicy.enforce('any', onValid: () {}), throwsA(isA<PolicyViolationException>()));
+        expect(() => alwaysInvalidPolicy.enforce('any', onValid: () {}), throwsA(isA<PolicyViolationException>()),
+            reason: 'Should throw PolicyViolationException for DummyAlwaysInvalidValidationPolicy');
       });
     });
   });
