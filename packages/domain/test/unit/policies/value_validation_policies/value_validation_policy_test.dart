@@ -1,6 +1,6 @@
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:test/test.dart';
-import '../../utils/policies/validation_policies/dummy_validation_policy.dart';
+import '../../utils/policies/value_validation_policies/dummy_value_validation_policy.dart';
 
 void main() {
   group('ValueValidationPolicy', () {

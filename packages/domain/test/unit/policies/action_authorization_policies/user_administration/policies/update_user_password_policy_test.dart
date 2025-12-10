@@ -1,11 +1,11 @@
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:test/test.dart';
 
-import '../../../utils/users.dart' show analyst, admin, user, otherUser;
+import '../../../../utils/mock/mock_users.dart' show analyst, admin, user, otherUser;
 
 void main() {
-  group('UpdateUserEmailPolicy', () {
-    final policy = UpdateUserEmailPolicy();
+  group('UpdateUserPasswordPolicy', () {
+    final policy = UpdateUserPasswordPolicy();
 
     test('analyst can update anyone', () {
       expect(policy.isAuthorized(analyst, otherUser), isTrue);

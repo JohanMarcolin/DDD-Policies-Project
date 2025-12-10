@@ -1,7 +1,7 @@
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:test/test.dart';
 
-import '../../../utils/users.dart' show analyst, admin, user, otherUser;
+import '../../../../utils/mock/mock_users.dart' show analyst, admin, user, otherUser;
 
 void main() {
   group('DeleteUserPolicy', () {

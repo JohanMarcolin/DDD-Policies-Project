@@ -1,7 +1,7 @@
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:test/test.dart';
 
-import '../../utils/policies/action_policies/dummy_action_policy.dart';
+import '../../utils/policies/action_authorization_policies/dummy_action_authorization_policy.dart';
 
 void main() {
   group('ActionAuthorizationPolicy', () {
