@@ -4,45 +4,49 @@ import 'package:domain/policies/value_validation_policies/user_credentials/user_
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:test/test.dart';
-import '../../../utils/mock/mock_users.dart';
+import 'package:test_utils/mocks/mock_user_credentials.dart';
+import 'package:test_utils/mocks/mock_users.dart';
 import '../../../utils/services/user_administration_service.dart';
 
+/// Unit tests for [UserAdministrationService.updateUserPassword].
 void main() {
   late UserAdministrationService userAdministrationService;
 
   setUp(() {
-    userAdministrationService =
-        createTestUserAdministrationService([user, otherUser, admin, otherAdmin, analyst, otherAnalyst]);
+    userAdministrationService = createTestUserAdministrationService(
+        [mockUser, otherMockUser, mockAdmin, otherMockAdmin, mockAnalyst, otherMockAnalyst]);
   });
 
   group('UserAdministrationService', () {
     group('updateUserPassword', () {
       group('User', () {
         test('should be able to update own password to a new valid password', () async {
-          final self = user;
-          final newPassword = Password('NewPassword123!');
+          final self = mockUser;
+          final newPassword = mockValidPassword;
           await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
           // No direct way to verify password, but no exception means success
         });
-        test('should not be able to update own password to an invalid password', () async {
-          final self = user;
-          final newPassword = Password('short');
-          expect(
-            () async => await userAdministrationService.updateUserPassword(
-                initiator: self, target: self, newPassword: newPassword),
-            throwsA(
-              predicate((e) =>
-                  e is PolicyViolationException<UpdateUserPasswordUnauthorizedReason> && e.reason is PasswordTooShort),
-            ),
-            reason: 'User should not be able to update own password to invalid password',
-          );
-        });
-        for (final other in [otherUser, otherAdmin, analyst]) {
-          test('should not be able to update password of ${other.role.name}', () async {
-            final newPassword = Password('NewPassword123!');
+
+        for (final invalidPassword in mockInvalidPasswords) {
+          test('should not be able to update own password to an invalid password', () async {
+            final self = mockUser;
+            final newPassword = invalidPassword;
             expect(
               () async => await userAdministrationService.updateUserPassword(
-                  initiator: user, target: other, newPassword: newPassword),
+                  initiator: self, target: self, newPassword: newPassword),
+              throwsA(predicate((e) => e is PolicyViolationException<PasswordInvalidReason>)),
+              reason:
+                  'User should not be able to update own password to invalid password of value "${newPassword.value}"',
+            );
+          });
+        }
+
+        for (final other in [otherMockUser, otherMockAdmin, mockAnalyst]) {
+          test('should not be able to update password of ${other.role.name}', () async {
+            final newPassword = mockValidPassword;
+            expect(
+              () async => await userAdministrationService.updateUserPassword(
+                  initiator: mockUser, target: other, newPassword: newPassword),
               throwsA(
                 predicate((e) =>
                     e is PolicyViolationException<UpdateUserPasswordUnauthorizedReason> &&
@@ -55,41 +59,43 @@ void main() {
       });
       group('Admin', () {
         test('should be able to update own password to a new valid password', () async {
-          final self = admin;
-          final newPassword = Password('NewPassword123!');
+          final self = mockAdmin;
+          final newPassword = mockValidPassword;
           await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
         });
-        test('should not be able to update own password to an invalid password', () async {
-          final self = admin;
-          final newPassword = Password('short');
-          expect(
-            () async => await userAdministrationService.updateUserPassword(
-                initiator: self, target: self, newPassword: newPassword),
-            throwsA(
-              predicate((e) =>
-                  e is PolicyViolationException<UpdateUserPasswordUnauthorizedReason> && e.reason is PasswordTooShort),
-            ),
-            reason: 'Admin should not be able to update own password to invalid password',
-          );
-        });
-        for (final other in [otherUser, user]) {
+
+        for (final invalidPassword in mockInvalidPasswords) {
+          test('should not be able to update own password to an invalid password', () async {
+            final self = mockAdmin;
+            final newPassword = invalidPassword;
+            expect(
+              () async => await userAdministrationService.updateUserPassword(
+                  initiator: self, target: self, newPassword: newPassword),
+              throwsA(predicate((e) => e is PolicyViolationException<PasswordInvalidReason>)),
+              reason:
+                  'Admin should not be able to update own password to invalid password of value "${newPassword.value}"',
+            );
+          });
+        }
+
+        for (final other in [otherMockUser, mockUser]) {
           test('should be able to update password of ${other.role.name} to a new valid password', () async {
-            final self = admin;
-            final newPassword = Password('NewPassword123!');
+            final self = mockAdmin;
+            final newPassword = mockValidPassword;
             await userAdministrationService.updateUserPassword(
                 initiator: self, target: other, newPassword: newPassword);
           });
         }
         test('should not be able to update analyst password', () async {
-          final self = admin;
-          final newPassword = Password('NewPassword123!');
+          final self = mockAdmin;
+          final newPassword = mockValidPassword;
           expect(
             () async => await userAdministrationService.updateUserPassword(
-                initiator: self, target: analyst, newPassword: newPassword),
+                initiator: self, target: mockAnalyst, newPassword: newPassword),
             throwsA(
               predicate((e) =>
                   e is PolicyViolationException<UpdateUserPasswordUnauthorizedReason> &&
-                  e.reason is CanOnlyUpdatePasswordOnSelf),
+                  e.reason is CannotUpdatePasswordOnAnalyst),
             ),
             reason: 'Admin should not be able to update analyst password',
           );
@@ -97,27 +103,29 @@ void main() {
       });
       group('Analyst', () {
         test('should be able to update own password to a new valid password', () async {
-          final self = analyst;
-          final newPassword = Password('NewPassword123!');
+          final self = mockAnalyst;
+          final newPassword = mockValidPassword;
           await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
         });
-        test('should not be able to update own password to an invalid password', () async {
-          final self = analyst;
-          final newPassword = Password('short');
-          expect(
-            () async => await userAdministrationService.updateUserPassword(
-                initiator: self, target: self, newPassword: newPassword),
-            throwsA(
-              predicate((e) =>
-                  e is PolicyViolationException<UpdateUserPasswordUnauthorizedReason> && e.reason is PasswordTooShort),
-            ),
-            reason: 'Analyst should not be able to update own password to invalid password',
-          );
-        });
-        for (final other in [otherUser, otherAdmin]) {
+
+        for (final invalidPassword in mockInvalidPasswords) {
+          test('should not be able to update own password to an invalid password', () async {
+            final self = mockAnalyst;
+            final newPassword = invalidPassword;
+            expect(
+              () async => await userAdministrationService.updateUserPassword(
+                  initiator: self, target: self, newPassword: newPassword),
+              throwsA(predicate((e) => e is PolicyViolationException<PasswordInvalidReason>)),
+              reason:
+                  'Analyst should not be able to update own password to invalid password of value "${newPassword.value}"',
+            );
+          });
+        }
+
+        for (final other in [otherMockUser, otherMockAdmin]) {
           test('should be able to update password of ${other.role.name} to a new valid password', () async {
-            final self = analyst;
-            final newPassword = Password('NewPassword123!');
+            final self = mockAnalyst;
+            final newPassword = mockValidPassword;
             await userAdministrationService.updateUserPassword(
                 initiator: self, target: other, newPassword: newPassword);
           });

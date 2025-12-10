@@ -2,6 +2,7 @@ import 'package:domain/services/user_administration/user_administration_service.
 import 'package:test/test.dart';
 import '../../../utils/services/user_administration_service.dart';
 
+/// Unit tests for [UserAdministrationService.generateUserPassword]
 void main() {
   late UserAdministrationService userAdministrationService;
 
@@ -20,6 +21,7 @@ void main() {
         );
         expect(result, isTrue);
       });
+
       test('generates different passwords on subsequent calls', () {
         final password1 = userAdministrationService.generateUserPassword();
         final password2 = userAdministrationService.generateUserPassword();
