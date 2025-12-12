@@ -1,8 +1,7 @@
 import 'package:domain/policies/action_authorization_policies/user_administration/user_administration_policy.dart';
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:test/test.dart';
-import 'package:test_utils/mocks/mock_users.dart'
-    show mockUser, otherMockUser, mockAdmin, otherMockAdmin, mockAnalyst, otherMockAnalyst;
+import 'package:test_utils/mocks/mock_users.dart';
 
 void main() {
   final policy = ViewUserPolicy();
