@@ -6,6 +6,7 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 resolution: workspace
 dependencies:
+  env_config: ^1.0.0
   domain: ^1.0.0
   http: ^1.2.1
   shelf: ^1.4.1

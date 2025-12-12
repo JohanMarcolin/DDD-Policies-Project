@@ -25,6 +25,7 @@ import 'controllers/user_controller.dart';
 import 'security/security_filter_chain.dart';
 import 'services/test_service.dart';
 import 'services/user_service.dart';
+import 'package:env_config/env_config.dart';
 
 /// Shelf-based HTTP server.
 ///
@@ -33,13 +34,16 @@ import 'services/user_service.dart';
 /// - Set [exposeTestRoutes] to true to enable internal test endpoints for development and integration testing.
 /// - Set [seedDevelopmentUsers] to true to populate the database with predefined test users for local development and manual testing.
 class Server {
-  Server({this.host = '0.0.0.0', this.port = 8080, this.exposeTestRoutes = false, this.seedDevelopmentUsers = false});
+  Server({String? host, int? port, this.exposeTestRoutes = false, this.seedDevelopmentUsers = false})
+      : host = host ?? Env.serverHost,
+        port = port ?? Env.serverPort;
   final String host;
   final int port;
   final bool exposeTestRoutes;
   final bool seedDevelopmentUsers;
+  late final String baseUrl;
+  
   HttpServer? _server;
-  late String baseUrl;
 
   /// Starts the server, configures all routes, middleware, and optionally seeds test users.
   ///

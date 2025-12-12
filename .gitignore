@@ -9,3 +9,6 @@ README.md
 
 # melos generated files
 **/melos_*
+
+# build_runner generated files
+*.g.dart

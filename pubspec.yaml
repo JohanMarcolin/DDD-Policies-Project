@@ -9,6 +9,7 @@ workspace:
   - apps/client
   - apps/server
   - packages/domain
+  - packages/env_config
   - packages/api_error_codes
   - packages/http_api
   - packages/test_utils
@@ -18,8 +19,12 @@ dev_dependencies:
   melos: ^7.3.0
   lints: ^6.0.0
 
+dependency_overrides:
+  analyzer: ^8.0.0
+
 melos:
   scripts:
+    env_build: melos exec --scope=env_config "dart run build_runner build --delete-conflicting-outputs"
     lint: melos exec --concurrency=4 "dart analyze"
     format: melos exec --concurrency=16 "dart format . --line-length 120"
 

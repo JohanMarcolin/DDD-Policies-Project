@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:env_config/env_config.dart';
 import 'package:http/http.dart' as http;
 
 part 'http_method.dart';
@@ -10,9 +11,7 @@ class _UnauthorizedException implements Exception {}
 ///
 /// Provides generic methods for CRUD requests, with support for authentication and token refresh.
 abstract class HttpApi {
-  static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080';
-  
-  static String _baseUrl = _androidEmulatorBaseUrl;
+  static String _baseUrl = Env.androidEmulatorBaseUrl;
 
   /// Sets the base URL for all API requests.
   ///
