@@ -11,7 +11,7 @@ class _UnauthorizedException implements Exception {}
 ///
 /// Provides generic methods for CRUD requests, with support for authentication and token refresh.
 abstract class HttpApi {
-  static String _baseUrl = Env.androidEmulatorBaseUrl;
+  static String _baseUrl = Env.androidEmulatorServerBaseUrl;
 
   /// Sets the base URL for all API requests.
   ///

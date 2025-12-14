@@ -1,5 +1,4 @@
 import 'package:test_utils/user_test_fixture.dart';
-import 'package:http_api/http_api.dart';
 import 'package:test_utils/server/test_server_fixture.dart';
 
 import 'integration_test_api.dart';
@@ -19,7 +18,6 @@ class IntegrationTestServerFixture {
   /// Call this in your test's `setUp` method.
   static Future<void> setup() async {
     await TestServerFixture.start(exposeTestRoutes: true);
-    HttpApi.baseUrl = TestServerFixture.baseUrl;
     _integrationTestApi = IntegrationTestApi();
     _authTokenService = AuthTokenService();
   }

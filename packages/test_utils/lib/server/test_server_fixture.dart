@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:http_api/http_api.dart';
 import 'package:server/infrastructure/server.dart';
 
 /// Utility class for managing a test HTTP server instance for testing purposes.
@@ -12,6 +13,7 @@ class TestServerFixture {
     final randomPort = 0;
     _server = Server(port: randomPort, exposeTestRoutes: exposeTestRoutes, seedDevelopmentUsers: seedDevelopmentUsers);
     _httpServer = await _server!.start();
+    HttpApi.baseUrl = _server!.baseUrl;
   }
 
   /// Stops the test server and cleans up resources.
