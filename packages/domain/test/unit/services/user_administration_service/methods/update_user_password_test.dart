@@ -22,8 +22,16 @@ void main() {
         test('should be able to update own password to a new valid password', () async {
           final self = mockUser;
           final newPassword = mockValidPassword;
-          await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
-          // No direct way to verify password, but no exception means success
+
+          expect(
+            () async => await userAdministrationService.updateUserPassword(
+              initiator: self,
+              target: self,
+              newPassword: newPassword,
+            ),
+            returnsNormally,
+            reason: 'User should be able to update their own password to a valid password.',
+          );
         });
 
         for (final invalidPassword in mockInvalidPasswords) {
@@ -60,7 +68,16 @@ void main() {
         test('should be able to update own password to a new valid password', () async {
           final self = mockAdmin;
           final newPassword = mockValidPassword;
-          await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
+
+          expect(
+            () async => await userAdministrationService.updateUserPassword(
+              initiator: self,
+              target: self,
+              newPassword: newPassword,
+            ),
+            returnsNormally,
+            reason: 'Admin should be able to update their own password to a valid password.',
+          );
         });
 
         for (final invalidPassword in mockInvalidPasswords) {
@@ -81,8 +98,16 @@ void main() {
           test('should be able to update password of ${other.role.name} to a new valid password', () async {
             final self = mockAdmin;
             final newPassword = mockValidPassword;
-            await userAdministrationService.updateUserPassword(
-                initiator: self, target: other, newPassword: newPassword);
+
+            expect(
+              () async => await userAdministrationService.updateUserPassword(
+                initiator: self,
+                target: other,
+                newPassword: newPassword,
+              ),
+              returnsNormally,
+              reason: 'Admin should be able to update the password of ${other.role.name} to a valid password.',
+            );
           });
         }
         test('should not be able to update analyst password', () async {
@@ -104,7 +129,16 @@ void main() {
         test('should be able to update own password to a new valid password', () async {
           final self = mockAnalyst;
           final newPassword = mockValidPassword;
-          await userAdministrationService.updateUserPassword(initiator: self, target: self, newPassword: newPassword);
+
+          expect(
+            () async => await userAdministrationService.updateUserPassword(
+              initiator: self,
+              target: self,
+              newPassword: newPassword,
+            ),
+            returnsNormally,
+            reason: 'Analyst should be able to update their own password to a valid password.',
+          );
         });
 
         for (final invalidPassword in mockInvalidPasswords) {
@@ -125,8 +159,16 @@ void main() {
           test('should be able to update password of ${other.role.name} to a new valid password', () async {
             final self = mockAnalyst;
             final newPassword = mockValidPassword;
-            await userAdministrationService.updateUserPassword(
-                initiator: self, target: other, newPassword: newPassword);
+
+            expect(
+              () async => await userAdministrationService.updateUserPassword(
+                initiator: self,
+                target: other,
+                newPassword: newPassword,
+              ),
+              returnsNormally,
+              reason: 'Analyst should be able to update the password of ${other.role.name} to a valid password.',
+            );
           });
         }
       });
