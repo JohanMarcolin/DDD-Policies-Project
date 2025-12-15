@@ -15,7 +15,7 @@ abstract class HttpApi {
 
   /// Sets the base URL for all API requests.
   ///
-  /// Useful for configuring different environments (e.g., development and e2e testing).
+  /// Useful for configuring different environments (e.g., api and e2e testing).
   static set baseUrl(String url) => _baseUrl = url;
 
   /// Performs a `GET` request to [endpoint] and maps the response using [map].

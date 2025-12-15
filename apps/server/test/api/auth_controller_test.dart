@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:test_utils/user_test_fixture.dart';
+import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'api_test_server_fixture.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;

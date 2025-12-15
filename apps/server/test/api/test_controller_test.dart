@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:domain/value_objects/role.dart';
-import 'package:test_utils/server/test_server_fixture.dart';
+import 'package:test_utils/fixtures/server/test_server_fixture.dart';
 import 'api_test_server_fixture.dart';
 // ignore: depend_on_referenced_packages
 import 'package:test/test.dart';

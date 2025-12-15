@@ -15,7 +15,7 @@ import 'package:client/main.dart' as app;
 import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
-import 'package:test_utils/user_test_fixture.dart';
+import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 
 import '../../../test_utils/mock_auth_api.dart';
 import 'widget_finder_extensions.dart';

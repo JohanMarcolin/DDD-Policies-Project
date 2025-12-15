@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:test_utils/server/test_server_fixture.dart';
-import 'package:test_utils/user_test_fixture.dart';
+import 'package:test_utils/fixtures/server/test_server_fixture.dart';
+import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:http/http.dart' as http;
 
 /// Generates an HTTP Authorization header for the given [UserTestFixture].
