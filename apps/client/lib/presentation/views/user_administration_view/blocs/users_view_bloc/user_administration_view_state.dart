@@ -1,6 +1,6 @@
 part of 'user_administration_view_bloc.dart';
 
-abstract class UserAdministrationViewState {}
+sealed class UserAdministrationViewState {}
 
 class UserAdministrationViewInitial extends UserAdministrationViewState {}
 

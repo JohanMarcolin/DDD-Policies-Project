@@ -1,6 +1,6 @@
 part of 'user_administration_view_bloc.dart';
 
-abstract class UserAdministrationViewEvent {}
+sealed class UserAdministrationViewEvent {}
 
 sealed class FetchUsersEvent extends UserAdministrationViewEvent {}
 

@@ -7,7 +7,7 @@ import 'package:domain/repositories/user_repository.dart' as domain;
 
 /// Implementation of [domain.UserRepository] using [UserApi].
 ///
-/// Delegates user CRUD operations to [UserApi].
+/// Delegates user operations to [UserApi].
 class HttpUserRepository implements domain.UserRepository {
   HttpUserRepository({required UserApi userApi}) : _userApi = userApi;
 
@@ -27,7 +27,9 @@ class HttpUserRepository implements domain.UserRepository {
 
   /// Retrieves a user by [userId].
   ///
-  /// Returns the [User] if found, otherwise `null`. Rethrows if the operation fails.
+  /// Returns the [User] if found, otherwise `null`.
+  /// 
+  /// Rethrows if the operation fails.
   @override
   Future<User?> get({required UserId userId}) async {
     try {
@@ -40,7 +42,7 @@ class HttpUserRepository implements domain.UserRepository {
 
   /// Retrieves a user by [email].
   ///
-  /// Rethrows if the operation fails. Not yet implemented.
+  /// Not yet implemented.
   ///
   /// Note: This method always throws [UnimplementedError].
   @override
@@ -74,7 +76,9 @@ class HttpUserRepository implements domain.UserRepository {
 
   /// Retrieves all users.
   ///
-  /// Returns a list of [User]:s. Rethrows if the operation fails.
+  /// Returns a list of [User]:s.
+  /// 
+  /// Rethrows if the operation fails.
   @override
   Future<List<User>> get users async {
     try {

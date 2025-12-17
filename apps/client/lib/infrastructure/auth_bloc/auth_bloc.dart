@@ -12,7 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRefreshAccessTokenRequested>(_onRefreshAccessTokenRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
-    on<AuthRevokeAuthentication>(_onRevokeAuthentication);
+    on<AuthRevokeAuthenticationRequested>(_onRevokeAuthentication);
   }
 
   final AuthApi _authApi;
@@ -54,7 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRevokeAuthentication(AuthRevokeAuthentication event, Emitter<AuthState> emit) async {
+  Future<void> _onRevokeAuthentication(AuthRevokeAuthenticationRequested event, Emitter<AuthState> emit) async {
     emit(Unauthenticated());
   }
 }

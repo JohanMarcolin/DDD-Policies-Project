@@ -9,7 +9,7 @@ import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:http_api/http_api.dart';
 
-/// API for user administration operations.
+/// API for user operations.
 class UserApi extends HttpApi {
   UserApi({required this.authApi, required this.authTokenService});
 
@@ -18,7 +18,9 @@ class UserApi extends HttpApi {
 
   /// Retrieves all users from the server.
   ///
-  /// Returns a list of [User]:s. Throws [UserApiException].
+  /// Returns a list of [User]:s.
+  /// 
+  /// Throws [UserApiException].
   Future<List<User>> get users async {
     return await callGet<List<User>>(
       endpoint: '/user/all',
@@ -35,7 +37,9 @@ class UserApi extends HttpApi {
 
   /// Retrieves a user by [userId].
   ///
-  /// Returns a [User] if found, otherwise `null`. Throws [UserApiException].
+  /// Returns a [User] if found, otherwise `null`.
+  /// 
+  /// Throws [UserApiException].
   Future<User?> get({required UserId userId}) async {
     return await callGet<User?>(
       endpoint: '/user/${userId.value}',
@@ -70,7 +74,7 @@ class UserApi extends HttpApi {
     );
   }
 
-  /// Updates the email address for the user with [userId].
+  /// Updates the email for the user with [userId].
   ///
   /// Throws [UserApiException].
   Future<void> updateEmail({required UserId userId, required Email newEmail}) async {

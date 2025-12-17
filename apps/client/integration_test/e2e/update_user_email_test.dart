@@ -41,6 +41,7 @@ void main() {
           },
         );
 
+        /// If the initiator cannot view themselves, they cannot update their own email.
         if (!canViewSelf) return;
 
         await userAdministrationService.authorizeUpdateUserEmail(
@@ -68,6 +69,7 @@ void main() {
             },
           );
 
+          /// If the initiator cannot view the target, they cannot update the target's email.
           if (!canViewTarget) return;
 
           await userAdministrationService.authorizeUpdateUserEmail(
@@ -122,7 +124,7 @@ Future<void> _assertUpdateEmailSucceeds({
 
   final emailField = find.descendant(of: confirmInputDialog, matching: find.byType(TextField));
 
-  final newTargetEmail = Email('new_${target.user.userId.value}@example.com');
+  final newTargetEmail = Email('updated_${target.email.value}');
 
   await tester.enterText(emailField, newTargetEmail.value);
 

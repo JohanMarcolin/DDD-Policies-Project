@@ -7,7 +7,9 @@ class DeleteUserIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Icons.delete;
     final bloc = context.read<UserAdministrationViewBloc>();
+    final isUserDeletingSelf = bloc.isAdministratingSelf(user);
 
     return bloc.authorizeDeleteUser(
       user,
@@ -15,17 +17,15 @@ class DeleteUserIcon extends StatelessWidget {
         return BlocPresentationListener<UserAdministrationViewBloc, UserAdministrationViewEvent>(
           listener: (_, event) async {
             if (event is DeleteSelfSuccess) {
-              context.read<AuthBloc>().add(AuthRevokeAuthentication());
+              context.read<AuthBloc>().add(AuthRevokeAuthenticationRequested());
             }
           },
           child: UserActionIcon.authorized(
-            icon: Icons.delete,
+            icon: icon,
             dialogChildBuilder: (context, {required closeDialog}) => DeleteUserDialogChild(
-              isUserDeletingSelf: bloc.isAdministratingSelf(user),
+              isUserDeletingSelf: isUserDeletingSelf,
               onCancel: () async => await closeDialog(context),
-              onConfirm: () {
-                bloc.add(DeleteUserRequested(targetUser: user));
-              },
+              onConfirm: () => bloc.add(DeleteUserRequested(targetUser: user)),
             ),
             closeDialogOnEvent: (event) => event is DeleteUserSuccess || event is DeleteSelfSuccess,
             eventMessageMapper: (event) => switch (event) {
@@ -39,7 +39,7 @@ class DeleteUserIcon extends StatelessWidget {
       },
       onUnauthorized: (DeleteUserUnauthorizedReason reason) {
         return UserActionIcon.unauthorized<DeleteUserUnauthorizedReason>(
-          icon: Icons.delete,
+          icon: icon,
           unauthorizedReason: reason,
           unauthorizedMessageMapper: (reason) => switch (reason) {
             CannotDeleteSelf() => 'You cannot delete yourself',

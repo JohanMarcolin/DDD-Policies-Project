@@ -4,7 +4,7 @@ import 'package:mappers/user_test_fixture_mapper.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:http_api/http_api.dart';
 
-/// API for managing user test fixtures in API tests.
+/// API for managing user test fixtures in tests.
 ///
 /// Provides methods to create and delete user test fixtures server-side, enabling
 /// isolated test scenarios.
@@ -19,8 +19,8 @@ class UserTestFixtureApi extends HttpApi {
 
   /// Creates user fixtures for all [Role.values].
   ///
-  /// Returns a list of [UserTestFixture]:s for role-based Api testing.
-  /// Throws [UserTestFixtureApiException] if the call returns an error.
+  /// Returns a list of [UserTestFixture]:s.
+  /// Throws [UserTestFixtureApiException].
   Future<List<UserTestFixture>> createAllUserFixtures() async {
     return await callPost<List<UserTestFixture>>(
       endpoint: '/test/create-all-user-fixtures',
@@ -35,7 +35,8 @@ class UserTestFixtureApi extends HttpApi {
 
   /// Deletes all user fixtures server-side.
   ///
-  /// Use this to ensure a clean state between Api tests. Throws [UserTestFixtureApiException] on failure.
+  /// Use this to ensure a clean state between tests. 
+  /// Throws [UserTestFixtureApiException].
   Future<void> deleteAllUserFixtures() async {
     await callDelete<void>(
       endpoint: '/test/delete-all-user-fixtures',
@@ -50,8 +51,8 @@ class UserTestFixtureApi extends HttpApi {
 
   /// Creates a user fixture with the specified [role] server-side.
   ///
-  /// Returns a [UserTestFixture] containing user credentials and metadata for use in Api tests.
-  /// Throws [UserTestFixtureApiException] if the call returns an error.
+  /// Returns a [UserTestFixture].
+  /// Throws [UserTestFixtureApiException].
   Future<UserTestFixture> createUserFixture({required Role role}) async {
     return await callPost<UserTestFixture>(
       endpoint: '/test/create-user-fixture/${role.name}',

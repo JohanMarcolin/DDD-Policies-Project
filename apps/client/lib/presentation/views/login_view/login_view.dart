@@ -26,6 +26,9 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
+          case AuthInitial():
+          case AuthLoading():
+            return;
           case Authenticated():
             ActionSnackBarHelper.show(message: 'Logged in as ${state.currentUser.email.value}');
           case Unauthenticated():

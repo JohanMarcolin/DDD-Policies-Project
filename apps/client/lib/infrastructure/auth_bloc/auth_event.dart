@@ -1,6 +1,6 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthEvent {}
+sealed class AuthEvent {}
 
 class AuthLoginRequested extends AuthEvent {
   final Email email;
@@ -13,4 +13,4 @@ class AuthRefreshAccessTokenRequested extends AuthEvent {}
 
 class AuthLogoutRequested extends AuthEvent {}
 
-class AuthRevokeAuthentication extends AuthEvent {}
+class AuthRevokeAuthenticationRequested extends AuthEvent {}

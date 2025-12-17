@@ -40,6 +40,7 @@ void main() {
           },
         );
 
+        /// If the initiator cannot view themselves, they cannot delete themselves.
         if (!canViewSelf) return;
 
         await userAdministrationService.authorizeDeleteUser(
@@ -68,6 +69,7 @@ void main() {
             },
           );
 
+          /// If the initiator cannot view the target, they cannot delete the target.
           if (!canViewTarget) return;
 
           await userAdministrationService.authorizeDeleteUser(

@@ -7,6 +7,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Icons.email;
     final bloc = context.read<UserAdministrationViewBloc>();
     final isUserUpdatingSelf = bloc.isAdministratingSelf(user);
 
@@ -14,7 +15,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
       user,
       onAuthorized: () {
         return UserActionIcon.authorized(
-          icon: Icons.password,
+          icon: icon,
           dialogChildBuilder: (context, {required closeDialog}) => UpdateUserPasswordDialogChild(
             isUserUpdatingSelf: isUserUpdatingSelf,
             onCancel: () async => await closeDialog(context),
@@ -40,7 +41,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
       },
       onUnauthorized: (UpdateUserPasswordUnauthorizedReason reason) {
         return UserActionIcon.unauthorized<UpdateUserPasswordUnauthorizedReason>(
-          icon: Icons.password,
+          icon: icon,
           unauthorizedReason: reason,
           unauthorizedMessageMapper: (reason) => switch (reason) {
             CannotUpdatePasswordOnAnalyst() => 'You cannot update the password of an analyst',

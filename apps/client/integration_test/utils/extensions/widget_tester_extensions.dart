@@ -20,13 +20,9 @@ import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import '../../../test_utils/mock_auth_api.dart';
 import 'widget_finder_extensions.dart';
 
-/// Extension on [WidgetTester] providing utilities to render widgets with stubbed [AuthBloc]
-/// and [UserAdministrationViewBloc] BLoCs.
-///
-/// This extension is intended for integration tests that require injecting mock or stubbed
-/// implementations of authentication and user administration logic. It simplifies the setup
-/// of widget trees with test-specific BLoC instances and dependencies, allowing tests to
-/// control authentication state and user data.
+/// This extension supports integration tests by providing utilities to set up
+/// widget trees with mock or stubbed authentication and user administration logic.
+/// It enables tests to manipulate BLoC states and customize data for specific scenarios.
 ///
 /// Typical usage:
 /// - Call [renderWidgetWithBlocStubs] to pump a widget wrapped in stubbed BLoC providers.
@@ -36,9 +32,18 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
   static late AuthBloc _authBlocWithStubs;
   static late UserAdministrationViewBloc _userAdministrationViewBlocWithStubs;
 
+  /// Provides access to the stubbed [AuthBloc] instance.
   AuthBloc get authBlocWithStubs => _authBlocWithStubs;
+
+  /// Provides access to the stubbed [UserAdministrationViewBloc] instance.
   UserAdministrationViewBloc get userAdministrationViewBlocWithStubs => _userAdministrationViewBlocWithStubs;
 
+  /// Renders a widget wrapped in stubbed BLoC providers for integration tests.
+  ///
+  /// - [testWidget]: The widget to render.
+  /// - [mockCurrentUser]: Optional mock user.
+  /// - [mockAuthApi]: Optional mock authentication API.
+  /// - [mockUserRepository]: Optional mock user repository.
   Future<void> renderWidgetWithBlocStubs({
     required Widget testWidget,
     User? mockCurrentUser,
@@ -69,6 +74,10 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
     );
   }
 
+  /// Creates a stubbed [UserAdministrationViewBloc] for integration tests.
+  ///
+  /// - [currentUser]: The current user.
+  /// - [stubbedUserAdministrationService]: The stubbed user administration service.
   UserAdministrationViewBloc _getStubbedUserAdministrationViewBloc(
     User currentUser,
     UserAdministrationService stubbedUserAdministrationService,
@@ -82,6 +91,10 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
 
 /// Extension methods on [WidgetTester] for login and logout actions in tests.
 extension WidgetTesterLoginExtension on WidgetTester {
+  /// Simulates a login action by entering credentials and tapping the login button.
+  ///
+  /// - [email]: The email to enter.
+  /// - [password]: The password to enter.
   Future<void> login({required Email email, required Password password}) async {
     final loginView = find.byType(LoginView);
 
@@ -94,6 +107,7 @@ extension WidgetTesterLoginExtension on WidgetTester {
     await pumpAndSettle();
   }
 
+  /// Simulates a logout action by tapping the logout button.
   Future<void> logout() async {
     await tap(find.byIcon(Icons.logout));
     await pumpAndSettle();
@@ -103,18 +117,32 @@ extension WidgetTesterLoginExtension on WidgetTester {
 
 /// Extension methods on [WidgetTester] for finding and asserting visibility of UserTiles.
 extension WidgetTesterTileFinderExtension on WidgetTester {
+  /// Finds a [UserTile] widget by the user's ID.
+  ///
+  /// - [userId]: The ID of the user to find.
   Finder findUserTileByUserId(UserId userId) {
     return find.byWidgetPredicate((widget) => widget is UserTile && widget.user.userId == userId);
   }
 
+  /// Finds a [UserTile] widget by the user's email.
+  ///
+  /// - [email]: The email of the user to find.
   Finder findUserTileByEmail(Email email) {
     return find.byWidgetPredicate((widget) => widget is UserTile && widget.user.email.value == email.value);
   }
 
+  /// Asserts that a [UserTile] is visible for the given initiator and target users.
+  ///
+  /// - [initiator]: The user initiating the action.
+  /// - [target]: The target user whose tile visibility is being checked.
   Future<void> assertUserTileIsVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
     await _assertUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: true);
   }
 
+  /// Asserts that a [UserTile] is not visible for the given initiator and target users.
+  ///
+  /// - [initiator]: The user initiating the action.
+  /// - [target]: The target user whose tile visibility is being checked.
   Future<void> assertUserTileIsNotVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
     await _assertUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: false);
   }
@@ -140,6 +168,7 @@ extension WidgetTesterTileFinderExtension on WidgetTester {
 
 /// Extension method on [WidgetTester] to find the Confirm button in dialogs.
 extension WidgetTesterConfirmButtonExtension on WidgetTester {
+  /// Finds the Confirm button in a dialog.
   Finder findConfirmButton() {
     return find.byWidgetPredicate(
       (widget) => widget is TextButton && widget.child is Text && (widget.child as Text).data == 'Confirm',
@@ -149,6 +178,7 @@ extension WidgetTesterConfirmButtonExtension on WidgetTester {
 
 /// Extension method on [WidgetTester] to start the app for integration tests.
 extension WidgetTesterStartAppExtension on WidgetTester {
+  /// Starts (or restarts) the app and waits for it to settle.
   Future<void> startApp() async {
     app.main();
     await pumpAndSettle();

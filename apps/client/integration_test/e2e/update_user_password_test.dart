@@ -44,6 +44,7 @@ void main() {
           },
         );
 
+        /// If the initiator cannot view themselves, they cannot update their own password.
         if (!canViewSelf) return;
 
         await userAdministrationService.authorizeUpdateUserPassword(
@@ -77,6 +78,7 @@ void main() {
             },
           );
 
+          /// If the initiator cannot view the target, they cannot update the target's password.
           if (!canViewTarget) return;
 
           await userAdministrationService.authorizeUpdateUserPassword(

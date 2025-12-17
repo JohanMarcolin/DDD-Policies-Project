@@ -7,6 +7,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Icons.email;
     final bloc = context.read<UserAdministrationViewBloc>();
     final isUserUpdatingSelf = bloc.isAdministratingSelf(user);
 
@@ -14,7 +15,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
       user,
       onAuthorized: () {
         return UserActionIcon.authorized(
-          icon: Icons.email,
+          icon: icon,
           dialogChildBuilder: (context, {required closeDialog}) => UpdateUserEmailDialogChild(
             isUserUpdatingSelf: isUserUpdatingSelf,
             onCancel: () async => await closeDialog(context),
@@ -37,7 +38,7 @@ class UpdateUserEmailIcon extends StatelessWidget {
       },
       onUnauthorized: (UpdateUserEmailUnauthorizedReason reason) {
         return UserActionIcon.unauthorized<UpdateUserEmailUnauthorizedReason>(
-          icon: Icons.email,
+          icon: icon,
           unauthorizedReason: reason,
           unauthorizedMessageMapper: (reason) => switch (reason) {
             CannotUpdateEmailOnAnalyst() => 'You cannot update the email of an analyst',

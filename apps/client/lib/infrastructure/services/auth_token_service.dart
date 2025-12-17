@@ -20,25 +20,25 @@ class AuthTokenService {
     return await accessToken;
   }
 
-  /// Gets the stored access token, or null if absent.
+  /// Gets the stored [AccessToken], or `null` if absent.
   Future<AccessToken?> get accessToken async => await _getToken(key: _accessTokenKey);
 
-  /// Returns true if an access token is stored.
+  /// Returns `true` if an [AccessToken] is stored.
   Future<bool> get hasAccessToken async => (await accessToken) != null;
 
-  /// Gets the stored refresh token, or null if absent.
+  /// Gets the stored [RefreshToken], or `null` if absent.
   Future<RefreshToken?> get refreshToken async => await _getToken(key: _refreshTokenKey);
 
-  /// Returns true if a refresh token is stored.
+  /// Returns `true` if a [RefreshToken] is stored.
   Future<bool> get hasRefreshToken async => (await refreshToken) != null;
 
-  /// Stores both [accessToken] and [refreshToken], overwriting any existing values.
+  /// Stores both [accessToken] and [refreshToken], overwriting any existing tokens.
   Future<void> storeTokens({required AccessToken accessToken, required RefreshToken refreshToken}) async {
     await setAccessToken(accessToken: accessToken);
     await setRefreshToken(refreshToken: refreshToken);
   }
 
-  /// Removes both access and refresh tokens from storage.
+  /// Removes both [AccessToken] and [RefreshToken] from storage.
   Future<void> clearTokens() async {
     await setAccessToken(accessToken: null);
     await setRefreshToken(refreshToken: null);
