@@ -27,8 +27,8 @@ class UpdateUserEmailIcon extends StatelessWidget {
           eventMessageMapper: (event) => switch (event) {
             UpdateUserEmailInvalid() => 'Invalid email format',
             UpdateUserEmailFailure(:var apiErrorCode) => switch (apiErrorCode) {
-              UpdateUserEmailTakenBySelf() => 'This is your current email',
-              UpdateUserEmailTakenByOther() => 'This email is already taken',
+              UpdateUserEmailInUseBySelf() => 'This is your current email',
+              UpdateUserEmailInUseByOther() => 'This email is already taken',
               _ => 'Failed to update email',
             },
             UpdateUserEmailSuccess() => 'Email updated successfully',

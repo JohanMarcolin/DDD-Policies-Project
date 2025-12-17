@@ -1,4 +1,4 @@
-import 'package:api_error_codes/api_error_codes.dart';
+part of '../global_exception_handler.dart';
 
 /// Base class for HTTP request-related exceptions, carrying an [ApiErrorCode].
 ///

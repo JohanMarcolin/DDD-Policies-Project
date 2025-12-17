@@ -25,7 +25,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on AuthApiException catch (e) {
       emit(Unauthenticated(e.apiErrorCode));
     } catch (e) {
-      print(e);
       emit(AuthFailure());
     }
   }

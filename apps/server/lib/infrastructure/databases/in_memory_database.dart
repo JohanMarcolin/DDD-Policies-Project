@@ -1,4 +1,4 @@
-/// A simple asynchronous in-memory key-value database.
+/// An asynchronous in-memory key-value database.
 ///
 /// Stores values of type [TValue] indexed by keys of type [TKey].
 base class InMemoryDatabase<TKey, TValue> {
@@ -7,7 +7,7 @@ base class InMemoryDatabase<TKey, TValue> {
   /// Provides direct access to the underlying map.
   Map<TKey, TValue> get map => _map;
 
-  /// Retrieves the value associated with [key], or null if not found.
+  /// Retrieves the value associated with [key], or `null` if not found.
   ///
   /// Rethrows any unexpected errors.
   Future<TValue?> get(TKey key) async {

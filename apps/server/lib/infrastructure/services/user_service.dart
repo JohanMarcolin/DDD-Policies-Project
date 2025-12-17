@@ -1,14 +1,14 @@
 import 'package:domain/repositories/user_repository.dart';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import '../http/exceptions/request_exceptions.dart';
-import '../http/request_utils.dart';
-import '../http/response_utils.dart';
-import '../security/security_filter_chain.dart';
+import 'package:server/infrastructure/http/utils/request/request.dart';
+import 'package:server/infrastructure/http/utils/response/response.dart';
+import 'package:server/infrastructure/security/security_filter_chain.dart';
 
 /// Service for handling user-related operations.
 class UserService {
@@ -19,9 +19,9 @@ class UserService {
   final UserRepository _userRepository;
   final UserAdministrationService _userAdministrationService;
 
-  /// Retrieves all users visible to the current initiator.
+  /// Retrieves all users visible to the current user.
   ///
-  /// Returns a list of user JSON objects.
+  /// Returns [ok] with a list of user JSON objects.
   Future<Response> getAllUsers(Request req) async {
     final users = await _userAdministrationService.viewUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
@@ -29,7 +29,8 @@ class UserService {
 
   /// Retrieves a user by [UserId], if authorized.
   ///
-  /// Throws [NotFoundException] if the [User] does not exist or is not visible to the initiator.
+  /// Returns [ok] with the user JSON object.
+  /// Throws [NotFoundException] if the [User] does not exist, or if the current user is not authorized to view it.
   Future<Response> getUserById(Request req) async {
     final userId = extractUserIdFromParams(req);
 
@@ -44,7 +45,7 @@ class UserService {
 
   /// Deletes the target [User], if authorized.
   ///
-  /// Returns a 200 OK response on success.
+  /// Returns [ok].
   Future<Response> deleteUser(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 
@@ -58,7 +59,8 @@ class UserService {
 
   /// Updates the [Email] for the target [User], if authorized.
   ///
-  /// Throws [BadRequestException] if the new email is missing or invalid, or [ConflictException] if the new email is already taken.
+  /// Returns [ok].
+  /// Throws [BadRequestException] if the new email is missing or invalid, or [ConflictException] if the new email is already in use.
   Future<Response> updateEmail(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);
 
@@ -73,16 +75,16 @@ class UserService {
 
     final isUpdatingSelf = req.currentUser.isSameAs(targetUser);
 
-    final isEmailTakenBySelf = isUpdatingSelf && targetUser.email == email;
+    final isEmailInUseBySelf = isUpdatingSelf && targetUser.email == email;
 
-    if (isEmailTakenBySelf) {
-      throw ConflictException(UpdateUserEmailTakenBySelf());
+    if (isEmailInUseBySelf) {
+      throw ConflictException(UpdateUserEmailInUseBySelf());
     }
 
-    final isEmailTakenByOther = await _userRepository.getByEmail(email: email) != null;
+    final isEmailInUseByOther = await _userRepository.getByEmail(email: email) != null;
 
-    if (isEmailTakenByOther) {
-      throw ConflictException(UpdateUserEmailTakenByOther());
+    if (isEmailInUseByOther) {
+      throw ConflictException(UpdateUserEmailInUseByOther());
     }
 
     await _userAdministrationService.updateUserEmail(initiator: req.currentUser, target: targetUser, newEmail: email);
@@ -92,6 +94,7 @@ class UserService {
 
   /// Updates the [Password] for the target [User], if authorized.
   ///
+  /// Returns [ok].
   /// Throws [BadRequestException] if the new password is missing or invalid.
   Future<Response> updatePassword(Request req) async {
     final targetUser = await getTargetUser(req, _userRepository);

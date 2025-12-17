@@ -4,10 +4,9 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:api_error_codes/api_error_codes.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import '../databases/in_memory_user_database.dart';
 import '../databases/in_memory_user_password_database.dart';
-import '../http/exceptions/request_exceptions.dart';
-import '../http/exceptions/request_exceptions.dart' show NotFoundException, ServerErrorException;
 
 /// In-memory implementation of [UserRepository] for managing [User] entities.
 ///
@@ -22,9 +21,9 @@ class InMemoryUserRepository implements UserRepository {
   final InMemoryUserDatabase _userdatabase;
   final InMemoryUserPasswordDatabase _userPasswordDatabase;
 
-  /// Returns all users in the repository.
+  /// Retrieves all users in the repository.
   ///
-  /// Throws [ServerErrorException] if fetching fails.
+  /// Throws [ServerErrorException].
   @override
   Future<List<User>> get users async {
     try {
@@ -36,7 +35,7 @@ class InMemoryUserRepository implements UserRepository {
 
   /// Retrieves a user by [userId].
   ///
-  /// Throws [ServerErrorException] if fetching fails.
+  /// Throws [ServerErrorException].
   @override
   Future<User?> get({required UserId userId}) async {
     try {
@@ -48,7 +47,7 @@ class InMemoryUserRepository implements UserRepository {
 
   /// Retrieves a user by [email].
   ///
-  /// Throws [ServerErrorException] if fetching fails.
+  /// Throws [ServerErrorException].
   @override
   Future<User?> getByEmail({required Email email}) async {
     try {

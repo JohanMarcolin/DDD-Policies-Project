@@ -4,14 +4,12 @@ import 'package:domain/entities/user.dart';
 import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
-import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:server/infrastructure/policy_registry.dart';
 import 'package:test_utils/auth/auth_header.dart';
 import 'package:test_utils/domain/user_administration_service.dart';
-import 'package:test_utils/fixtures/server/test_server_fixture.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
-import 'api_test_server_fixture.dart';
+import 'package:test_utils/mocks/mock_user_credentials.dart';
+import 'utils/api_test_server_fixture.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,14 +20,9 @@ void main() {
   late List<UserTestFixture> initiators;
   late UserTestFixture target;
 
-  setUp(() async {
-    await ApiTestServerFixture.setup();
-  });
+  setUp(() async => await ApiTestServerFixture.setup());
 
-  tearDown(() async {
-    await ApiTestServerFixture.teardown();
-  });
-
+  tearDown(() async => await ApiTestServerFixture.teardown());
   group('User Controller', () {
     for (final initiatorRole in Role.values) {
       group('_getAllUsers', () {
@@ -39,7 +32,7 @@ void main() {
         test('should get users authorized for viewing', () async {
           for (final initiator in initiators) {
             final response = await http.get(
-              Uri.parse('${TestServerFixture.baseUrl}/user/all'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/all'),
               headers: await getAuthHeader(initiator),
             );
             final body = jsonDecode(response.body);
@@ -78,7 +71,7 @@ void main() {
 
           test('should get user by id if authorized, otherwise NOT', () async {
             final response = await http.get(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}'),
               headers: await getAuthHeader(initiator),
             );
             final body = jsonDecode(response.body);
@@ -111,7 +104,7 @@ void main() {
 
           test('should delete user by id if authorized, otherwise NOT', () async {
             final response = await http.delete(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}'),
               headers: await getAuthHeader(initiator),
             );
             final body = jsonDecode(response.body);
@@ -137,15 +130,10 @@ void main() {
             target = await ApiTestServerFixture.createUserFixture(role: targetRole);
           });
           test('should update email with valid email if authorized, otherwise NOT', () async {
-            final email = Email('valid@example.com');
-
-            expect(PolicyRegistry.userEmailValidationPolicy.isValid(email), isTrue);
-            final validEmail = email;
-
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/email'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}/email'),
               headers: await getAuthHeader(initiator),
-              body: jsonEncode({'newEmail': validEmail.value}),
+              body: jsonEncode({'newEmail': mockValidEmail.value}),
             );
             final body = jsonDecode(response.body);
 
@@ -164,15 +152,10 @@ void main() {
           });
 
           test('should NOT update email with invalid email', () async {
-            final email = Email('invalid-email');
-
-            expect(PolicyRegistry.userEmailValidationPolicy.isValid(email), isFalse);
-            final invalidEmail = email;
-
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/email'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}/email'),
               headers: await getAuthHeader(initiator),
-              body: jsonEncode({'newEmail': invalidEmail.value}),
+              body: jsonEncode({'newEmail': mockInvalidEmail.value}),
             );
             final body = jsonDecode(response.body);
 
@@ -195,7 +178,7 @@ void main() {
             final currentEmail = initiator.email;
 
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${initiator.userId.value}/email'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${initiator.userId.value}/email'),
               headers: await getAuthHeader(initiator),
               body: jsonEncode({'newEmail': currentEmail.value}),
             );
@@ -207,7 +190,7 @@ void main() {
                 onAuthorized: () {
                   expect(response.statusCode, 409);
                   expect(body['isSuccess'], isFalse);
-                  expect(body['apiErrorCode'], UpdateUserEmailTakenBySelf().toString());
+                  expect(body['apiErrorCode'], UpdateUserEmailInUseBySelf().toString());
                 },
                 onUnauthorized: (reason) {
                   expect(response.statusCode, 409);
@@ -220,7 +203,7 @@ void main() {
             final takenEmail = initiator.email;
 
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/email'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}/email'),
               headers: await getAuthHeader(initiator),
               body: jsonEncode({'newEmail': takenEmail.value}),
             );
@@ -232,12 +215,12 @@ void main() {
                 onAuthorized: () {
                   expect(response.statusCode, 409);
                   expect(body['isSuccess'], isFalse);
-                  expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
+                  expect(body['apiErrorCode'], UpdateUserEmailInUseByOther().toString());
                 },
                 onUnauthorized: (_) {
                   expect(response.statusCode, 409);
                   expect(body['isSuccess'], isFalse);
-                  expect(body['apiErrorCode'], UpdateUserEmailTakenByOther().toString());
+                  expect(body['apiErrorCode'], UpdateUserEmailInUseByOther().toString());
                 });
           });
         });
@@ -248,15 +231,10 @@ void main() {
             target = await ApiTestServerFixture.createUserFixture(role: targetRole);
           });
           test('should update password with valid password if authorized, otherwise NOT', () async {
-            final password = PolicyRegistry.userPasswordValidationPolicy.generateRandomPassword();
-
-            expect(PolicyRegistry.userPasswordValidationPolicy.isValid(password), isTrue);
-            final validPassword = password;
-
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/password'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}/password'),
               headers: await getAuthHeader(initiator),
-              body: jsonEncode({'newPassword': validPassword.value}),
+              body: jsonEncode({'newPassword': mockValidPassword.value}),
             );
             final body = jsonDecode(response.body);
 
@@ -275,15 +253,10 @@ void main() {
           });
 
           test('should NOT update password with invalid password', () async {
-            final password = Password('short');
-
-            expect(UserPasswordValidationPolicy().isValid(password), isFalse);
-            final invalidPassword = password;
-
             final response = await http.put(
-              Uri.parse('${TestServerFixture.baseUrl}/user/${target.userId.value}/password'),
+              Uri.parse('${ApiTestServerFixture.baseUrl}/user/${target.userId.value}/password'),
               headers: await getAuthHeader(initiator),
-              body: jsonEncode({'newPassword': invalidPassword.value}),
+              body: jsonEncode({'newPassword': mockTooShortPassword.value}),
             );
             final body = jsonDecode(response.body);
 

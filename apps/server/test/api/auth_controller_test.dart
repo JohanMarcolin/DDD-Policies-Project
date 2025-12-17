@@ -2,32 +2,28 @@ import 'dart:convert';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
-import 'api_test_server_fixture.dart';
+import 'utils/api_test_server_fixture.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  late UserTestFixture initiator;
+  late UserTestFixture user;
 
-  setUpAll(() async {
-    await ApiTestServerFixture.setup();
-  });
+  setUpAll(() async => await ApiTestServerFixture.setup());
 
-  tearDownAll(() async {
-    await ApiTestServerFixture.teardown();
-  });
+  tearDownAll(() async => await ApiTestServerFixture.teardown());
 
   group('Auth Controller', () {
     group('Shall succeed', () {
       for (final role in Role.values) {
         setUp(() async {
-          initiator = await ApiTestServerFixture.createUserFixture(role: role);
+          user = await ApiTestServerFixture.createUserFixture(role: role);
         });
 
         test('Login returns tokens and current user for valid ${role.name} credentials', () async {
           final response = await http.post(
             Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
-            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
+            body: jsonEncode({'email': user.email.value, 'password': user.password.value}),
           );
 
           expect(response.statusCode, 200);
@@ -39,13 +35,13 @@ void main() {
 
           expect(accessToken, isNotNull);
           expect(refreshToken, isNotNull);
-          expect(currentUser['userId'], equals(initiator.userId.value));
+          expect(currentUser['userId'], equals(user.userId.value));
         });
 
         test('Refresh returns new access token and current user for valid ${role.name} credentials', () async {
           final loginResponse = await http.post(
             Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
-            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
+            body: jsonEncode({'email': user.email.value, 'password': user.password.value}),
           );
 
           final loginBody = jsonDecode(loginResponse.body);
@@ -63,13 +59,13 @@ void main() {
           final currentUser = refreshBody['data']['currentUser'];
 
           expect(newAccessToken, isNotNull);
-          expect(currentUser['userId'], equals(initiator.userId.value));
+          expect(currentUser['userId'], equals(user.userId.value));
         });
 
         test('Logout succeeds with valid refresh token', () async {
           final loginResponse = await http.post(
             Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
-            body: jsonEncode({'email': initiator.email.value, 'password': initiator.password.value}),
+            body: jsonEncode({'email': user.email.value, 'password': user.password.value}),
           );
           final loginBody = jsonDecode(loginResponse.body);
           final refreshToken = loginBody['data']['refreshToken'];
@@ -87,13 +83,13 @@ void main() {
         final roleName = role.name;
 
         setUp(() async {
-          initiator = await ApiTestServerFixture.createUserFixture(role: role);
+          user = await ApiTestServerFixture.createUserFixture(role: role);
         });
 
         test('Login fails for invalid $roleName credentials', () async {
           final response = await http.post(
             Uri.parse('${ApiTestServerFixture.baseUrl}/auth/login'),
-            body: jsonEncode({'email': initiator.email.value, 'password': 'wrong'}),
+            body: jsonEncode({'email': user.email.value, 'password': 'wrong'}),
           );
           expect(response.statusCode, equals(403));
         });

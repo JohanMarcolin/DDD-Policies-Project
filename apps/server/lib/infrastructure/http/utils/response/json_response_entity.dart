@@ -1,4 +1,4 @@
-part of 'response_utils.dart';
+part of 'response.dart';
 
 /// Base class for standardized JSON HTTP responses.
 sealed class JsonResponseEntity {

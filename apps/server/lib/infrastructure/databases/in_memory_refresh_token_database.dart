@@ -3,5 +3,5 @@ import 'package:server/infrastructure/security/token_service.dart';
 
 import 'in_memory_database.dart';
 
-/// Provides an in-memory database for refresh tokens associated with user/session [Id]s.
-final class InMemoryRefreshTokenDatabase extends InMemoryDatabase<Id, RefreshToken> {}
+/// Provides an in-memory database for [RefreshToken] associated with [UserId]s.
+final class InMemoryRefreshTokenDatabase extends InMemoryDatabase<UserId, RefreshToken> {}

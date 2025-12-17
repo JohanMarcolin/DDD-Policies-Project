@@ -4,17 +4,18 @@ import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:domain/value_objects/role.dart';
 import 'package:api_error_codes/api_error_codes.dart';
-import 'package:server/infrastructure/http/exceptions/request_exceptions.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:uuid/uuid.dart';
 
 import '../databases/in_memory_user_database.dart';
 import '../databases/in_memory_user_password_database.dart';
-import '../http/response_utils.dart';
+import '../http/utils/response/response.dart';
 
-/// Service for managing [UserTestFixture]s and related operations.
+/// Service for managing [UserTestFixture]:s and related operations.
 class TestService {
   TestService({
     required InMemoryUserDatabase userDatabase,
@@ -37,7 +38,7 @@ class TestService {
 
   /// Creates user fixtures for all [Role.values] and returns them in the response.
   ///
-  /// Returns a list of user fixture maps.
+  /// Returns [created] with a list of user fixture maps.
   Future<Response> createAllUserFixtures(Request req) async {
     try {
       var userFixtures = [];
@@ -53,6 +54,7 @@ class TestService {
 
   /// Creates a [UserTestFixture] for the specified [Role] and returns it in the response.
   ///
+  /// Returns [created] with the user fixture map.
   /// Throws [BadRequestException] if the role parameter is missing or invalid.
   Future<Response> createUserFixture(Request req) async {
     try {
@@ -83,9 +85,9 @@ class TestService {
     return (user: user, password: password);
   }
 
-  /// Deletes all [UserTestFixtures]s from the in-memory databases.
+  /// Deletes all [UserTestFixtures]:s from the in-memory databases.
   ///
-  /// Returns a 204 Deleted response after successful deletion.
+  /// Returns [deleted].
   Future<Response> deleteAllUserFixtures(Request req) async {
     final users = await _userDatabase.getAll();
     for (final user in users) {
@@ -93,5 +95,29 @@ class TestService {
       await _userPasswordDatabase.delete(user.userId);
     }
     return deleted();
+  }
+
+  /// Generates a list of [UserTestFixture] for default user seeding.
+  ///
+  /// This method is intended for internal use by the server to seed test users.
+  List<UserTestFixture> generateDefaultUserFixtures() {
+    final fixtureCredentials = [
+      {'email': 'user1', 'password': 'user1', 'role': Role.user},
+      {'email': 'user2', 'password': 'user2', 'role': Role.user},
+      {'email': 'admin1', 'password': 'admin1', 'role': Role.admin},
+      {'email': 'admin2', 'password': 'admin2', 'role': Role.admin},
+      {'email': 'analyst1', 'password': 'analyst1', 'role': Role.analyst},
+      {'email': 'analyst2', 'password': 'analyst2', 'role': Role.analyst},
+    ];
+
+    return fixtureCredentials.map((credentials) {
+      final user = User(
+        userId: UserId.generate(),
+        email: Email(credentials['email'] as String),
+        role: credentials['role'] as Role,
+      );
+      final password = Password(credentials['password'] as String);
+      return UserTestFixture(user: user, password: password);
+    }).toList();
   }
 }

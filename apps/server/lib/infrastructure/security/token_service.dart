@@ -1,12 +1,13 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:api_error_codes/api_error_codes.dart';
+import 'package:env_config/env_config.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:domain/entities/user.dart';
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/role.dart';
 import '../databases/in_memory_refresh_token_database.dart';
-import '../http/exceptions/request_exceptions.dart';
 
 typedef AccessToken = String;
 typedef RefreshToken = String;
@@ -21,8 +22,8 @@ class TokenService {
   final InMemoryRefreshTokenDatabase _refreshTokenDatabase;
 
   static final SecretKey _key = SecretKey(Uuid().v4());
-  final Duration _accessTokenExpiration = Duration(minutes: 5);
-  final Duration _refreshTokenExpiration = Duration(days: 7);
+  final Duration _accessTokenExpiration = Duration(minutes: Env.accessTokenExpirationMinutes);
+  final Duration _refreshTokenExpiration = Duration(days: Env.refreshTokenExpirationDays);
 
   /// Generates a signed JWT [AccessToken] for the given [user].
   AccessToken generateAccessToken(User user) {

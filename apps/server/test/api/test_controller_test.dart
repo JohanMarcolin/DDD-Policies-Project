@@ -1,23 +1,18 @@
 import 'dart:convert';
 import 'package:domain/value_objects/role.dart';
-import 'package:test_utils/fixtures/server/test_server_fixture.dart';
-import 'api_test_server_fixture.dart';
+import 'utils/api_test_server_fixture.dart';
 // ignore: depend_on_referenced_packages
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
   group('Test Controller', () {
-    setUp(() async {
-      await ApiTestServerFixture.setup();
-    });
+    setUp(() async => await ApiTestServerFixture.setup());
 
-    tearDown(() async {
-      await ApiTestServerFixture.teardown();
-    });
+    tearDown(() async => await ApiTestServerFixture.teardown());
 
     Future<http.Response> createAllTestFixtures() => http.post(
-          Uri.parse('${TestServerFixture.baseUrl}/test/create-all-user-fixtures'),
+          Uri.parse('${ApiTestServerFixture.baseUrl}/test/create-all-user-fixtures'),
         );
 
     test('creates all user fixtures', () async {
@@ -46,7 +41,7 @@ void main() {
       await createAllTestFixtures();
 
       final response = await http.delete(
-        Uri.parse('${TestServerFixture.baseUrl}/test/delete-all-user-fixtures'),
+        Uri.parse('${ApiTestServerFixture.baseUrl}/test/delete-all-user-fixtures'),
       );
       expect(response.statusCode, 204);
     });
@@ -54,7 +49,7 @@ void main() {
     test('creates user fixture for role', () async {
       for (final role in Role.values) {
         final response = await http.post(
-          Uri.parse('${TestServerFixture.baseUrl}/test/create-user-fixture/${role.name}'),
+          Uri.parse('${ApiTestServerFixture.baseUrl}/test/create-user-fixture/${role.name}'),
         );
         expect(response.statusCode, 201);
         final body = jsonDecode(response.body);

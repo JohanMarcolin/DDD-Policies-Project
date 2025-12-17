@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:domain/repositories/user_repository.dart';
 import 'package:api_error_codes/api_error_codes.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:domain/value_objects/id.dart';
 
 import 'package:domain/entities/user.dart';
-import 'exceptions/request_exceptions.dart';
 
 /// Retrieves the target [User] from the request using the [UserId].
 ///

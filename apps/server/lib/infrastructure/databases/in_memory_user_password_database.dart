@@ -3,7 +3,7 @@ import 'package:domain/value_objects/password.dart';
 import '../security/password_hasher.dart';
 import 'in_memory_database.dart';
 
-/// Provides an in-memory database for user passwords associated with [UserId]s.
+/// Provides an in-memory database for user [Password]:s associated with [UserId]s.
 final class InMemoryUserPasswordDatabase extends InMemoryDatabase<UserId, Password> {
   InMemoryUserPasswordDatabase({required PasswordHasher passwordHasher}) : _passwordHasher = passwordHasher;
 

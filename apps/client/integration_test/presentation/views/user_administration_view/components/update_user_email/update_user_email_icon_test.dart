@@ -151,7 +151,7 @@ Future<void> main() async {
 
             when(() => mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).thenThrow(
               UserApiException(
-                isUpdatingSelf ? UpdateUserEmailTakenBySelf().toString() : UpdateUserEmailTakenByOther().toString(),
+                isUpdatingSelf ? UpdateUserEmailInUseBySelf().toString() : UpdateUserEmailInUseByOther().toString(),
               ),
             );
 

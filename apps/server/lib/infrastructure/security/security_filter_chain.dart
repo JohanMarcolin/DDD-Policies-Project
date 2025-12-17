@@ -1,8 +1,8 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:api_error_codes/api_error_codes.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 import 'package:shelf/shelf.dart';
 import 'package:domain/entities/user.dart';
-import '../http/exceptions/request_exceptions.dart';
 import 'token_service.dart';
 
 extension CurrentUserRequestExtension on Request {
@@ -31,6 +31,7 @@ class SecurityFilterChain {
   /// Returns a Shelf [Middleware] that enforces authorization on protected paths.
   ///
   /// Validates access tokens and appends the authenticated user to the request context.
+  /// Rethrows exceptions from the authorization process.
   Middleware get middleware => (Handler protectedHandler) {
         return (Request req) async {
           final path = req.url.path;
@@ -61,7 +62,9 @@ class SecurityFilterChain {
 
   /// Extracts and verifies the access token from the [req].
   ///
-  /// Returns a verified [JWT]. Throws if verification fails.
+  /// Returns a verified [JWT].
+  ///
+  /// Throws if verification fails.
   JWT _getVerifiedAccessToken(Request req) {
     final accessToken = _extractAccessToken(req);
 

@@ -3,15 +3,15 @@ import 'package:domain/value_objects/id.dart';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:server/infrastructure/databases/in_memory_user_password_database.dart';
+import 'package:server/infrastructure/http/global_exception_handler/global_exception_handler.dart';
 
-import '../http/request_utils.dart';
+import '../http/utils/request/request.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/password.dart';
-import '../http/exceptions/request_exceptions.dart';
-import '../http/response_utils.dart';
+import '../http/utils/response/response.dart';
 import '../security/token_service.dart';
 
 /// Service for handling authentication-related operations.
@@ -28,8 +28,9 @@ class AuthService {
   final InMemoryUserPasswordDatabase _userPasswordDatabase;
   final TokenService _tokenService;
 
-  /// Handles [User] login by validating credentials and issuing [AccessToken] and [RefreshToken], as well as providing the current user data.
+  /// Handles [User] login by validating credentials and issuing a [AccessToken] and [RefreshToken], as well as providing the current user data.
   ///
+  /// Returns [ok] with the current user data, access token, and refresh token.
   /// Throws [BadRequestException], [NotFoundException], or [ForbiddenException] for invalid input or credentials.
   Future<Response> handleLogin(Request req) async {
     final data = await readJsonBody(req);
@@ -66,6 +67,7 @@ class AuthService {
 
   /// Verifies the user's password against the stored hash.
   ///
+  /// Returns `true` if the password is verified, `false` otherwise.
   /// Throws [ServerErrorException] if verification fails.
   Future<bool> _isPasswordVerified({required UserId userId, required Password password}) async {
     try {
@@ -77,6 +79,7 @@ class AuthService {
 
   /// Handles [AccessToken] refresh using a valid [RefreshToken].
   ///
+  /// Returns [ok] with the current user data and new access token.
   /// Throws [BadRequestException], [NotFoundException], or [InvalidRefreshTokenException] for invalid input or tokens.
   Future<Response> handleRefreshAccessToken(Request req) async {
     final data = await readJsonBody(req);
@@ -100,6 +103,7 @@ class AuthService {
 
   /// Handles user logout by revoking the [RefreshToken].
   ///
+  /// returns [deleted].
   /// Throws [BadRequestException], [NotFoundException], or [ServerErrorException] for invalid input or failures.
   Future<Response> handleLogout(Request req) async {
     final refreshToken = req.params['refreshToken'];
