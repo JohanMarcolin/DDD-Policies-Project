@@ -1,5 +1,7 @@
 name: domain
-description: user administration business logic for fullstack usage.
+description: >-
+  Centralized business logic for user administration. 
+  Designed for usage in both client and server environments.
 version: 1.0.0
 publish_to: 'none'
 resolution: workspace

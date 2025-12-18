@@ -1,6 +1,8 @@
 name: ddd_policies_project
 publish_to: "none"
-description: A Dart project template using DDD policies.
+description: >-
+  A full-stack Dart project developed for the purpose of exploring how DDD policies can be implemented in practice.
+  Includes a Flutter client, a Dart Shelf-based server, centralized business logic, and reusable utilities.
 version: 1.0.0
 
 environment:

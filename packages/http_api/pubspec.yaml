@@ -1,7 +1,8 @@
 name: http_api
 version: 1.0.0
 publish_to: "none"
-description: a custom http api package.
+description: >-
+  A custom HTTP API package providing utilities for making authenticated requests and handling responses.
 resolution: workspace
 environment:
   sdk: ">=3.5.0 <4.0.0"

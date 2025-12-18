@@ -1,7 +1,8 @@
 name: test_utils
 version: 1.0.0
 publish_to: "none"
-description: a package for global testing utilities.
+description: >-
+  Provides shared utilities, mocks, and fixtures to simplify testing across the monorepo.
 resolution: workspace
 environment:
   sdk: ">=3.5.0 <4.0.0"

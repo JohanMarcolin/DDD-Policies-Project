@@ -1,7 +1,8 @@
 name: env_config
 version: 1.0.0
 publish_to: none
-description: Shared environment configuration for all apps in the monorepo.
+description: >-
+  Provides shared environment variables for all apps & packages in the monorepo.
 environment:
   sdk: ">=3.5.0 <4.0.0"
 resolution: workspace

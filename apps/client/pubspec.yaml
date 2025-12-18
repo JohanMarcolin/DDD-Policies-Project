@@ -1,5 +1,6 @@
 name: client
-description: "The user administration frontend app."
+description: >-
+  A Flutter-based frontend application for user administration.
 publish_to: 'none'
 version: 1.0.0
 resolution: workspace
