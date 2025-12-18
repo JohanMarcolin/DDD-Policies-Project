@@ -4,7 +4,7 @@ import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 
-/// Dummy implementation of [UserRepository] for unit tests.
+/// Dummy implementation of [UserRepository] for domain unit tests.
 ///
 /// Stores users in memory and simulates repository operations.
 class DummyUserRepository implements UserRepository {

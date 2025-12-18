@@ -19,9 +19,9 @@ typedef OnInvalid<TReturn, TReason extends ValueInvalidReason> = TReturn Functio
 /// [TValue]: type being validated (e.g., String, Email)
 /// [TReason]: reason type for invalid values (extends [ValueInvalidReason])
 /// [TReturn]: callback return type, supports both sync and async
-/// 
+///
 /// Use for defining validation rules for value objects in the domain.
-/// 
+///
 /// Example:
 /// ```dart
 /// // Define a policy for a value that needs validation, e.g., a validation policy for emails:
@@ -117,7 +117,7 @@ class Invalid<TReason> extends ValidationResult<TReason> {
 
 /// Base class for reasons why a value was invalid in validation policies.
 ///
-/// Extend this class to define domain-specific reason types, e.g. `EmailValidationFailure`.
+/// Extend this class to define specific reasons for invalid values in your policies.
 base class ValueInvalidReason extends Equatable {
   @override
   List<Object?> get props => [];

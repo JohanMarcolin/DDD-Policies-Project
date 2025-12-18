@@ -10,7 +10,7 @@ part 'policies/view_user_policy.dart';
 /// Base class for user administration policies.
 /// Determines if a [User] is authorized to perform administrative actions on another [User].
 ///
-/// [TReason]: reason type for unauthorized actions (extends [UserAdministrationUnauthorizedReason])
+/// [TReason]: reason type for unauthorized actions.
 abstract base class UserAdministrationPolicy<TReason extends UserAdministrationUnauthorizedReason>
     extends ActionAuthorizationPolicy<User, User, TReason> {
   /// Creates a user administration policy with the given authorization logic.

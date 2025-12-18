@@ -20,8 +20,6 @@ class User extends Equatable {
 
   bool isSameAs(User other) => userId == other.userId;
 
-  bool get isUser => role == Role.user;
-
   bool get isAdmin => role == Role.admin;
 
   bool get isAnalyst => role == Role.analyst;

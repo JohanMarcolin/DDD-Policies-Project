@@ -8,8 +8,8 @@ void main() {
   group('User', () {
     final id1 = UserId('1');
     final id2 = UserId('2');
-    final email1 = Email('user1@example.com');
-    final email2 = Email('user2@example.com');
+    final email1 = Email('email1@example.com');
+    final email2 = Email('email2@example.com');
 
     test('equality is based on id', () {
       final userA = User(userId: id1, email: email1);

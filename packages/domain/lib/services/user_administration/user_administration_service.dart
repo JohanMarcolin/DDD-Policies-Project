@@ -6,7 +6,16 @@ import '../../../value_objects/email.dart';
 import '../../../value_objects/id.dart';
 import '../../../value_objects/password.dart';
 
-/// Service for user administration with policy enforcement and validation.
+/// A service responsible for managing user-related operations.
+///
+/// This service handles user administration actions such as viewing, updating,
+/// and deleting users. It ensures that all operations are
+/// authorized and validated according to the provided policies.
+///
+/// Responsibilities include:
+/// - Enforcing authorization policies for user actions.
+/// - Enforcing validation policies for user credentials.
+/// - Interacting with the [UserRepository] to perform database operations.
 class UserAdministrationService {
   UserAdministrationService({
     required UserRepository userRepository,
@@ -34,9 +43,9 @@ class UserAdministrationService {
 
   /// Returns all users the [initiator] is authorized to view, as determined by [ViewUserPolicy].
   ///
-  /// [initiator] The user requesting to view users.
+  /// [initiator] The user requesting to view the users.
   ///
-  /// Returns a [Future] containing the list of authorized [User]s.
+  /// Returns a [Future<List<User>>] of authorized users.
   Future<List<User>> viewUsers({required User initiator}) async {
     final users = await _userRepository.users;
     return users.where((user) => _viewUserPolicy.isAuthorized(initiator, user)).toList();
@@ -47,9 +56,8 @@ class UserAdministrationService {
   /// [initiator] The user requesting to view another user.
   /// [userId] The ID of the user to view.
   ///
-  /// Returns a [Future] containing the [User] if authorized, or null if not found.
-  ///
-  /// Throws [PolicyViolationException]<[ViewUserUnauthorizedReason]> if [initiator] is not authorized to view the user.
+  /// Returns a [Future<User?>] containing the [User] if authorized, or `null` if not found.
+  /// Throws [PolicyViolationException]<[ViewUserUnauthorizedReason]>.
   Future<User?> viewUser({required User initiator, required UserId userId}) async {
     final user = await _userRepository.get(userId: userId);
 
@@ -81,9 +89,8 @@ class UserAdministrationService {
   /// [initiator] The user requesting the deletion.
   /// [target] The user to be deleted.
   ///
-  /// Returns a [Future] that completes when the user is deleted.
-  ///
-  /// Throws [PolicyViolationException]<[DeleteUserUnauthorizedReason]> if [initiator] is not authorized to delete the user.
+  /// Returns a [Future<void>] that completes when the user is deleted.
+  /// Throws [PolicyViolationException]<[DeleteUserUnauthorizedReason]>.
   Future<void> deleteUser({required User initiator, required User target}) async {
     return _deleteUserPolicy.enforce(initiator, target,
         onAuthorized: () => _userRepository.delete(userId: target.userId));
@@ -117,9 +124,8 @@ class UserAdministrationService {
   /// [target] The user whose email is being updated.
   /// [newEmail] The new email address.
   ///
-  /// Returns a [Future] that completes when the email is updated.
-  ///
-  /// Throws [PolicyViolationException]<[UpdateUserEmailUnauthorizedReason]> if not authorized, or [PolicyViolationException]<[EmailInvalidReason]> if the email is invalid.
+  /// Returns a [Future<void>] that completes when the email is updated.
+  /// Throws [PolicyViolationException]<[UpdateUserEmailUnauthorizedReason] or [EmailInvalidReason]>.
   Future<void> updateUserEmail({required User initiator, required User target, required Email newEmail}) async {
     return _updateUserEmailPolicy.enforce(initiator, target, onAuthorized: () {
       _userEmailValidationPolicy.enforce(newEmail, onValid: () {
@@ -175,9 +181,8 @@ class UserAdministrationService {
   /// [target] The user whose password is being updated.
   /// [newPassword] The new password.
   ///
-  /// Returns a [Future] that completes when the password is updated.
-  ///
-  /// Throws [PolicyViolationException]<[UpdateUserPasswordUnauthorizedReason]> if not authorized, or [PolicyViolationException]<[PasswordInvalidReason]> if the password is invalid.
+  /// Returns a [Future<void>] that completes when the password is updated.
+  /// Throws [PolicyViolationException]<[UpdateUserPasswordUnauthorizedReason] or [PasswordInvalidReason]>.
   Future<void> updateUserPassword(
       {required User initiator, required User target, required Password newPassword}) async {
     return _updateUserPasswordPolicy.enforce(initiator, target, onAuthorized: () {
@@ -206,9 +211,9 @@ class UserAdministrationService {
     );
   }
 
-  /// Generates a random [Password] that satisfies the password policy.
+  /// Generates a [Password] that satisfies the password policy.
   ///
-  /// Returns a valid [Password].
+  /// Returns a random valid [Password].
   Password generateUserPassword() {
     return _userPasswordValidationPolicy.generateRandomPassword();
   }

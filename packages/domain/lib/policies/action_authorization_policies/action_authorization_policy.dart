@@ -21,7 +21,7 @@ typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TRet
 /// [TResource]: resource type (e.g., Document, Account)
 /// [TReason]: reason type for unauthorized actions (extends [ActionUnauthorizedReason])
 /// [TReturn]: callback return type, supports sync/async
-/// 
+///
 /// Use for defining authorization rules for actions in the domain.
 ///
 /// Example:
@@ -40,7 +40,7 @@ typedef OnUnauthorized<TReturn, TReason extends ActionUnauthorizedReason> = TRet
 ///
 /// // Define reasons why an action might be unauthorized.
 /// sealed class UpdateUserSettingsUnauthorizedReason extends ActionUnauthorizedReason {}
-/// 
+///
 /// final class CanOnlyUpdateOwnSettings extends UpdateUserSettingsUnauthorizedReason {}
 ///
 /// // Using the policy:

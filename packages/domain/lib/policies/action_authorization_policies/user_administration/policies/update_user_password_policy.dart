@@ -27,6 +27,7 @@ final class UpdateUserPasswordPolicy extends UserAdministrationPolicy<UpdateUser
   }
 }
 
+/// Reasons why a [User] may be unauthorized to update their own password or another [User]'s password.
 sealed class UpdateUserPasswordUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
 final class CannotUpdatePasswordOnAnalyst extends UpdateUserPasswordUnauthorizedReason {}

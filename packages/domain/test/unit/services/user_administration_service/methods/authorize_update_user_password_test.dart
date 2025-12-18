@@ -8,8 +8,8 @@ void main() {
   late UserAdministrationService userAdministrationService;
 
   setUp(() {
-    userAdministrationService =
-        createTestUserAdministrationService([mockUser, otherMockUser, mockAdmin, otherMockAdmin, mockAnalyst, otherMockAnalyst]);
+    userAdministrationService = createTestUserAdministrationService(
+        [mockUser, otherMockUser, mockAdmin, otherMockAdmin, mockAnalyst, otherMockAnalyst]);
   });
 
   group('UserAdministrationService', () {

@@ -19,6 +19,7 @@ final class ViewUserPolicy extends UserAdministrationPolicy<ViewUserUnauthorized
   }
 }
 
+/// Reasons why a [User] may be unauthorized to view another [User].
 sealed class ViewUserUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
 final class CannotViewAnalyst extends ViewUserUnauthorizedReason {}

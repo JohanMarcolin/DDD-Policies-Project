@@ -11,7 +11,6 @@ final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, 
   static const includeNumbers = true;
   static const includeSpecialCharacters = true;
 
-  /// Validates a [Password] against policy requirements.
   static ValidationResult<PasswordInvalidReason> _validatePassword(Password password) {
     final value = password.value;
 
@@ -67,6 +66,7 @@ final class UserPasswordValidationPolicy extends UserCredentialPolicy<Password, 
   }
 }
 
+/// Reasons why a [Password] may be invalid for user credentials.
 sealed class PasswordInvalidReason extends UserCredentialInvalidReason {}
 
 final class PasswordTooShort extends PasswordInvalidReason {}

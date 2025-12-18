@@ -30,6 +30,7 @@ final class DeleteUserPolicy extends UserAdministrationPolicy<DeleteUserUnauthor
   }
 }
 
+/// Reasons why a [User] may be unauthorized to delete themselves or another [User].
 sealed class DeleteUserUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
 final class CannotDeleteSelf extends DeleteUserUnauthorizedReason {}

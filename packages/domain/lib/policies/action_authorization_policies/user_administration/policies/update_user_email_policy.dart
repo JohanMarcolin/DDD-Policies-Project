@@ -27,6 +27,7 @@ final class UpdateUserEmailPolicy extends UserAdministrationPolicy<UpdateUserEma
   }
 }
 
+/// Reasons why a [User] may be unauthorized to update their own email or another [User]'s email.
 sealed class UpdateUserEmailUnauthorizedReason extends UserAdministrationUnauthorizedReason {}
 
 final class CannotUpdateEmailOnAnalyst extends UpdateUserEmailUnauthorizedReason {}
