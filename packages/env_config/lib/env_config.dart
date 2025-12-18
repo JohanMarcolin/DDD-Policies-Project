@@ -3,8 +3,6 @@ import 'package:envied/envied.dart';
 part 'env_config.g.dart';
 
 /// A class that provides access to environment variables defined in the `.env` file.
-///
-/// Use this for server and API configuration.
 @Envied(path: '.env')
 abstract class Env {
   /// Represents the host address of the server.
@@ -20,6 +18,8 @@ abstract class Env {
       const String.fromEnvironment('SERVER_SHOULD_SEED_DEVELOPMENT_USERS').toLowerCase() == 'true';
 
   /// Represents the base URL for the server when accessed from the Android emulator.
+  ///
+  /// `Note:` required because `localhost` from the emulator points to the emulator itself, not the host machine.
   @EnviedField(varName: 'ANDROID_EMULATOR_SERVER_BASE_URL')
   static const String androidEmulatorServerBaseUrl = _Env.androidEmulatorServerBaseUrl;
 
