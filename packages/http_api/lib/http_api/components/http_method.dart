@@ -1,6 +1,6 @@
-part of 'http_api.dart';
+part of '../http_api.dart';
 
-/// Represents an HTTP method for API requests.
+/// Represents an http method for api requests.
 ///
 /// Use the static constants [get], [post], [put], and [delete] to specify the method for a request.
 sealed class HttpMethod {

@@ -2,18 +2,22 @@ import 'dart:convert';
 import 'package:env_config/env_config.dart';
 import 'package:http/http.dart' as http;
 
-part 'http_method.dart';
-part 'http_api_response.dart';
+part 'components/http_method.dart';
+part 'components/http_api_response.dart';
 
-class _UnauthorizedException implements Exception {}
-
-/// Abstract base class for making HTTP API calls.
+/// Custom abstract class for making http api calls.
 ///
-/// Provides generic methods for CRUD requests, with support for authentication and token refresh.
+/// This class provides generic methods for crud requests, with support for authenticated requests
+/// and automated token refresh.
+///
+/// Extend this class to create specific api clients.
 abstract class HttpApi {
+  /// The base url for all api requests.
+  ///
+  /// Defaults to [Env.androidEmulatorServerBaseUrl]. This can be overridden using the [baseUrl] setter.
   static String _baseUrl = Env.androidEmulatorServerBaseUrl;
 
-  /// Sets the base URL for all API requests.
+  /// Sets the base url for all api requests.
   ///
   /// Useful for configuring different environments (e.g., api and e2e testing).
   static set baseUrl(String url) => _baseUrl = url;
@@ -90,7 +94,7 @@ abstract class HttpApi {
     return map(HttpApiResponse.fromMap(decoded));
   }
 
-  /// Internal helper to perform the HTTP request and decode the response.
+  /// Internal util to perform the http request and decode the response.
   Future<Map<String, dynamic>> _call({
     required HttpMethod method,
     required String endpoint,
@@ -114,10 +118,10 @@ abstract class HttpApi {
     if (decoded is Map<String, dynamic>) {
       return decoded;
     }
-    throw Exception('Invalid response format: expected a JSON object');
+    throw _InvalidResponseFormatException('Expected a JSON object but received: ${response.body}');
   }
 
-  /// Performs an unauthenticated HTTP request.
+  /// Performs an unauthenticated http request.
   Future<http.Response> _doPlainRequest({required HttpMethod method, required String endpoint, Object? data}) async {
     final uri = _buildUri(endpoint);
     return switch (method) {
@@ -128,7 +132,7 @@ abstract class HttpApi {
     };
   }
 
-  /// Performs an authenticated HTTP request, with optional token refresh.
+  /// Performs an authenticated http request, with optional token refresh.
   Future<http.Response> _doAuthedRequest({
     required HttpMethod method,
     required String endpoint,
@@ -187,3 +191,15 @@ abstract class HttpApi {
     throw _UnauthorizedException();
   }
 }
+
+/// Exception thrown when the response format is invalid.
+class _InvalidResponseFormatException implements Exception {
+  final String message;
+  _InvalidResponseFormatException(this.message);
+
+  @override
+  String toString() => 'InvalidResponseFormatException: $message';
+}
+
+/// Exception thrown when an unauthorized request is encountered.
+class _UnauthorizedException implements Exception {}

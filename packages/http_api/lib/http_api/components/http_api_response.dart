@@ -1,9 +1,9 @@
-part of 'http_api.dart';
+part of '../http_api.dart';
 
-/// Represents a response from an HTTP API call, including success status, data, and error details.
+/// Represents a response from an http api call, including success status, data, and error details.
 ///
-/// [TData] is the type of the expected data payload. Use this class to standardize API responses
-/// and error handling throughout the client infrastructure.
+/// [TData] is the type of the expected payload. Use this class to standardize api responses
+/// and error handling
 class HttpApiResponse<TData> {
   final bool isSuccess;
   final TData? data;
@@ -14,11 +14,9 @@ class HttpApiResponse<TData> {
 
   /// Constructs a [HttpApiResponse] from a decoded JSON [map].
   ///
-  /// Handles typical API response structures, including lists, maps, and error fields.
+  /// Handles typical api response structures, including lists, maps, and error fields.
   factory HttpApiResponse.fromMap(Map<String, dynamic> map) {
-    if (map.isEmpty) {
-      return HttpApiResponse(isSuccess: true);
-    }
+    if (map.isEmpty) return HttpApiResponse(isSuccess: true);
 
     final isSuccess = map['isSuccess'] == true;
     final hasData = isSuccess && map.containsKey('data');

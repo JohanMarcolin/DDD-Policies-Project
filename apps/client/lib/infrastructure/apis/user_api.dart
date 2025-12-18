@@ -7,7 +7,7 @@ import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/password.dart';
 import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
-import 'package:http_api/http_api.dart';
+import 'package:http_api/http_api/http_api.dart';
 
 /// API for user operations.
 class UserApi extends HttpApi {
