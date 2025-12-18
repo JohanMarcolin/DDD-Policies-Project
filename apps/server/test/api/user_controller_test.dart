@@ -5,7 +5,7 @@ import 'package:domain/policies/value_validation_policies/user_credentials/user_
 import 'package:domain/value_objects/email.dart';
 import 'package:domain/value_objects/id.dart';
 import 'package:domain/value_objects/role.dart';
-import 'package:test_utils/auth/auth_header.dart';
+import 'package:test_utils/fixtures/user/auth/auth_header.dart';
 import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:test_utils/mocks/mock_user_credentials.dart';

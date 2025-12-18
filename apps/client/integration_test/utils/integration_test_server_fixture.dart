@@ -8,7 +8,7 @@ import 'package:domain/value_objects/role.dart';
 /// Provides setup, teardown, and test data utilities for integration tests which require a running server.
 ///
 /// This fixture is intended exclusively for integration tests. It manages the lifecycle of the test server,
-/// configures API endpoints, and exposes helpers for creating user fixtures. All methods are static for
+/// configures api endpoints, and exposes helpers for creating user fixtures. All methods are static for
 /// convenient use in test setup/teardown blocks.
 class IntegrationTestServerFixture {
   static late UserTestFixtureApi _userTestFixtureApi;

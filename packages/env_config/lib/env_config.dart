@@ -17,7 +17,7 @@ abstract class Env {
   static bool get serverShouldSeedTestUsers =>
       const String.fromEnvironment('SERVER_SHOULD_SEED_DEVELOPMENT_USERS').toLowerCase() == 'true';
 
-  /// Represents the base URL for the server when accessed from the Android emulator.
+  /// Represents the base url for the server when accessed from the Android emulator.
   ///
   /// `Note:` required because `localhost` from the emulator points to the emulator itself, not the host machine.
   @EnviedField(varName: 'ANDROID_EMULATOR_SERVER_BASE_URL')

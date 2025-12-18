@@ -9,7 +9,7 @@ import '../../../test_utils/mock_auth_api.dart';
 ///
 /// Usage:
 /// - Use [mockBloc] to dispatch events or check state.
-/// - Use [mockApi] to stub or verify that API methods were called.
+/// - Use [mockApi] to stub or verify that api methods were called.
 /// - Call [test] to run a [blocTest] with all dependencies set up.
 class AuthBlocTestFixture {
   late MockAuthApi mockApi;

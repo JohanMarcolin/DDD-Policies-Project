@@ -21,7 +21,7 @@ Future<User> getTargetUser(Request req, UserRepository userRepository) async {
   return user;
 }
 
-/// Reads and decodes the JSON body from a [Request].
+/// Reads and decodes the json body from a [Request].
 ///
 /// Throws [BadRequestException] if the body is empty or missing.
 Future<Map<String, dynamic>> readJsonBody(Request req) async {

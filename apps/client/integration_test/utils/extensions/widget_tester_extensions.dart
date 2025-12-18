@@ -42,7 +42,7 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
   ///
   /// - [testWidget]: The widget to render.
   /// - [mockCurrentUser]: Optional mock user.
-  /// - [mockAuthApi]: Optional mock authentication API.
+  /// - [mockAuthApi]: Optional mock authentication api.
   /// - [mockUserRepository]: Optional mock user repository.
   Future<void> renderWidgetWithBlocStubs({
     required Widget testWidget,

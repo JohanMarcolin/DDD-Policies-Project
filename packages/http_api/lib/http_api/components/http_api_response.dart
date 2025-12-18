@@ -12,7 +12,7 @@ class HttpApiResponse<TData> {
 
   HttpApiResponse({required this.isSuccess, this.data, this.apiErrorCode, this.policyViolationReason});
 
-  /// Constructs a [HttpApiResponse] from a decoded JSON [map].
+  /// Constructs a [HttpApiResponse] from a decoded json [map].
   ///
   /// Handles typical api response structures, including lists, maps, and error fields.
   factory HttpApiResponse.fromMap(Map<String, dynamic> map) {

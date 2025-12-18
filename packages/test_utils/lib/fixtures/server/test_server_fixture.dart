@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:server/infrastructure/server.dart';
 
-/// Utility class for managing a test HTTP server instance for testing purposes.
+/// Utility class for managing a http server instance for testing purposes.
 class TestServerFixture {
   static Server? _server;
   static HttpServer? _httpServer;
@@ -20,9 +20,9 @@ class TestServerFixture {
     _server = null;
   }
 
-  /// Returns the base URL of the running test server.
+  /// Returns the base url of the running test server.
   ///
-  /// Throws [StateError] if the server is not started.
+  /// Throws [StateError] if the server was not yet started.
   static String get baseUrl {
     if (_httpServer == null) throw StateError('Test server not started');
     return 'http://localhost:${_httpServer!.port}';

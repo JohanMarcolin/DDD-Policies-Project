@@ -118,7 +118,7 @@ abstract class HttpApi {
     if (decoded is Map<String, dynamic>) {
       return decoded;
     }
-    throw _InvalidResponseFormatException('Expected a JSON object but received: ${response.body}');
+    throw _InvalidResponseFormatException('Expected a json object but received: ${response.body}');
   }
 
   /// Performs an unauthenticated http request.
@@ -155,7 +155,7 @@ abstract class HttpApi {
     return await _withAuthRetry(request, accessToken, refreshAccessToken);
   }
 
-  /// Builds a [Uri] for the given [endpoint] using the current base URL.
+  /// Builds a [Uri] for the given [endpoint] using the current base url.
   Uri _buildUri(String endpoint) {
     return Uri.parse('$_baseUrl$endpoint');
   }

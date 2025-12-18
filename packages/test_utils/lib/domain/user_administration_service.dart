@@ -3,6 +3,9 @@ import 'package:domain/policies/value_validation_policies/user_credentials/user_
 import 'package:domain/services/user_administration/user_administration_service.dart';
 import 'package:test_utils/mocks/mock_user_repository.dart';
 
+/// Creates a [UserAdministrationService] with mock dependencies for testing.
+///
+/// Uses [mockUserRepository] if provided, otherwise defaults to a new [MockUserRepository].
 UserAdministrationService createStubbedUserAdministrationService([MockUserRepository? mockUserRepository]) {
   mockUserRepository ??= MockUserRepository();
 

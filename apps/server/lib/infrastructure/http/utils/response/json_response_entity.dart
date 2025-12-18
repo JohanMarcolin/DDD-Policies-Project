@@ -1,6 +1,6 @@
 part of 'response.dart';
 
-/// Base class for standardized JSON HTTP responses.
+/// Base class for standardized json http responses.
 sealed class JsonResponseEntity {
   static const jsonHeaders = {'Content-Type': 'application/json'};
 
@@ -10,7 +10,7 @@ sealed class JsonResponseEntity {
       jsonEncode({'isSuccess': false, 'apiErrorCode': apiErrorCode.toString()});
 }
 
-/// Represents a successful `200` OK JSON response.
+/// Represents a successful `200` OK json response.
 class JsonResponseOk extends JsonResponseEntity {
   static Response asShelfResponse([Object? body]) => Response.ok(
         JsonResponseEntity.encodeSuccess(body),
@@ -18,7 +18,7 @@ class JsonResponseOk extends JsonResponseEntity {
       );
 }
 
-/// Represents a successful `201` Created JSON response.
+/// Represents a successful `201` Created json response.
 class JsonResponseCreated extends JsonResponseEntity {
   static Response asShelfResponse([Object? body]) => Response(
         201,
@@ -27,7 +27,7 @@ class JsonResponseCreated extends JsonResponseEntity {
       );
 }
 
-/// Represents a `204` No Content JSON response.
+/// Represents a `204` No Content json response.
 class JsonResponseNoContent extends JsonResponseEntity {
   static Response asShelfResponse() => Response(204, headers: JsonResponseEntity.jsonHeaders);
 }
@@ -37,7 +37,7 @@ class JsonResponseDeleted extends JsonResponseEntity {
   static Response asShelfResponse() => JsonResponseNoContent.asShelfResponse();
 }
 
-/// Represents a `404` Not Found JSON error response.
+/// Represents a `404` Not Found json error response.
 class JsonResponseNotFound extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.notFound(
         JsonResponseEntity.encodeError(apiErrorCode),
@@ -45,7 +45,7 @@ class JsonResponseNotFound extends JsonResponseEntity {
       );
 }
 
-/// Represents a `403` Forbidden JSON error response.
+/// Represents a `403` Forbidden json error response.
 class JsonResponseForbidden extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) {
     return Response.forbidden(
@@ -65,7 +65,7 @@ class JsonResponsePolicyViolation extends JsonResponseEntity {
   }
 }
 
-/// Represents a `400` Bad Request JSON error response.
+/// Represents a `400` Bad Request json error response.
 class JsonResponseBadRequest extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.badRequest(
         body: JsonResponseEntity.encodeError(apiErrorCode),
@@ -73,7 +73,7 @@ class JsonResponseBadRequest extends JsonResponseEntity {
       );
 }
 
-/// Represents a `409` Conflict JSON error response.
+/// Represents a `409` Conflict json error response.
 class JsonResponseConflict extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response(
         409,
@@ -82,7 +82,7 @@ class JsonResponseConflict extends JsonResponseEntity {
       );
 }
 
-/// Represents a `401` Unauthorized JSON error response.
+/// Represents a `401` Unauthorized json error response.
 class JsonResponseUnauthorized extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response(
         401,
@@ -91,7 +91,7 @@ class JsonResponseUnauthorized extends JsonResponseEntity {
       );
 }
 
-/// Represents a `500` Internal Server Error JSON response.
+/// Represents a `500` Internal Server Error json response.
 class JsonResponseServerError extends JsonResponseEntity {
   static Response asShelfResponse(ApiErrorCode apiErrorCode) => Response.internalServerError(
         body: JsonResponseEntity.encodeError(apiErrorCode),

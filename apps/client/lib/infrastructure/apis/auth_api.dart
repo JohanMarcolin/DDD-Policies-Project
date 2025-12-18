@@ -7,7 +7,7 @@ import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:http_api/http_api/http_api.dart';
 
-/// API for authentication-related operations: login, logout, and token refresh.
+/// Api for authentication-related operations: login, logout, and token refresh.
 class AuthApi extends HttpApi {
   AuthApi({required AuthTokenService authTokenService}) : _authTokenService = authTokenService;
 
@@ -73,7 +73,7 @@ class AuthApi extends HttpApi {
   }
 }
 
-/// Exception thrown for authentication API errors.
+/// Exception thrown for authentication api errors.
 class AuthApiException extends ApiException {
   AuthApiException(super.apiErrorCode);
 }

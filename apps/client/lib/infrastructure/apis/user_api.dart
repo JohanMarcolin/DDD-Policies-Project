@@ -9,7 +9,7 @@ import 'package:api_error_codes/api_error_codes.dart';
 import 'package:mappers/user_mapper.dart';
 import 'package:http_api/http_api/http_api.dart';
 
-/// API for user operations.
+/// Api for user operations.
 class UserApi extends HttpApi {
   UserApi({required this.authApi, required this.authTokenService});
 
@@ -19,7 +19,7 @@ class UserApi extends HttpApi {
   /// Retrieves all users from the server.
   ///
   /// Returns a list of [User]:s.
-  /// 
+  ///
   /// Throws [UserApiException].
   Future<List<User>> get users async {
     return await callGet<List<User>>(
@@ -38,7 +38,7 @@ class UserApi extends HttpApi {
   /// Retrieves a user by [userId].
   ///
   /// Returns a [User] if found, otherwise `null`.
-  /// 
+  ///
   /// Throws [UserApiException].
   Future<User?> get({required UserId userId}) async {
     return await callGet<User?>(

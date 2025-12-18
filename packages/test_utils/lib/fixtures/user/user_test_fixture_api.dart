@@ -4,10 +4,9 @@ import 'package:mappers/user_test_fixture_mapper.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:http_api/http_api/http_api.dart';
 
-/// API for managing user test fixtures in tests.
+/// Api for managing user test fixtures in tests.
 ///
-/// Provides methods to create and delete user test fixtures server-side, enabling
-/// isolated test scenarios.
+/// Provides methods to create and delete user test fixtures server-side, enabling isolated test scenarios.
 class UserTestFixtureApi extends HttpApi {
   UserTestFixtureApi({required String baseUrl}) : _baseUrl = baseUrl {
     HttpApi.baseUrl = baseUrl;
@@ -35,7 +34,7 @@ class UserTestFixtureApi extends HttpApi {
 
   /// Deletes all user fixtures server-side.
   ///
-  /// Use this to ensure a clean state between tests. 
+  /// Use this to ensure a clean state between tests.
   /// Throws [UserTestFixtureApiException].
   Future<void> deleteAllUserFixtures() async {
     await callDelete<void>(

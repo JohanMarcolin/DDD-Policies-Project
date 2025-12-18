@@ -6,9 +6,9 @@ part 'api_error_codes/security.dart';
 part 'api_error_codes/token.dart';
 part 'api_error_codes/server.dart';
 
-/// Base class for all API error codes.
+/// Base class for all api error codes.
 ///
-/// Extend this class to define specific error code categories for API responses.
+/// Extend this class to define specific error code categories for api responses.
 sealed class ApiErrorCode {
   @override
   String toString() => runtimeType.toString();
@@ -92,7 +92,7 @@ ApiErrorCode apiErrorCodeFromString(String? apiErrorCode) {
   }
 }
 
-/// Exception type for API errors, wrapping an [ApiErrorCode].
+/// Exception type for api errors, wrapping an [ApiErrorCode].
 class ApiException implements Exception {
   final ApiErrorCode apiErrorCode;
 

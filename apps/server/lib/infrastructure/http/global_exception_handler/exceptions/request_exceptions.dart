@@ -1,6 +1,6 @@
 part of '../global_exception_handler.dart';
 
-/// Base class for HTTP request-related exceptions, carrying an [ApiErrorCode].
+/// Base class for http request-related exceptions, carrying an [ApiErrorCode].
 ///
 /// `Note`: All custom request exceptions should extend this class.
 sealed class RequestException implements Exception {

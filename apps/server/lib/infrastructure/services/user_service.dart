@@ -21,7 +21,7 @@ class UserService {
 
   /// Retrieves all users visible to the current user.
   ///
-  /// Returns [ok] with a list of user JSON objects.
+  /// Returns [ok] with a list of user json objects.
   Future<Response> getAllUsers(Request req) async {
     final users = await _userAdministrationService.viewUsers(initiator: req.currentUser);
     return ok(UserMapper.toJsonList(users));
@@ -29,7 +29,7 @@ class UserService {
 
   /// Retrieves a user by [UserId], if authorized.
   ///
-  /// Returns [ok] with the user JSON object.
+  /// Returns [ok] with the user json object.
   /// Throws [NotFoundException] if the [User] does not exist, or if the current user is not authorized to view it.
   Future<Response> getUserById(Request req) async {
     final userId = extractUserIdFromParams(req);

@@ -12,7 +12,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
 
-/// Shelf-based HTTP server.
+/// Shelf-based http server.
 ///
 /// Manages routing, middleware, controller setup, and optionally seeds test users.
 ///
