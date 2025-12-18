@@ -37,7 +37,7 @@ class UserService {
     final user = await _userAdministrationService.viewUser(initiator: req.currentUser, userId: userId);
 
     if (user == null) {
-      throw NotFoundException(RefreshUserNotFound());
+      throw NotFoundException(TokenRefreshTokenUserNotFound());
     }
 
     return ok(UserMapper.toJson(user));

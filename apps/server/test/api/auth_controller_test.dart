@@ -196,10 +196,10 @@ void main() {
       });
 
       test('Missing refreshToken returns 400', () async {
-        for (final missingRefreshToken in [null, '']) {
+        for (final tokenRefreshTokenMissing in [null, '']) {
           final response = await http.post(
             Uri.parse('${ApiTestServerFixture.baseUrl}/auth/refresh'),
-            body: jsonEncode({'refreshToken': missingRefreshToken}),
+            body: jsonEncode({'refreshToken': tokenRefreshTokenMissing}),
           );
           expect(response.statusCode, 400);
         }

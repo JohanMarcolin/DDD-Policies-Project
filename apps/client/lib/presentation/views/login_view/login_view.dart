@@ -37,8 +37,8 @@ class _LoginViewState extends State<LoginView> {
               LoginMissingPassword() => 'Please enter your password',
               LoginUserNotFound() => 'Email not found',
               LoginInvalidPassword() => 'Invalid password',
-              RefreshMissingRefreshToken() => 'Missing refresh token. Please log in again',
-              RefreshUserNotFound() => 'User ID not found. Please log in again',
+              TokenRefreshTokenMissing() => 'Missing refresh token. Please log in again',
+              TokenRefreshTokenUserNotFound() => 'User ID not found. Please log in again',
               _ => null,
             };
             if (message != null) ActionSnackBarHelper.show(message: message);

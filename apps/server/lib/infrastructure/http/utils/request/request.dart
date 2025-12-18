@@ -16,7 +16,7 @@ Future<User> getTargetUser(Request req, UserRepository userRepository) async {
   final userId = extractUserIdFromParams(req);
   final user = await userRepository.get(userId: userId);
   if (user == null) {
-    throw NotFoundException(RefreshUserNotFound());
+    throw NotFoundException(TokenRefreshTokenUserNotFound());
   }
   return user;
 }

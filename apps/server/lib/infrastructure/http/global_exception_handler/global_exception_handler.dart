@@ -26,7 +26,7 @@ Middleware globalExceptionHandler() {
           NotFoundException(:final apiErrorCode) => notFound(apiErrorCode),
           PolicyViolationException(:final reason) => policyViolation(reason),
           ServerErrorException(:final apiErrorCode) => serverError(apiErrorCode),
-          _ => serverError(ServerUnhandledServer()),
+          _ => serverError(ServerUnhandledError()),
         };
       }
     };

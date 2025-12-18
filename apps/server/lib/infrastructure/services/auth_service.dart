@@ -86,7 +86,7 @@ class AuthService {
     final refreshToken = data['refreshToken'] as String?;
 
     if (refreshToken == null || refreshToken.isEmpty) {
-      throw BadRequestException(RefreshMissingRefreshToken());
+      throw BadRequestException(TokenRefreshTokenMissing());
     }
 
     final verifiedRefreshToken = await _tokenService.verifyRefreshToken(refreshToken);
@@ -95,7 +95,7 @@ class AuthService {
     final user = await _userRepository.get(userId: userId);
 
     if (user == null) {
-      throw NotFoundException(RefreshUserNotFound());
+      throw NotFoundException(TokenRefreshTokenUserNotFound());
     }
 
     return ok({'currentUser': UserMapper.toJson(user), 'accessToken': _tokenService.generateAccessToken(user)});
@@ -109,7 +109,7 @@ class AuthService {
     final refreshToken = req.params['refreshToken'];
 
     if (refreshToken == null || refreshToken.isEmpty) {
-      throw BadRequestException(LogoutMissingRefreshToken());
+      throw BadRequestException(LogoutTokenRefreshTokenMissing());
     }
 
     final verifiedRefreshToken = await _tokenService.verifyRefreshToken(refreshToken);
