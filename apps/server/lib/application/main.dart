@@ -6,6 +6,7 @@ import '../infrastructure/server.dart';
 ///
 /// Initializes and starts the [Server].
 void main() async {
-  final server = Server(seedTestUsers: Env.serverShouldSeedTestUsers);
+  final shouldSeedTestUsers = Env.serverShouldSeedTestUsers == 'true';
+  final server = Server(seedTestUsers: shouldSeedTestUsers);
   await server.start();
 }

@@ -121,7 +121,12 @@ Future<void> main() async {
             expect(ActionSnackBarHelper.lastMessage, 'Password updated successfully');
           });
 
-          for (final invalidPassword in mockInvalidPasswords) {
+          /// add more invalid password cases as needed
+          for (final invalidPassword in [
+            mockTooShortPassword,
+            mockMissingUppercasePassword,
+            mockMissingNumberPassword,
+          ]) {
             testWidgets(
               'confirm with invalid password "${invalidPassword.value}" shows error snackbar and keeps dialog open',
               (WidgetTester tester) async {

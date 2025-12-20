@@ -14,8 +14,8 @@ abstract class Env {
   static const int serverPort = _Env.serverPort;
 
   /// Indicates whether development users should be seeded on the server.
-  static bool get serverShouldSeedTestUsers =>
-      const String.fromEnvironment('SERVER_SHOULD_SEED_DEVELOPMENT_USERS').toLowerCase() == 'true';
+  @EnviedField(varName: 'SERVER_SHOULD_SEED_TEST_USERS')
+  static const String serverShouldSeedTestUsers = _Env.serverShouldSeedTestUsers;
 
   /// Represents the base url for the server when accessed from the Android emulator.
   ///

@@ -120,7 +120,8 @@ Future<void> main() async {
             expect(ActionSnackBarHelper.lastMessage, 'Email updated successfully');
           });
 
-          for (final invalidEmail in mockInvalidEmails) {
+          /// add more invalid email cases as needed
+          for (final invalidEmail in [mockMissingUsernameEmail, mockMissingAtEmail, mockMissingDomainEmail]) {
             testWidgets(
               'confirm with invalid email "${invalidEmail.value}" shows error snackbar and keeps dialog open',
               (WidgetTester tester) async {

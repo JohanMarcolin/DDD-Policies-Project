@@ -8,8 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:integration_test/integration_test.dart';
-import '../utils/extensions/widget_tester_extensions.dart';
-import '../utils/integration_test_server_fixture.dart';
+import '../../utils/extensions/widget_tester_extensions.dart';
+import '../../utils/integration_test_server_fixture.dart';
 
 /// Entry point for Delete User integration tests.
 ///
