@@ -55,7 +55,7 @@ void main() {
       tearDown(() async => await IntegrationTestServerFixture.teardown());
 
       testWidgets('analyst updating email on self', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
+        final self = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
         await tester.updateUserEmail(initiator: self, target: self);
       });
 
