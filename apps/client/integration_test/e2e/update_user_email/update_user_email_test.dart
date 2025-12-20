@@ -11,6 +11,7 @@ import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/fixtures/user/user_test_fixture.dart';
 import 'package:test_utils/mocks/mock_user_credentials.dart';
 import '../../utils/extensions/widget_tester_extensions.dart';
+import '../../utils/integration_test_debug_logger.dart';
 import '../../utils/integration_test_server_fixture.dart';
 
 part 'update_user_email_tester_extension.dart';
@@ -21,31 +22,33 @@ part 'update_user_email_tester_extension.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  Future<UserTestFixture> create(Role role) async => await IntegrationTestServerFixture.createUserFixture(role: role);
+
   group('Update user email integration tests', () {
     group('Analyst tests', () {
       setUp(() async => await IntegrationTestServerFixture.setup());
       tearDown(() async => await IntegrationTestServerFixture.teardown());
 
       testWidgets('analyst updating email on self', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
+        final self = await create(Role.analyst);
         await tester.updateUserEmail(initiator: self, target: self);
       });
 
       testWidgets('analyst updating email on user', (WidgetTester tester) async {
-        final analyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
-        final user = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
+        final analyst = await create(Role.analyst);
+        final user = await create(Role.user);
         await tester.updateUserEmail(initiator: analyst, target: user);
       });
 
       testWidgets('analyst updating email on admin', (WidgetTester tester) async {
-        final analyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
-        final admin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
+        final analyst = await create(Role.analyst);
+        final admin = await create(Role.admin);
         await tester.updateUserEmail(initiator: analyst, target: admin);
       });
 
       testWidgets('analyst updating email on other analyst', (WidgetTester tester) async {
-        final analyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
-        final otherAnalyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
+        final analyst = await create(Role.analyst);
+        final otherAnalyst = await create(Role.analyst);
         await tester.updateUserEmail(initiator: analyst, target: otherAnalyst);
       });
     });
@@ -55,25 +58,25 @@ void main() {
       tearDown(() async => await IntegrationTestServerFixture.teardown());
 
       testWidgets('analyst updating email on self', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
+        final self = await create(Role.admin);
         await tester.updateUserEmail(initiator: self, target: self);
       });
 
       testWidgets('admin updating email on user', (WidgetTester tester) async {
-        final admin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
-        final user = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
+        final admin = await create(Role.admin);
+        final user = await create(Role.user);
         await tester.updateUserEmail(initiator: admin, target: user);
       });
 
       testWidgets('admin updating email on other admin', (WidgetTester tester) async {
-        final admin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
-        final otherAdmin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
+        final admin = await create(Role.admin);
+        final otherAdmin = await create(Role.admin);
         await tester.updateUserEmail(initiator: admin, target: otherAdmin);
       });
 
       testWidgets('admin updating email on analyst', (WidgetTester tester) async {
-        final admin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
-        final analyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
+        final admin = await create(Role.admin);
+        final analyst = await create(Role.analyst);
         await tester.updateUserEmail(initiator: admin, target: analyst);
       });
     });
@@ -83,25 +86,25 @@ void main() {
       tearDown(() async => await IntegrationTestServerFixture.teardown());
 
       testWidgets('user updating email on self', (WidgetTester tester) async {
-        final self = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
+        final self = await create(Role.user);
         await tester.updateUserEmail(initiator: self, target: self);
       });
 
       testWidgets('user updating email on other user', (WidgetTester tester) async {
-        final user = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
-        final otherUser = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
+        final user = await create(Role.user);
+        final otherUser = await create(Role.user);
         await tester.updateUserEmail(initiator: user, target: otherUser);
       });
 
       testWidgets('user updating email on admin', (WidgetTester tester) async {
-        final user = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
-        final admin = await IntegrationTestServerFixture.createUserFixture(role: Role.admin);
+        final user = await create(Role.user);
+        final admin = await create(Role.admin);
         await tester.updateUserEmail(initiator: user, target: admin);
       });
 
       testWidgets('user updating email on analyst', (WidgetTester tester) async {
-        final user = await IntegrationTestServerFixture.createUserFixture(role: Role.user);
-        final analyst = await IntegrationTestServerFixture.createUserFixture(role: Role.analyst);
+        final user = await create(Role.user);
+        final analyst = await create(Role.analyst);
         await tester.updateUserEmail(initiator: user, target: analyst);
       });
     });

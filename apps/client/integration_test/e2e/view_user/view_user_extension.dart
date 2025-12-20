@@ -1,21 +1,31 @@
 part of 'view_user_test.dart';
 
+final log = IntegrationTestDebugLogger(tag: 'ViewUser');
 final userAdministrationService = createStubbedUserAdministrationService();
 
 extension ViewUserExtension on WidgetTester {
-  /// Views a target user's tile as an initiator.
+  /// Views a target user's details as an initiator.
   ///
   /// This method checks if the initiator is authorized to view the target user.
-  /// Depending on the authorization, the target user tile is either displayed or access is blocked.
+  /// Depending on the authorization, the target user's details are either displayed or access is blocked.
   ///
   /// - [initiator]: The user initiating the view action.
   /// - [target]: The target user whose details are being viewed.
   Future<void> viewUser({required UserTestFixture initiator, required UserTestFixture target}) async {
+    final initiatorRole = initiator.user.role.name;
+    final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
+
     await userAdministrationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
-      onAuthorized: () async => await _assertViewUserSucceeds(initiator: initiator, target: target),
-      onUnauthorized: (_) async => await _assertViewUserIsBlocked(initiator: initiator, target: target),
+      onAuthorized: () async {
+        log.authorized('$initiatorRole authorized to view $targetRole');
+        await _assertViewUserSucceeds(initiator: initiator, target: target);
+      },
+      onUnauthorized: (_) async {
+        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
+        await _assertViewUserIsBlocked(initiator: initiator, target: target);
+      },
     );
   }
 

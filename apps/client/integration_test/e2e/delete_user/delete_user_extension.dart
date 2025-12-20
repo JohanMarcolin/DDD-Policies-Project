@@ -1,5 +1,6 @@
 part of 'delete_user_test.dart';
 
+final log = IntegrationTestDebugLogger(tag: 'DeleteUser');
 final userAdministrationService = createStubbedUserAdministrationService();
 
 extension DeleteUserExtension on WidgetTester {
@@ -12,14 +13,19 @@ extension DeleteUserExtension on WidgetTester {
   /// [initiator]: The user initiating the deletion.
   /// [target]: The target user who is being deleted.
   Future<void> deleteUser({required UserTestFixture initiator, required UserTestFixture target}) async {
+    final initiatorRole = initiator.user.role.name;
+    final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
+
     final canViewTarget = await userAdministrationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
+        log.authorized('$initiatorRole authorized to view $targetRole');
         await assertUserTileIsVisible(initiator: initiator, target: target);
         return true;
       },
       onUnauthorized: (_) async {
+        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
         await assertUserTileIsNotVisible(initiator: initiator, target: target);
         return false;
       },
@@ -31,8 +37,14 @@ extension DeleteUserExtension on WidgetTester {
     await userAdministrationService.authorizeDeleteUser(
       initiator: initiator.user,
       target: target.user,
-      onAuthorized: () async => await _assertDeleteUserSucceeds(initiator: initiator, target: target),
-      onUnauthorized: (_) async => await _assertDeleteUserIsBlocked(initiator: initiator, target: target),
+      onAuthorized: () async {
+        log.authorized('$initiatorRole authorized to delete $targetRole');
+        await _assertDeleteUserSucceeds(initiator: initiator, target: target);
+      },
+      onUnauthorized: (_) async {
+        log.unauthorized('$initiatorRole unauthorized to delete $targetRole');
+        await _assertDeleteUserIsBlocked(initiator: initiator, target: target);
+      },
     );
   }
 

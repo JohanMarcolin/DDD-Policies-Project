@@ -1,5 +1,6 @@
 part of 'update_user_password_test.dart';
 
+final log = IntegrationTestDebugLogger(tag: 'UpdateUserPassword');
 final userAdministrationService = createStubbedUserAdministrationService();
 
 extension UpdateUserPasswordExtension on WidgetTester {
@@ -12,14 +13,19 @@ extension UpdateUserPasswordExtension on WidgetTester {
   /// - [initiator]: The user initiating the password update.
   /// - [target]: The target user whose password is being updated.
   Future<void> updateUserPassword({required UserTestFixture initiator, required UserTestFixture target}) async {
+    final initiatorRole = initiator.user.role.name;
+    final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
+
     final canViewTarget = await userAdministrationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
+        log.authorized('$initiatorRole authorized to view $targetRole');
         await assertUserTileIsVisible(initiator: initiator, target: target);
         return true;
       },
       onUnauthorized: (_) async {
+        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
         await assertUserTileIsNotVisible(initiator: initiator, target: target);
         return false;
       },
@@ -31,12 +37,18 @@ extension UpdateUserPasswordExtension on WidgetTester {
     await userAdministrationService.authorizeUpdateUserPassword(
       initiator: initiator.user,
       target: target.user,
-      onAuthorized: () async => await _assertUpdatePasswordSucceeds(
-        initiator: initiator,
-        target: target,
-        newPassword: userAdministrationService.generateUserPassword(),
-      ),
-      onUnauthorized: (_) async => await _assertUpdatePasswordIsBlocked(initiator: initiator, target: target),
+      onAuthorized: () async {
+        log.authorized('$initiatorRole authorized to update password for $targetRole');
+        await _assertUpdatePasswordSucceeds(
+          initiator: initiator,
+          target: target,
+          newPassword: userAdministrationService.generateUserPassword(),
+        );
+      },
+      onUnauthorized: (_) async {
+        log.unauthorized('$initiatorRole unauthorized to update password for $targetRole');
+        await _assertUpdatePasswordIsBlocked(initiator: initiator, target: target);
+      },
     );
   }
 
