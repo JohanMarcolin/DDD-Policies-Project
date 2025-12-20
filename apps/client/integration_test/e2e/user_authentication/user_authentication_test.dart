@@ -8,6 +8,8 @@ import '../../utils/extensions/widget_finder_extensions.dart';
 import '../../utils/extensions/widget_tester_extensions.dart';
 import '../../utils/integration_test_server_fixture.dart';
 
+part 'user_authentication_extension.dart';
+
 /// Entry point for User Authentication integration tests.
 ///
 /// Covers login, session persistence, and logout scenarios for all user roles.
@@ -21,47 +23,10 @@ void main() {
 
     testWidgets('should login, persist session, and logout successfully', (WidgetTester tester) async {
       for (final user in await IntegrationTestServerFixture.createAllUserFixtures()) {
-        await _testLogin(tester, user);
-        await _testSessionPersistence(tester, user);
-        await _testLogout(tester, user);
+        await tester.testLogin(user);
+        await tester.testSessionPersistence(user);
+        await tester.testLogout(user);
       }
     });
   });
-}
-
-Future<void> _testLogin(WidgetTester tester, UserTestFixture user) async {
-  final roleName = user.role.name;
-  await tester.startApp();
-  await tester.login(email: user.email, password: user.password);
-  final userAdministrationView = find.byType(UserAdministrationView);
-
-  expect(
-    userAdministrationView,
-    findsOne,
-    reason: 'Should show UserAdministrationView after successful login for $roleName',
-  );
-  expect(
-    userAdministrationView.findDescendant(UserList),
-    findsOne,
-    reason: 'Should show UserList in UserAdministrationView for $roleName',
-  );
-}
-
-Future<void> _testSessionPersistence(WidgetTester tester, UserTestFixture user) async {
-  final roleName = user.role.name;
-  await tester.startApp();
-
-  expect(find.byType(LoginView), findsNothing, reason: 'LoginView should not be shown after app restart for $roleName');
-
-  expect(
-    find.byType(UserAdministrationView),
-    findsOne,
-    reason: 'Should show UserAdministrationView directly after app restart for $roleName',
-  );
-}
-
-Future<void> _testLogout(WidgetTester tester, UserTestFixture user) async {
-  await tester.tap(find.byIcon(Icons.logout));
-  await tester.pumpAndSettle();
-  expect(find.byType(LoginView), findsOne, reason: 'Should show LoginView after logout for ${user.role.name}');
 }
