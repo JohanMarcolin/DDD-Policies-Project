@@ -10,7 +10,7 @@ The project is organized as a Melos monorepo.
 It includes a Flutter client using BLoC for state management, with extensive BLoC and integration test coverage. 
 The server was built with Shelf using in-memory databases, including some API tests. 
 
-The project has a shared domain package implemented on both the client and server-side, including full unit-testing. 
+The project has a shared domain package implemented by both the client and server, and is fully unit-tested. 
 Other packages include utilities for API management, mapping and testing.
 
 Aside from the domain modeling, some advanced features were developed, such as server test fixtures for running isolated integration tests.
@@ -65,10 +65,10 @@ packages/
 	dart run apps/server/lib/application/main.dart
 	```
 6. **Select your Flutter Device**
-	- Using VSCode with Flutter installed, select your Android emulator as your *Flutter device*. Alternatively, generate a *launch.json* file and pass the emulator name as an argument.
+	- Using VSCode with Flutter installed, select your Android emulator as your *Flutter device*. Alternatively, generate a *"launch.json"* file and pass the emulator name as an argument.
 
 7. **Start the client**
-	- Manually run the client's *main.dart*, or run your *launch.json* file.
+	- Manually run the client's *main.dart*, or run your *"launch.json"* file.
 
 8. **Login to a test account**
 	 ```
