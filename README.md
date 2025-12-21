@@ -2,29 +2,31 @@
 
 ## Introduction
 I'm interested in how domain-driven design (DDD) policies can be used to centralize business logic in full-stack applications. 
-To explore this concept I've developed an Android app with an user administration domain. 
-The end result could serve as a practical example of DDD-policies being used to define and enforce business logic.
+To explore this I've developed an Android app with a user administration domain. 
+The end result could serve as a practical example of how DDD-policies can be used to define and enforce business logic.
 
 ## Description
-The project is organized as a Melos monorepo and includes a simplistic Flutter client using BLoC for state management, with extensive BLoC and integration test coverage. 
-The server was built with Shelf, using in-memory databases with controller level API testing. 
-The project also includes a shared domain package which was fully unit tested. Other packages include utilities for API management, mapping and testing.
+The project is organized as a Melos monorepo. 
+It includes a Flutter client using BLoC for state management, with extensive BLoC and integration test coverage. 
+The server was built with Shelf using in-memory databases, including some API tests. 
+The project has a shared domain package implemented on both the client and server-side, including full unit-testing. 
+Other packages include utilities for API management, mapping and testing.
 
-Some advanced features were included, such as policy based user action authorization and credential validation.
+Aside from the domain modeling, some advanced features were developed, such as automated test server fixtures for running isolated integration tests.
 
-By working on this project I've learned more about the challenges and potential benefits involved building a system with policy based business logic.
+By working on this project I've learned more about the challenges and potential benefits of building a full-stack application with policy based business logic. It's also been good for learning about integration testing in Flutter.
 
 ## Project Structure
 ```
 apps/
 	client/         # Flutter Android app
-	server/         # Shelf backend
+	server/         # Shelf app
 packages/
 	domain/         # Shared entities, services and policies etc
-	api_error_codes/# API error codes and base exceptions
+	api_error_codes/# API error codes, base exceptions
 	http_api/       # HTTP API client utility
-	test_utils/     # Test fixtures, runners, mocks, server utilities
-	mappers/        # Entity mappers
+	test_utils/     # Test fixtures, runners, mocks, server utilities etc
+	mappers/        # Model mappers
 ```
 
 ## UI Examples
@@ -45,11 +47,11 @@ packages/
 	```
 
 2. **Set up your development device**
-	- For Android: Install [Android Studio](https://developer.android.com/studio) and set up an emulator. Follow the official [Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup).
+	- Install [Android Studio](https://developer.android.com/studio) and set up an emulator. Follow the official [Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup).
 
 3. **Install dependencies for all packages/apps**
 	```sh
-	melos bootstrap
+	melos run bootstrap
 	```
 
 4. **Build the required env configuration for all packages/apps**
@@ -62,10 +64,10 @@ packages/
 	dart run apps/server/lib/application/main.dart
 	```
 6. **Select your Flutter Device**
-Set your Android emulator as your Flutter device
+	- Using VSCode with Flutter installed, select your Android emulator as your *Flutter device*. Alternatively, generate a *launch.json* file and pass the emulator name as an argument.
 
 7. **Start the client**
-Set your Android emulator as your *Flutter device* and manually run the client's *main.dart*, or setup and run a *launch.json* file passing the emulator name as an argument.
+	- Manually run the client's *main.dart*, or run your *launch.json* file.
 
 8. **Login to a test account**
 	 ```
