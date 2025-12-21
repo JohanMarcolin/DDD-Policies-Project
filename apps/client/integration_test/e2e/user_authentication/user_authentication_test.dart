@@ -16,7 +16,7 @@ part 'user_authentication_extension.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('User Authentication Scenario', () {
+  group('User authentication integration tests', () {
     setUpAll(() async => await IntegrationTestServerFixture.setup());
 
     tearDownAll(() async => await IntegrationTestServerFixture.teardown());

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Extension methods for [Finder] to simplify widget tree traversal in tests.
 ///
 /// These methods help locate widgets within the widget tree based on type or criteria.
-extension WidgetFinderExtension on Finder {
+extension FinderExtension on Finder {
   /// Finds widgets of the specified [Type] that are descendants of this [Finder].
   ///
   /// Example:

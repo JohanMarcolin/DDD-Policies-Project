@@ -16,14 +16,14 @@ import 'package:mocktail/mocktail.dart';
 import '../../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
-late MockUserRepository mockUserRepository;
+late MockUserRepository _mockUserRepository;
 
 extension on WidgetTester {
   Future<void> renderUpdateUserPasswordIcon({required User initiator, required User target}) async {
     return renderWidgetWithBlocStubs(
       testWidget: UpdateUserPasswordIcon(user: target),
       mockCurrentUser: initiator,
-      mockUserRepository: mockUserRepository,
+      mockUserRepository: _mockUserRepository,
     );
   }
 }
@@ -34,16 +34,16 @@ extension on WidgetTester {
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  final userAdministrationService = createStubbedUserAdministrationService();
+  final authorizationService = createStubbedUserAdministrationService();
 
   setUp(() {
-    mockUserRepository = MockUserRepository();
+    _mockUserRepository = MockUserRepository();
   });
 
   UserPairTestUtil.forEachUserPair(
     users: allMockUserPairs,
     onUserPair: (initiator, target) {
-      userAdministrationService.authorizeUpdateUserPassword(
+      authorizationService.authorizeUpdateUserPassword(
         initiator: initiator,
         target: target,
         onAuthorized: () {
@@ -98,7 +98,7 @@ Future<void> main() async {
             WidgetTester tester,
           ) async {
             when(
-              () => mockUserRepository.updatePassword(userId: target.userId, newPassword: mockValidPassword),
+              () => _mockUserRepository.updatePassword(userId: target.userId, newPassword: mockValidPassword),
             ).thenAnswer((_) async => {});
 
             await tester.renderUpdateUserPasswordIcon(initiator: initiator, target: target);
@@ -116,7 +116,7 @@ Future<void> main() async {
             expect(find.byType(UpdateUserPasswordDialogChild), findsNothing);
 
             verify(
-              () => mockUserRepository.updatePassword(userId: target.userId, newPassword: mockValidPassword),
+              () => _mockUserRepository.updatePassword(userId: target.userId, newPassword: mockValidPassword),
             ).called(1);
             expect(ActionSnackBarHelper.lastMessage, 'Password updated successfully');
           });
@@ -144,7 +144,7 @@ Future<void> main() async {
                 expect(find.byType(UpdateUserPasswordDialogChild), findsOne);
 
                 verifyNever(
-                  () => mockUserRepository.updatePassword(userId: target.userId, newPassword: invalidPassword),
+                  () => _mockUserRepository.updatePassword(userId: target.userId, newPassword: invalidPassword),
                 );
 
                 String expectedMessage;

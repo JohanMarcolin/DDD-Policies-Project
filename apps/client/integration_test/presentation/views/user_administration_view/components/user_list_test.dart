@@ -7,7 +7,7 @@ import 'package:test_utils/mocks/mock_users.dart';
 import '../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../utils/extensions/widget_tester_extensions.dart';
 
-late List<User> users;
+late List<User> _users;
 
 extension on WidgetTester {
   Future<void> renderUserList(List<User> users) async =>
@@ -16,24 +16,24 @@ extension on WidgetTester {
 
 /// Entry point for [UserList] integration tests.
 ///
-/// Covers presentation scenarios for user list display.
-Future<void> main() async {
+  /// Covers presentation scenarios for user list display.
+  Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
-    users = [mockUser, mockAdmin, mockAnalyst];
+    _users = [mockUser, mockAdmin, mockAnalyst];
   });
 
   group('userList', () {
     testWidgets('displays user list with all provided users', (WidgetTester tester) async {
-      await tester.renderUserList(users);
+      await tester.renderUserList(_users);
 
       final userList = find.byType(UserList);
       expect(userList, findsOne);
 
-      expect(userList.findDescendant(UserTile), findsExactly(users.length));
+      expect(userList.findDescendant(UserTile), findsExactly(_users.length));
 
-      for (final user in users) {
+      for (final user in _users) {
         final userTileFinder = find.descendant(
           of: userList,
           matching: find.byWidgetPredicate((widget) {

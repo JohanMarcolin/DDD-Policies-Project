@@ -13,13 +13,13 @@ import '../../../../utils/extensions/widget_tester_extensions.dart';
 import '../../../../../test_utils/mock_auth_api.dart';
 
 late MockAuthApi mockAuthApi;
-late MockUserRepository mockUserRepository;
+late MockUserRepository _mockUserRepository;
 
 extension on WidgetTester {
   Future<void> renderUserAdministrationAppBar() async => await renderWidgetWithBlocStubs(
     testWidget: UserAdministrationAppBar(),
     mockAuthApi: mockAuthApi,
-    mockUserRepository: mockUserRepository,
+    mockUserRepository: _mockUserRepository,
   );
 }
 
@@ -32,7 +32,7 @@ Future<void> main() async {
   group('UserAdministrationApp', () {
     setUp(() {
       mockAuthApi = MockAuthApi();
-      mockUserRepository = MockUserRepository();
+      _mockUserRepository = MockUserRepository();
     });
     testWidgets('displays app bar with all required static components', (WidgetTester tester) async {
       await tester.renderUserAdministrationAppBar();

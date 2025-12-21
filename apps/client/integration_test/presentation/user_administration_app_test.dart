@@ -5,22 +5,17 @@ import 'package:client/presentation/views/user_administration_view/user_administ
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
 
 import '../utils/extensions/widget_finder_extensions.dart';
 import '../utils/extensions/widget_tester_extensions.dart';
 import '../../test_utils/mock_auth_api.dart';
 
-late MockAuthApi mockAuthApi;
-late MockUserRepository mockUserRepository;
+late MockAuthApi _mockAuthApi;
 
 extension on WidgetTester {
-  Future<void> renderUserAdministrationApp() async => await renderWidgetWithBlocStubs(
-    testWidget: UserAdministrationApp(),
-    mockAuthApi: mockAuthApi,
-    mockUserRepository: mockUserRepository,
-  );
+  Future<void> renderUserAdministrationApp() async =>
+      await renderWidgetWithBlocStubs(testWidget: UserAdministrationApp(), mockAuthApi: _mockAuthApi);
 }
 
 /// Entry point for [UserAdministrationApp] integration tests.
@@ -31,8 +26,7 @@ Future<void> main() async {
 
   group('UserAdministrationApp', () {
     setUp(() {
-      mockAuthApi = MockAuthApi();
-      mockUserRepository = MockUserRepository();
+      _mockAuthApi = MockAuthApi();
     });
     testWidgets('displays user administration view with all required static components', (WidgetTester tester) async {
       await tester.renderUserAdministrationApp();
@@ -54,7 +48,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows user administration view when user is authenticated', (WidgetTester tester) async {
-      when(() => mockAuthApi.refreshAccessToken()).thenAnswer((_) async => mockUser);
+      when(() => _mockAuthApi.refreshAccessToken()).thenAnswer((_) async => mockUser);
 
       await tester.renderUserAdministrationApp();
 

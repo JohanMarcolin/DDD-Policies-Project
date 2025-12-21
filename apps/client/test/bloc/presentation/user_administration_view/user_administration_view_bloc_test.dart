@@ -7,13 +7,12 @@ import 'package:test_utils/user_pair_test_util.dart';
 import 'package:mocktail/mocktail.dart';
 import 'user_administration_view_bloc_test_fixture.dart';
 
-final blocFixture = UserAdministrationViewBlocTestFixture();
-
-final userAdministrationService = createStubbedUserAdministrationService();
+final _blocFixture = UserAdministrationViewBlocTestFixture();
+final _authorizationService = createStubbedUserAdministrationService();
 
 void main() {
   tearDown(() {
-    blocFixture.dispose();
+    _blocFixture.dispose();
   });
 
   group('UserAdministrationViewBloc', () {
@@ -21,7 +20,7 @@ void main() {
       UserPairTestUtil.forEachUserPair(
         users: distinctMockUsers,
         onUserPair: (currentUser, targetUser) {
-          blocFixture.test(
+          _blocFixture.test(
             description: 'should initialize with expected state',
             currentUser: currentUser,
             targetUser: targetUser,
@@ -36,16 +35,16 @@ void main() {
         UserPairTestUtil.forEachUserPair(
           users: allMockUserPairs,
           onUserPair: (initiator, target) {
-            userAdministrationService.authorizeViewUser(
+            _authorizationService.authorizeViewUser(
               initiator: initiator,
               target: target,
               onAuthorized: () {
-                blocFixture.test(
+                _blocFixture.test(
                   description:
                       'fetched users should include users with role ${target.role.name} when FetchUsersRequested is added',
                   currentUser: initiator,
                   targetUser: target,
-                  stub: () => when(() => blocFixture.mockRepository.users).thenAnswer((_) async => allMockUserPairs),
+                  stub: () => when(() => _blocFixture.mockRepository.users).thenAnswer((_) async => allMockUserPairs),
                   act: (bloc) => bloc.add(FetchUsersRequested()),
                   expect: () => [isA<UserAdministrationViewLoading>(), isA<UserAdministrationViewLoaded>()],
                   verify: (bloc) {
@@ -56,11 +55,11 @@ void main() {
                     }
                   },
                 );
-                blocFixture.test(
+                _blocFixture.test(
                   description: 'fetched users should emit failure when repo throws on FetchUsersRequested',
                   currentUser: initiator,
                   targetUser: target,
-                  stub: () => when(() => blocFixture.mockRepository.users).thenThrow(Exception('fetch error')),
+                  stub: () => when(() => _blocFixture.mockRepository.users).thenThrow(Exception('fetch error')),
                   act: (bloc) => bloc.add(FetchUsersRequested()),
                   expect: () => [isA<UserAdministrationViewLoading>(), isA<UserAdministrationViewFailure>()],
                   verify: (bloc) {
@@ -69,12 +68,12 @@ void main() {
                 );
               },
               onUnauthorized: (_) {
-                blocFixture.test(
+                _blocFixture.test(
                   description:
                       'fetched users should not include users with role ${target.role.name} when FetchUsersRequested is added',
                   currentUser: initiator,
                   targetUser: target,
-                  stub: () => when(() => blocFixture.mockRepository.users).thenAnswer((_) async => allMockUserPairs),
+                  stub: () => when(() => _blocFixture.mockRepository.users).thenAnswer((_) async => allMockUserPairs),
                   act: (bloc) => bloc.add(FetchUsersRequested()),
                   expect: () => [isA<UserAdministrationViewLoading>(), isA<UserAdministrationViewLoaded>()],
                   verify: (bloc) {
@@ -93,29 +92,29 @@ void main() {
           UserPairTestUtil.forEachUserPair(
             users: allMockUserPairs,
             onUserPair: (initiator, target) {
-              userAdministrationService.authorizeDeleteUser(
+              _authorizationService.authorizeDeleteUser(
                 initiator: initiator,
                 target: target,
                 onAuthorized: () {
                   final isDeletingSelf = initiator.isSameAs(target);
 
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should delete user when DeleteUserRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () =>
-                        when(() => blocFixture.mockRepository.delete(userId: target.userId)).thenAnswer((_) async {}),
+                        when(() => _blocFixture.mockRepository.delete(userId: target.userId)).thenAnswer((_) async {}),
                     event: DeleteUserRequested(targetUser: target),
                     expectPresentation: () => isDeletingSelf ? [isA<DeleteSelfSuccess>()] : [isA<DeleteUserSuccess>()],
-                    verify: (bloc) => verify(() => blocFixture.mockRepository.delete(userId: target.userId)).called(1),
+                    verify: (bloc) => verify(() => _blocFixture.mockRepository.delete(userId: target.userId)).called(1),
                   );
 
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should emit failure when repo throws on DeleteUserRequested',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.delete(userId: target.userId),
+                      () => _blocFixture.mockRepository.delete(userId: target.userId),
                     ).thenThrow(Exception('delete error')),
                     event: DeleteUserRequested(targetUser: target),
                     expectPresentation: () => [isA<DeleteUserFailure>()],
@@ -123,15 +122,15 @@ void main() {
                   );
                 },
                 onUnauthorized: (_) {
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should not delete user when DeleteUserRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () =>
-                        when(() => blocFixture.mockRepository.delete(userId: target.userId)).thenAnswer((_) async {}),
+                        when(() => _blocFixture.mockRepository.delete(userId: target.userId)).thenAnswer((_) async {}),
                     event: DeleteUserRequested(targetUser: target),
                     expectPresentation: () => [isA<DeleteUserFailure>()],
-                    verify: (bloc) => verifyNever(() => blocFixture.mockRepository.delete(userId: target.userId)),
+                    verify: (bloc) => verifyNever(() => _blocFixture.mockRepository.delete(userId: target.userId)),
                   );
                 },
               );
@@ -143,63 +142,63 @@ void main() {
           UserPairTestUtil.forEachUserPair(
             users: allMockUserPairs,
             onUserPair: (initiator, target) {
-              userAdministrationService.authorizeUpdateUserEmail(
+              _authorizationService.authorizeUpdateUserEmail(
                 initiator: initiator,
                 target: target,
                 onAuthorized: () {
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should update user email with valid new email when UpdateUserEmailRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
+                      () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
                     ).thenAnswer((_) async {}),
                     event: UpdateUserEmailRequested(targetUser: target, newEmail: mockValidEmail),
                     expectPresentation: () => [isA<UpdateUserEmailSuccess>()],
                     verify: (bloc) => verify(
-                      () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
+                      () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
                     ).called(1),
                   );
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should emit failure when repo throws on UpdateUserEmailRequested',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
+                      () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
                     ).thenThrow(Exception('update email error')),
                     event: UpdateUserEmailRequested(targetUser: target, newEmail: mockValidEmail),
                     expectPresentation: () => [isA<UpdateUserEmailFailure>()],
                     verify: (bloc) {},
                   );
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description:
                         'should not update user email with invalid new email when UpdateUserEmailRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockInvalidEmail),
+                      () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockInvalidEmail),
                     ).thenAnswer((_) async {}),
                     event: UpdateUserEmailRequested(targetUser: target, newEmail: mockInvalidEmail),
                     expectPresentation: () => [isA<UpdateUserEmailInvalid>()],
                     verify: (bloc) => verifyNever(
-                      () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockInvalidEmail),
+                      () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockInvalidEmail),
                     ),
                   );
                 },
                 onUnauthorized: (_) {
                   for (final newEmail in [mockValidEmail, mockInvalidEmail]) {
-                    blocFixture.testPresentation(
+                    _blocFixture.testPresentation(
                       description:
                           'should not update user email with any new email when UpdateUserEmailRequested is added',
                       currentUser: initiator,
                       targetUser: target,
                       stub: () => when(
-                        () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: newEmail),
+                        () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: newEmail),
                       ).thenAnswer((_) async {}),
                       event: UpdateUserEmailRequested(targetUser: target, newEmail: newEmail),
                       expectPresentation: () => [anyOf(isA<UpdateUserEmailInvalid>(), isA<UpdateUserEmailFailure>())],
                       verify: (bloc) => verifyNever(
-                        () => blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: newEmail),
+                        () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: newEmail),
                       ),
                     );
                   }
@@ -213,17 +212,17 @@ void main() {
           UserPairTestUtil.forEachUserPair(
             users: allMockUserPairs,
             onUserPair: (initiator, target) {
-              userAdministrationService.authorizeUpdateUserPassword(
+              _authorizationService.authorizeUpdateUserPassword(
                 initiator: initiator,
                 target: target,
                 onAuthorized: () {
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description:
                         'should update user password with valid new password when UpdateUserPasswordRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updatePassword(
+                      () => _blocFixture.mockRepository.updatePassword(
                         userId: target.userId,
                         newPassword: mockValidPassword,
                       ),
@@ -231,18 +230,18 @@ void main() {
                     event: UpdateUserPasswordRequested(targetUser: target, newPassword: mockValidPassword),
                     expectPresentation: () => [isA<UpdateUserPasswordSuccess>()],
                     verify: (bloc) => verify(
-                      () => blocFixture.mockRepository.updatePassword(
+                      () => _blocFixture.mockRepository.updatePassword(
                         userId: target.userId,
                         newPassword: mockValidPassword,
                       ),
                     ).called(1),
                   );
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description: 'should emit failure when repo throws on UpdateUserPasswordRequested',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updatePassword(
+                      () => _blocFixture.mockRepository.updatePassword(
                         userId: target.userId,
                         newPassword: mockValidPassword,
                       ),
@@ -251,13 +250,13 @@ void main() {
                     expectPresentation: () => [isA<UpdateUserPasswordFailure>()],
                     verify: (bloc) {},
                   );
-                  blocFixture.testPresentation(
+                  _blocFixture.testPresentation(
                     description:
                         'should not update user password with invalid new password when UpdateUserPasswordRequested is added',
                     currentUser: initiator,
                     targetUser: target,
                     stub: () => when(
-                      () => blocFixture.mockRepository.updatePassword(
+                      () => _blocFixture.mockRepository.updatePassword(
                         userId: target.userId,
                         newPassword: mockTooShortPassword,
                       ),
@@ -265,7 +264,7 @@ void main() {
                     event: UpdateUserPasswordRequested(targetUser: target, newPassword: mockTooShortPassword),
                     expectPresentation: () => [isA<UpdateUserPasswordInvalid>()],
                     verify: (bloc) => verifyNever(
-                      () => blocFixture.mockRepository.updatePassword(
+                      () => _blocFixture.mockRepository.updatePassword(
                         userId: target.userId,
                         newPassword: mockTooShortPassword,
                       ),
@@ -274,14 +273,14 @@ void main() {
                 },
                 onUnauthorized: (_) {
                   for (final newPassword in [mockValidPassword, mockTooShortPassword]) {
-                    blocFixture.testPresentation(
+                    _blocFixture.testPresentation(
                       description:
                           'should not update user password with any new password when UpdateUserPasswordRequested is added',
                       currentUser: initiator,
                       targetUser: target,
                       stub: () => when(
                         () =>
-                            blocFixture.mockRepository.updatePassword(userId: target.userId, newPassword: newPassword),
+                            _blocFixture.mockRepository.updatePassword(userId: target.userId, newPassword: newPassword),
                       ).thenAnswer((_) async {}),
                       event: UpdateUserPasswordRequested(targetUser: target, newPassword: newPassword),
                       expectPresentation: () => [
@@ -289,7 +288,7 @@ void main() {
                       ],
                       verify: (bloc) => verifyNever(
                         () =>
-                            blocFixture.mockRepository.updatePassword(userId: target.userId, newPassword: newPassword),
+                            _blocFixture.mockRepository.updatePassword(userId: target.userId, newPassword: newPassword),
                       ),
                     );
                   }

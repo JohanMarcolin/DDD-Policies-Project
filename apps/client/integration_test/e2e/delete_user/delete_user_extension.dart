@@ -1,14 +1,14 @@
 part of 'delete_user_test.dart';
 
-final log = IntegrationTestDebugLogger(tag: 'DeleteUser');
-final userAdministrationService = createStubbedUserAdministrationService();
+final _log = IntegrationTestDebugLogger(tag: 'DeleteUser');
+final _authorizationService = createStubbedUserAdministrationService();
 
 extension DeleteUserExtension on WidgetTester {
   /// Deletes a target user as an initiator.
   ///
-  /// This method first checks if the initiator is authorized to view the target user.
+  /// Checks if the initiator is authorized to view the target user.
   /// If authorized, it proceeds to check if the initiator can delete the target user.
-  /// Depending on the authorization, it either deletes the user or asserts that the deletion is blocked.
+  /// Depending on the authorization, it either deletes the user or verifys that the deletion is blocked.
   ///
   /// [initiator]: The user initiating the deletion.
   /// [target]: The target user who is being deleted.
@@ -16,17 +16,17 @@ extension DeleteUserExtension on WidgetTester {
     final initiatorRole = initiator.user.role.name;
     final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
 
-    final canViewTarget = await userAdministrationService.authorizeViewUser(
+    final canViewTarget = await _authorizationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to view $targetRole');
-        await assertUserTileIsVisible(initiator: initiator, target: target);
+        _log.authorized('$initiatorRole authorized to view $targetRole');
+        await verifyUserTileIsVisible(initiator: initiator, target: target);
         return true;
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
-        await assertUserTileIsNotVisible(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to view $targetRole');
+        await verifyUserTileIsNotVisible(initiator: initiator, target: target);
         return false;
       },
     );
@@ -34,16 +34,16 @@ extension DeleteUserExtension on WidgetTester {
     /// If the initiator cannot view the target, they cannot delete the target.
     if (!canViewTarget) return;
 
-    await userAdministrationService.authorizeDeleteUser(
+    await _authorizationService.authorizeDeleteUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to delete $targetRole');
-        await _assertDeleteUserSucceeds(initiator: initiator, target: target);
+        _log.authorized('$initiatorRole authorized to delete $targetRole');
+        await _verifyDeleteUserSucceeds(initiator: initiator, target: target);
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to delete $targetRole');
-        await _assertDeleteUserIsBlocked(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to delete $targetRole');
+        await _verifyDeleteUserIsBlocked(initiator: initiator, target: target);
       },
     );
   }
@@ -56,7 +56,7 @@ extension DeleteUserExtension on WidgetTester {
   ///
   /// [initiator]: The user initiating the deletion.
   /// [target]: The target user to be deleted.
-  Future<void> _assertDeleteUserSucceeds({required UserTestFixture initiator, required UserTestFixture target}) async {
+  Future<void> _verifyDeleteUserSucceeds({required UserTestFixture initiator, required UserTestFixture target}) async {
     final targetUserRole = target.user.role.name;
 
     await startApp();
@@ -108,7 +108,7 @@ extension DeleteUserExtension on WidgetTester {
   ///
   /// [initiator]: The user initiating the deletion.
   /// [target]: The target user whose deletion is blocked.
-  Future<void> _assertDeleteUserIsBlocked({required UserTestFixture initiator, required UserTestFixture target}) async {
+  Future<void> _verifyDeleteUserIsBlocked({required UserTestFixture initiator, required UserTestFixture target}) async {
     final targetUserRole = target.user.role.name;
 
     await startApp();

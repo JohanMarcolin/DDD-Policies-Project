@@ -28,7 +28,7 @@ import 'widget_finder_extensions.dart';
 /// - Call [renderWidgetWithBlocStubs] to pump a widget wrapped in stubbed BLoC providers.
 /// - Access [authBlocWithStubs] and [userAdministrationViewBlocWithStubs] for direct BLoC manipulation.
 /// - Customize the injected `currentUser`, `mockAuthApi`, or `mockUserRepository` for specific test scenarios.
-extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
+extension RenderWidgetWithBlocStubsExtension on WidgetTester {
   static late AuthBloc _authBlocWithStubs;
   static late UserAdministrationViewBloc _userAdministrationViewBlocWithStubs;
 
@@ -90,7 +90,7 @@ extension WidgetTesterRenderWidgetWithBlocStubsExtension on WidgetTester {
 }
 
 /// Extension methods on [WidgetTester] for login and logout actions in tests.
-extension WidgetTesterLoginExtension on WidgetTester {
+extension LoginExtension on WidgetTester {
   /// Simulates a login action by entering credentials and tapping the login button.
   ///
   /// - [email]: The email to enter.
@@ -115,8 +115,8 @@ extension WidgetTesterLoginExtension on WidgetTester {
   }
 }
 
-/// Extension methods on [WidgetTester] for finding and asserting visibility of UserTiles.
-extension WidgetTesterTileFinderExtension on WidgetTester {
+/// Extension methods on [WidgetTester] for finding and verifying visibility of UserTiles.
+extension UserTileFinderExtension on WidgetTester {
   /// Finds a [UserTile] widget by the user's ID.
   ///
   /// - [userId]: The ID of the user to find.
@@ -131,23 +131,23 @@ extension WidgetTesterTileFinderExtension on WidgetTester {
     return find.byWidgetPredicate((widget) => widget is UserTile && widget.user.email.value == email.value);
   }
 
-  /// Asserts that a [UserTile] is visible for the given initiator and target users.
+  /// Verifies that a [UserTile] is visible for the given initiator and target users.
   ///
   /// - [initiator]: The user initiating the action.
   /// - [target]: The target user whose tile visibility is being checked.
-  Future<void> assertUserTileIsVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
-    await _assertUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: true);
+  Future<void> verifyUserTileIsVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
+    await _verifyUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: true);
   }
 
-  /// Asserts that a [UserTile] is not visible for the given initiator and target users.
+  /// Verifies that a [UserTile] is not visible for the given initiator and target users.
   ///
   /// - [initiator]: The user initiating the action.
   /// - [target]: The target user whose tile visibility is being checked.
-  Future<void> assertUserTileIsNotVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
-    await _assertUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: false);
+  Future<void> verifyUserTileIsNotVisible({required UserTestFixture initiator, required UserTestFixture target}) async {
+    await _verifyUserTileVisibility(initiator: initiator, target: target, shouldBeVisible: false);
   }
 
-  Future<void> _assertUserTileVisibility({
+  Future<void> _verifyUserTileVisibility({
     required UserTestFixture initiator,
     required UserTestFixture target,
     required bool shouldBeVisible,
@@ -167,7 +167,7 @@ extension WidgetTesterTileFinderExtension on WidgetTester {
 }
 
 /// Extension method on [WidgetTester] to find the Confirm button in dialogs.
-extension WidgetTesterConfirmButtonExtension on WidgetTester {
+extension ConfirmButtonExtension on WidgetTester {
   /// Finds the Confirm button in a dialog.
   Finder findConfirmButton() {
     return find.byWidgetPredicate(
@@ -177,7 +177,7 @@ extension WidgetTesterConfirmButtonExtension on WidgetTester {
 }
 
 /// Extension method on [WidgetTester] to start the app for integration tests.
-extension WidgetTesterStartAppExtension on WidgetTester {
+extension StartAppExtension on WidgetTester {
   /// Starts (or restarts) the app and waits for it to settle.
   Future<void> startApp() async {
     app.main();

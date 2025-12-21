@@ -20,7 +20,7 @@ void main() {
 
   Future<UserTestFixture> create(Role role) async => await IntegrationTestServerFixture.createUserFixture(role: role);
 
-  group('View User integration tests', () {
+  group('View user integration tests', () {
     group('Analyst tests', () {
       setUp(() async => await IntegrationTestServerFixture.setup());
       tearDown(() async => await IntegrationTestServerFixture.teardown());

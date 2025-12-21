@@ -19,14 +19,14 @@ import 'package:mocktail/mocktail.dart';
 import '../../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
-late MockUserRepository mockUserRepository;
+late MockUserRepository _mockUserRepository;
 
 extension on WidgetTester {
   Future<void> renderUpdateUserEmailIcon({required User initiator, required User target}) async {
     return renderWidgetWithBlocStubs(
       testWidget: UpdateUserEmailIcon(user: target),
       mockCurrentUser: initiator,
-      mockUserRepository: mockUserRepository,
+      mockUserRepository: _mockUserRepository,
     );
   }
 }
@@ -37,16 +37,16 @@ extension on WidgetTester {
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  final UserAdministrationService userAdministrationService = createStubbedUserAdministrationService();
+  final UserAdministrationService authorizationService = createStubbedUserAdministrationService();
 
   setUp(() {
-    mockUserRepository = MockUserRepository();
+    _mockUserRepository = MockUserRepository();
   });
 
   UserPairTestUtil.forEachUserPair(
     users: allMockUserPairs,
     onUserPair: (initiator, target) {
-      userAdministrationService.authorizeUpdateUserEmail(
+      authorizationService.authorizeUpdateUserEmail(
         initiator: initiator,
         target: target,
         onAuthorized: () {
@@ -99,7 +99,7 @@ Future<void> main() async {
 
           testWidgets('confirm with valid email shows success snackbar and closes dialog', (WidgetTester tester) async {
             when(
-              () => mockUserRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
+              () => _mockUserRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
             ).thenAnswer((_) async => {});
 
             await tester.renderUpdateUserEmailIcon(initiator: initiator, target: target);
@@ -116,7 +116,7 @@ Future<void> main() async {
 
             expect(find.byType(UpdateUserEmailDialogChild), findsNothing);
 
-            verify(() => mockUserRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail)).called(1);
+            verify(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail)).called(1);
             expect(ActionSnackBarHelper.lastMessage, 'Email updated successfully');
           });
 
@@ -138,7 +138,7 @@ Future<void> main() async {
                 await tester.pumpAndSettle();
                 expect(find.byType(UpdateUserEmailDialogChild), findsOne);
 
-                verifyNever(() => mockUserRepository.updateEmail(userId: target.userId, newEmail: invalidEmail));
+                verifyNever(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: invalidEmail));
 
                 expect(ActionSnackBarHelper.lastMessage, 'Invalid email format');
               },
@@ -150,7 +150,7 @@ Future<void> main() async {
             final isUpdatingSelf = initiator.isSameAs(target);
             final takenEmail = isUpdatingSelf ? initiator.email : target.email;
 
-            when(() => mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).thenThrow(
+            when(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).thenThrow(
               UserApiException(
                 isUpdatingSelf ? UpdateUserEmailInUseBySelf().toString() : UpdateUserEmailInUseByOther().toString(),
               ),
@@ -169,7 +169,7 @@ Future<void> main() async {
             await tester.pumpAndSettle();
             expect(find.byType(UpdateUserEmailDialogChild), findsOne);
 
-            verify(() => mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).called(1);
+            verify(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).called(1);
 
             if (isUpdatingSelf) {
               expect(ActionSnackBarHelper.lastMessage, 'This is your current email');

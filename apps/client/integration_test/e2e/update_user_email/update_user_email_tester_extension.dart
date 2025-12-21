@@ -1,15 +1,15 @@
 part of 'update_user_email_test.dart';
 
-final log = IntegrationTestDebugLogger(tag: 'UpdateUserEmail');
-final userAdministrationService = createStubbedUserAdministrationService();
+final _log = IntegrationTestDebugLogger(tag: 'UpdateUserEmail');
+final _authorizationService = createStubbedUserAdministrationService();
 
 /// Extension methods on [WidgetTester] for update user email scenarios.
 extension _UpdateUserEmailExtension on WidgetTester {
   /// Updates the email of a target user as an initiator.
   ///
-  /// This method first checks if the initiator is authorized to view the target user.
+  /// Checks if the initiator is authorized to view the target user.
   /// If authorized, it proceeds to check if the initiator can update the target's email.
-  /// Depending on the authorization, it either updates the email or asserts that the update is blocked.
+  /// Depending on the authorization, it either updates the email or verifies that the update is blocked.
   ///
   /// [initiator]: The user initiating the email update.
   /// [target]: The target user whose email is being updated.
@@ -17,17 +17,17 @@ extension _UpdateUserEmailExtension on WidgetTester {
     final initiatorRole = initiator.user.role.name;
     final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
 
-    final canViewTarget = await userAdministrationService.authorizeViewUser(
+    final canViewTarget = await _authorizationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to view $targetRole');
-        await assertUserTileIsVisible(initiator: initiator, target: target);
+        _log.authorized('$initiatorRole authorized to view $targetRole');
+        await verifyUserTileIsVisible(initiator: initiator, target: target);
         return true;
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
-        await assertUserTileIsNotVisible(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to view $targetRole');
+        await verifyUserTileIsNotVisible(initiator: initiator, target: target);
         return false;
       },
     );
@@ -35,32 +35,28 @@ extension _UpdateUserEmailExtension on WidgetTester {
     /// If the initiator cannot view the target, they cannot update the target's email.
     if (!canViewTarget) return;
 
-    await userAdministrationService.authorizeUpdateUserEmail(
+    await _authorizationService.authorizeUpdateUserEmail(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to update email for $targetRole');
-        await _assertUpdateUserEmailSucceeds(initiator: initiator, target: target);
+        _log.authorized('$initiatorRole authorized to update email for $targetRole');
+        await _verifyUpdateUserEmailSucceeds(initiator: initiator, target: target);
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to update email for $targetRole');
-        await _assertUpdateUserEmailIsBlocked(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to update email for $targetRole');
+        await _verifyUpdateUserEmailIsBlocked(initiator: initiator, target: target);
       },
     );
   }
 
-  /// Asserts that updating a user's email succeeds.
+  /// Verifies that updating a user's email succeeds.
   ///
-  /// This method performs the following steps:
-  /// - Logs in as the initiator.
-  /// - Finds the target user's tile and verifies the current email.
-  /// - Updates the email and verifies the update.
-  /// - Ensures the old email cannot be used to log in.
-  /// - Verifies login with the new email.
+  /// Logs in as the initiator, verifies the target user's current email, updates the email, and ensures the old email
+  /// cannot be used to log in. Verifies login with the new email.
   ///
   /// [initiator]: The user initiating the email update.
   /// [target]: The target user whose email is being updated.
-  Future<void> _assertUpdateUserEmailSucceeds({
+  Future<void> _verifyUpdateUserEmailSucceeds({
     required UserTestFixture initiator,
     required UserTestFixture target,
   }) async {
@@ -137,16 +133,16 @@ extension _UpdateUserEmailExtension on WidgetTester {
 
   /// Waits for the target user's tile to reflect the updated email.
   ///
-  /// This method repeatedly checks the target user's tile until the email is updated
+  /// Repeatedly checks the target user's tile until the email is updated
   /// or a timeout occurs.
   ///
   /// [targetUserId]: The ID of the target user whose email is being updated.
   /// [newTargetEmail]: The new email to verify in the target user's tile.
   /// [timeout]: The maximum duration to wait for the email update.
+  ///
   /// `Note:` The default [timeout] is likely excessive, but was set to avoid flakiness due to
-  /// performance differences in Android emulators. Further optimization of the client app
-  /// may allow for a reduced or removed timeout, although this lies outside the scope of
-  /// the current project.
+  /// potential performance differences in Android emulators. Further optimization of the client app
+  /// may allow for a reduced or removed timeout, but this lies outside the scope of the current project.
   Future<bool> _isEmailUpdatedInTargetUserTile({
     required UserId targetUserId,
     required Email newTargetEmail,
@@ -156,7 +152,7 @@ extension _UpdateUserEmailExtension on WidgetTester {
 
     while (!_isTimedOut(startTime, timeout)) {
       await pumpAndSettle();
-      if (_isEmailUpdated(targetUserId, newTargetEmail)) return true;
+      if (_isEmailUpdateVerified(targetUserId, newTargetEmail)) return true;
     }
     fail('Target UserTile did not show updated email within ${timeout.inSeconds} seconds');
   }
@@ -168,23 +164,23 @@ extension _UpdateUserEmailExtension on WidgetTester {
     return DateTime.now().difference(startTime) > timeout;
   }
 
-  /// Checks if the target user's tile shows the updated email.
+  /// Verifies if the target user's tile shows the updated email.
   /// [targetUserId]: The ID of the target user.
   /// [newTargetEmail]: The new email to verify in the target user's tile.
-  bool _isEmailUpdated(UserId targetUserId, Email newTargetEmail) {
+  bool _isEmailUpdateVerified(UserId targetUserId, Email newTargetEmail) {
     final targetUserTile = findUserTileByUserId(targetUserId);
     final targetUserTileWidget = widget<UserTile>(targetUserTile);
     return targetUserTileWidget.user.email == newTargetEmail;
   }
 
-  /// Asserts that updating a user's email is blocked.
+  /// Verifies that updating a user's email is blocked.
   ///
-  /// This method verifies that the email update dialog is not shown
+  /// Verifies that the email update dialog is not shown
   /// when the initiator is unauthorized to update the target's email.
   ///
   /// [initiator]: The user initiating the email update.
   /// [target]: The target user whose email update is being blocked.
-  Future<void> _assertUpdateUserEmailIsBlocked({
+  Future<void> _verifyUpdateUserEmailIsBlocked({
     required UserTestFixture initiator,
     required UserTestFixture target,
   }) async {

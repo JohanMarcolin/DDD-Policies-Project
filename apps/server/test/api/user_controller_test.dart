@@ -14,7 +14,7 @@ import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  final userAdministrationService = createStubbedUserAdministrationService();
+  final authorizationService = createStubbedUserAdministrationService();
 
   late UserTestFixture initiator;
   late List<UserTestFixture> initiators;
@@ -50,7 +50,7 @@ void main() {
               expect(email, isNotNull);
               expect(role, isNotNull);
 
-              userAdministrationService.authorizeViewUser(
+              authorizationService.authorizeViewUser(
                 initiator: initiator.user,
                 target: User(userId: userId, email: email, role: role),
                 onAuthorized: () {},
@@ -76,7 +76,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeViewUser(
+            authorizationService.authorizeViewUser(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -109,7 +109,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeDeleteUser(
+            authorizationService.authorizeDeleteUser(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -137,7 +137,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserEmail(
+            authorizationService.authorizeUpdateUserEmail(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -159,7 +159,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserEmail(
+            authorizationService.authorizeUpdateUserEmail(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -184,7 +184,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserEmail(
+            authorizationService.authorizeUpdateUserEmail(
                 initiator: initiator.user,
                 target: initiator.user,
                 onAuthorized: () {
@@ -209,7 +209,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserEmail(
+            authorizationService.authorizeUpdateUserEmail(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -238,7 +238,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserPassword(
+            authorizationService.authorizeUpdateUserPassword(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {
@@ -260,7 +260,7 @@ void main() {
             );
             final body = jsonDecode(response.body);
 
-            userAdministrationService.authorizeUpdateUserPassword(
+            authorizationService.authorizeUpdateUserPassword(
                 initiator: initiator.user,
                 target: target.user,
                 onAuthorized: () {

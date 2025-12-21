@@ -1,32 +1,32 @@
 part of 'update_user_password_test.dart';
 
-final log = IntegrationTestDebugLogger(tag: 'UpdateUserPassword');
-final userAdministrationService = createStubbedUserAdministrationService();
+final _log = IntegrationTestDebugLogger(tag: 'UpdateUserPassword');
+final _authorizationService = createStubbedUserAdministrationService();
 
 extension UpdateUserPasswordExtension on WidgetTester {
   /// Updates the password of a target user as an initiator.
   ///
-  /// This method checks if the initiator is authorized to view the target user.
+  /// Checks if the initiator is authorized to view the target user.
   /// If authorized, it verifies if the initiator can update the target's password.
   /// Depending on the authorization, the password is either updated or the update is blocked.
   ///
-  /// - [initiator]: The user initiating the password update.
-  /// - [target]: The target user whose password is being updated.
+  /// [initiator]: The user initiating the password update.
+  /// [target]: The target user whose password is being updated.
   Future<void> updateUserPassword({required UserTestFixture initiator, required UserTestFixture target}) async {
     final initiatorRole = initiator.user.role.name;
     final targetRole = initiator.user.isSameAs(target.user) ? 'self' : target.user.role.name;
 
-    final canViewTarget = await userAdministrationService.authorizeViewUser(
+    final canViewTarget = await _authorizationService.authorizeViewUser(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to view $targetRole');
-        await assertUserTileIsVisible(initiator: initiator, target: target);
+        _log.authorized('$initiatorRole authorized to view $targetRole');
+        await verifyUserTileIsVisible(initiator: initiator, target: target);
         return true;
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to view $targetRole');
-        await assertUserTileIsNotVisible(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to view $targetRole');
+        await verifyUserTileIsNotVisible(initiator: initiator, target: target);
         return false;
       },
     );
@@ -34,34 +34,34 @@ extension UpdateUserPasswordExtension on WidgetTester {
     /// If the initiator cannot view the target, they cannot update the target's password.
     if (!canViewTarget) return;
 
-    await userAdministrationService.authorizeUpdateUserPassword(
+    await _authorizationService.authorizeUpdateUserPassword(
       initiator: initiator.user,
       target: target.user,
       onAuthorized: () async {
-        log.authorized('$initiatorRole authorized to update password for $targetRole');
-        await _assertUpdatePasswordSucceeds(
+        _log.authorized('$initiatorRole authorized to update password for $targetRole');
+        await _verifyUpdatePasswordSucceeds(
           initiator: initiator,
           target: target,
-          newPassword: userAdministrationService.generateUserPassword(),
+          newPassword: _authorizationService.generateUserPassword(),
         );
       },
       onUnauthorized: (_) async {
-        log.unauthorized('$initiatorRole unauthorized to update password for $targetRole');
-        await _assertUpdatePasswordIsBlocked(initiator: initiator, target: target);
+        _log.unauthorized('$initiatorRole unauthorized to update password for $targetRole');
+        await _verifyUpdatePasswordIsBlocked(initiator: initiator, target: target);
       },
     );
   }
 
-  /// Asserts that updating a user's password succeeds.
+  /// Verifies that updating a user's password succeeds.
   ///
   /// Logs in as the initiator and verifies the target user's tile is visible.
   /// Updates the password and ensures the dialog closes after the update.
   /// Verifies that the old password cannot be used to log in and that the new password works.
   ///
-  /// - [initiator]: The user initiating the password update.
-  /// - [target]: The target user whose password is being updated.
-  /// - [newPassword]: The new password to set for the target user.
-  Future<void> _assertUpdatePasswordSucceeds({
+  /// [initiator]: The user initiating the password update.
+  /// [target]: The target user whose password is being updated.
+  /// [newPassword]: The new password to set for the target user.
+  Future<void> _verifyUpdatePasswordSucceeds({
     required UserTestFixture initiator,
     required UserTestFixture target,
     required Password newPassword,
@@ -118,14 +118,14 @@ extension UpdateUserPasswordExtension on WidgetTester {
     expect(find.byType(UserAdministrationView), findsOne, reason: 'Login should succeed with new password');
   }
 
-  /// Asserts that updating a user's password is blocked.
+  /// Verifies that updating a user's password is blocked.
   ///
   /// Verifies that the password update dialog is not shown when the initiator
   /// is unauthorized to update the target's password.
 
-  /// - [initiator]: The user initiating the password update.
-  /// - [target]: The target user whose password update is being blocked.
-  Future<void> _assertUpdatePasswordIsBlocked({
+  /// [initiator]: The user initiating the password update.
+  /// [target]: The target user whose password update is being blocked.
+  Future<void> _verifyUpdatePasswordIsBlocked({
     required UserTestFixture initiator,
     required UserTestFixture target,
   }) async {

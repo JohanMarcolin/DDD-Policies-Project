@@ -13,14 +13,14 @@ import 'package:mocktail/mocktail.dart';
 import '../../../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../../../utils/extensions/widget_tester_extensions.dart';
 
-late MockUserRepository mockUserRepository;
+late MockUserRepository _mockUserRepository;
 
 extension on WidgetTester {
   Future<void> renderDeleteUserIcon({required User initiator, required User target}) async {
     return renderWidgetWithBlocStubs(
       testWidget: DeleteUserIcon(user: target),
       mockCurrentUser: initiator,
-      mockUserRepository: mockUserRepository,
+      mockUserRepository: _mockUserRepository,
     );
   }
 }
@@ -31,16 +31,16 @@ extension on WidgetTester {
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  final userAdministrationService = createStubbedUserAdministrationService();
+  final authorizationService = createStubbedUserAdministrationService();
 
   setUp(() {
-    mockUserRepository = MockUserRepository();
+    _mockUserRepository = MockUserRepository();
   });
 
   UserPairTestUtil.forEachUserPair(
     users: allMockUserPairs,
     onUserPair: (initiator, target) {
-      userAdministrationService.authorizeDeleteUser(
+      authorizationService.authorizeDeleteUser(
         initiator: initiator,
         target: target,
         onAuthorized: () {
@@ -96,7 +96,7 @@ Future<void> main() async {
           testWidgets('confirm with valid delete shows success snackbar and closes dialog', (
             WidgetTester tester,
           ) async {
-            when(() => mockUserRepository.delete(userId: target.userId)).thenAnswer((_) async => {});
+            when(() => _mockUserRepository.delete(userId: target.userId)).thenAnswer((_) async => {});
 
             await tester.renderDeleteUserIcon(initiator: initiator, target: target);
             final actionIcon = find.byType(ActionIcon);
@@ -110,7 +110,7 @@ Future<void> main() async {
 
             expect(find.byType(DeleteUserDialogChild), findsNothing);
 
-            verify(() => mockUserRepository.delete(userId: target.userId)).called(1);
+            verify(() => _mockUserRepository.delete(userId: target.userId)).called(1);
 
             final expectedMessage = initiator.isSameAs(target)
                 ? 'You have deleted your account'

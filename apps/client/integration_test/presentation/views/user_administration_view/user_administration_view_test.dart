@@ -11,14 +11,14 @@ import 'package:test_utils/mocks/mock_users.dart';
 import '../../../utils/extensions/widget_finder_extensions.dart';
 import '../../../utils/extensions/widget_tester_extensions.dart';
 
-late User currentUser;
-late MockUserRepository mockUserRepository;
+late User _currentUser;
+late MockUserRepository _mockUserRepository;
 
 extension on WidgetTester {
   Future<void> renderUserAdministrationView() async => await renderWidgetWithBlocStubs(
     testWidget: UserAdministrationView(),
-    mockCurrentUser: currentUser,
-    mockUserRepository: mockUserRepository,
+    mockCurrentUser: _currentUser,
+    mockUserRepository: _mockUserRepository,
   );
 }
 
@@ -30,8 +30,8 @@ Future<void> main() async {
 
   group('UserAdministrationView', () {
     setUp(() {
-      currentUser = mockUser;
-      mockUserRepository = MockUserRepository();
+      _currentUser = mockUser;
+      _mockUserRepository = MockUserRepository();
     });
     testWidgets('displays user administration view with all required static components', (WidgetTester tester) async {
       await tester.renderUserAdministrationView();
@@ -45,7 +45,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows loading indicator when fetching users', (WidgetTester tester) async {
-      when(() => mockUserRepository.users).thenAnswer((_) async {
+      when(() => _mockUserRepository.users).thenAnswer((_) async {
         await Future.delayed(const Duration(seconds: 1));
         return [];
       });
@@ -60,7 +60,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows failure message when user fetching fails', (WidgetTester tester) async {
-      when(() => mockUserRepository.users).thenThrow(Exception('Failed to fetch users'));
+      when(() => _mockUserRepository.users).thenThrow(Exception('Failed to fetch users'));
 
       await tester.renderUserAdministrationView();
 
@@ -72,7 +72,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows user list when users are fetched successfully', (WidgetTester tester) async {
-      when(() => mockUserRepository.users).thenAnswer((_) async => allMockUserPairs);
+      when(() => _mockUserRepository.users).thenAnswer((_) async => allMockUserPairs);
 
       await tester.renderUserAdministrationView();
 
