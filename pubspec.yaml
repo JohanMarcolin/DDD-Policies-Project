@@ -26,10 +26,13 @@ dependency_overrides:
 
 melos:
   scripts:
+    # Building
+    bootstrap: melos bootstrap
     env_build: melos exec --scope=env_config "dart run build_runner build --delete-conflicting-outputs"
+    # Code Quality
     lint: melos exec --concurrency=4 "dart analyze"
     format: melos exec --concurrency=16 "dart format . --line-length 120"
-
+    # Testing
     domain_unit_test: melos exec --scope=domain "dart test"
     client_bloc_test: melos exec --scope=client --fail-fast "flutter test test/bloc"
     client_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test"
