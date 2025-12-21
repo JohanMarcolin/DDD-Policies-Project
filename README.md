@@ -9,10 +9,11 @@ The end result could serve as a practical example of how DDD-policies can be use
 The project is organized as a Melos monorepo. 
 It includes a Flutter client using BLoC for state management, with extensive BLoC and integration test coverage. 
 The server was built with Shelf using in-memory databases, including some API tests. 
+
 The project has a shared domain package implemented on both the client and server-side, including full unit-testing. 
 Other packages include utilities for API management, mapping and testing.
 
-Aside from the domain modeling, some advanced features were developed, such as automated test server fixtures for running isolated integration tests.
+Aside from the domain modeling, some advanced features were developed, such as server test fixtures for running isolated integration tests.
 
 By working on this project I've learned more about the challenges and potential benefits of building a full-stack application with policy based business logic. It's also been good for learning about integration testing in Flutter.
 
@@ -22,21 +23,21 @@ apps/
 	client/         # Flutter Android app
 	server/         # Shelf app
 packages/
-	domain/         # Shared entities, services and policies etc
-	api_error_codes/# API error codes, base exceptions
+	domain/         # Shared entities, services & policies etc
+	api_error_codes/# API error codes & base exceptions
 	http_api/       # HTTP API client utility
-	test_utils/     # Test fixtures, runners, mocks, server utilities etc
+	test_utils/     # Test fixtures, runners & mocks etc
 	mappers/        # Model mappers
 ```
 
 ## UI Examples
 <p align="center">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="276">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_delete_user_policy.png?raw=true" width="276">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_email_policy.png?raw=true" width="276">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_password_policy.png?raw=true" width="276">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_email_policy.png?raw=true" width="276">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_password_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="250">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_delete_user_policy.png?raw=true" width="250">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_email_policy.png?raw=true" width="250">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_password_policy.png?raw=true" width="250">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_email_policy.png?raw=true" width="250">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_password_policy.png?raw=true" width="250">
 </p>
 
 ## How to Run Locally
@@ -47,7 +48,7 @@ packages/
 	```
 
 2. **Set up your development device**
-	- Install [Android Studio](https://developer.android.com/studio) and set up an emulator. Follow the official [Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup).
+	- Install [Android Studio](https://developer.android.com/studio) and set up an emulator ([Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup)).
 
 3. **Install dependencies for all packages/apps**
 	```sh
