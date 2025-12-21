@@ -35,5 +35,6 @@ melos:
     # Testing
     domain_unit_test: melos exec --scope=domain "dart test"
     client_bloc_test: melos exec --scope=client --fail-fast "flutter test test/bloc"
-    client_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test"
+    client_e2e_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test/e2e"
+    client_presentation_integration_test: melos exec --scope=client --fail-fast "flutter test integration_test/presentation"
     server_api_test: melos exec --scope=server --fail-fast "dart test"

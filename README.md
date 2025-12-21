@@ -2,7 +2,7 @@
 
 ## Introduction
 I'm interested in how domain-driven design (DDD) policies can be used to centralize business logic in full-stack applications. 
-To explore this concept I've developed an Android app with a user administration domain. 
+To explore this concept I've developed an Android app with an user administration domain. 
 The end result could serve as a practical example of DDD-policies being used to define and enforce business logic.
 
 ## Description
@@ -13,16 +13,6 @@ The project also includes a shared domain package which was fully unit tested. O
 Some advanced features were included, such as policy based user action authorization and credential validation.
 
 By working on this project I've learned more about the challenges and potential benefits involved building a system with policy based business logic.
-
-## UI Examples
-<p align="center">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="200">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_delete_user_policy.png?raw=true" width="200">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_email_policy.png?raw=true" width="200">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_password_policy.png?raw=true" width="200">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_email_policy.png?raw=true" width="200">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_password_policy.png?raw=true" width="200">
-</p>
 
 ## Project Structure
 ```
@@ -36,6 +26,16 @@ packages/
 	test_utils/     # Test fixtures, runners, mocks, server utilities
 	mappers/        # Entity mappers
 ```
+
+## UI Examples
+<p align="center">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_delete_user_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_email_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_password_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_email_policy.png?raw=true" width="276">
+  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_password_policy.png?raw=true" width="276">
+</p>
 
 ## How to Run Locally
 
@@ -61,11 +61,13 @@ packages/
 	```sh
 	dart run apps/server/lib/application/main.dart
 	```
+6. **Select your Flutter Device**
+Set your Android emulator as your Flutter device
 
-6. **Start the client**
-Manually run the client's main.dart or setup a launch.json file.
+7. **Start the client**
+Set your Android emulator as your *Flutter device* and manually run the client's *main.dart*, or setup and run a *launch.json* file passing the emulator name as an argument.
 
-7. **Login to a test account**
+8. **Login to a test account**
 	 ```
 	 User account:
 	 { email: "user1", password: "user1" }
@@ -78,15 +80,19 @@ Manually run the client's main.dart or setup a launch.json file.
 	 ```
 
 **Run tests**
-	 - **Server tests:**
-		 ```sh
-		 melos run server_api_test
-		 ```
-	 - **Client integration tests:**
-		 ```sh
-		 melos run client_integration_test
-		 ```
-	 - **Domain unit tests:**
-		 ```sh
-		 melos run domain_unit_test
-		 ```
+- **Server tests:**
+  ```sh
+  melos run server_api_test
+  ```
+- **Client presentation integration tests**
+  ```sh
+  melos run client_presentation_integration_test
+  ```
+- **Client e2e integration tests**
+  ```sh
+  melos run client_e2e_integration_test
+  ```
+- **Domain unit tests:**
+  ```sh
+  melos run domain_unit_test
+  ```
