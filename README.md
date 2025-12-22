@@ -7,21 +7,21 @@ The end result could serve as a practical example of how DDD-policies can be use
 
 ## Description
 The project is organized as a Melos monorepo. 
-It includes a Flutter client using BLoC for state management, with extensive BLoC and integration test coverage. 
-The server was built with Shelf using in-memory databases, including some API tests. 
+It includes a Flutter client using BLoC for state management. 
+The server was built with Dart and Shelf with in-memory databases. 
 
-The project has a shared domain package implemented by both the client and server, and is fully unit-tested. 
+The project has a shared domain package implemented by both the client and server. 
 Other packages include utilities for API management, mapping and testing.
 
 Aside from the domain modeling, some advanced features were developed, such as server test fixtures for running isolated integration tests.
 
-By working on this project I've learned more about the challenges and potential benefits of building a full-stack application with policy based business logic. It's also been good for learning about integration testing in Flutter.
+By working on this project I've learned more about the challenges and potential benefits of using DDD policies. It's also been a good opportunity for learning about integration testing in Flutter.
 
 ## Project Structure
 ```
 apps/
 	client/         # Flutter Android app
-	server/         # Shelf app
+	server/         # Dart/Shelf app
 packages/
 	domain/         # Shared entities, services & policies etc
 	api_error_codes/# API error codes & base exceptions
@@ -33,6 +33,7 @@ packages/
 <p align="center">
   <img src="/images/update_user_email_puml.png">
 </p>
+
 ## UI Examples
 <p align="center">
   <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="250">
