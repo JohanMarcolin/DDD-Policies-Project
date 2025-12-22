@@ -56,7 +56,7 @@ packages/
 
 3. **Install dependencies for all packages/apps**
 	```sh
-	melos run bootstrap
+	melos bootstrap
 	```
 
 4. **Build the required env configuration for all packages/apps**

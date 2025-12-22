@@ -27,7 +27,6 @@ dependency_overrides:
 melos:
   scripts:
     # Building
-    bootstrap: melos bootstrap
     env_build: melos exec --scope=env_config "dart run build_runner build --delete-conflicting-outputs"
     # Code Quality
     lint: melos exec --concurrency=4 "dart analyze"
