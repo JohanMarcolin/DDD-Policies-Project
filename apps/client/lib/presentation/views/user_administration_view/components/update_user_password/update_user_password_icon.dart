@@ -7,7 +7,7 @@ class UpdateUserPasswordIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = Icons.email;
+    final icon = Icons.password;
     final bloc = context.read<UserAdministrationViewBloc>();
     final isUserUpdatingSelf = bloc.isAdministratingSelf(user);
 
