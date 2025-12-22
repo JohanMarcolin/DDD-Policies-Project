@@ -52,7 +52,7 @@ packages/
 	```
 
 2. **Set up your development device**
-	- Install [Android Studio](https://developer.android.com/studio) and set up an emulator ([Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup)).
+	- Install [Android Studio](https://developer.android.com/studio) and set up an emulator ([Flutter Android setup guide](https://docs.flutter.dev/get-started/install/windows#android-setup)) for VSCode. You will also need to install [Melos](https://pub.dev/packages/melos).
 
 3. **Install dependencies for all packages/apps**
 	```sh
