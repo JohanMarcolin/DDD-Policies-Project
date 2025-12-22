@@ -36,12 +36,12 @@ packages/
 
 ## UI Examples
 <p align="center">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="250">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_delete_user_policy.png?raw=true" width="250">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_email_policy.png?raw=true" width="250">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_update_password_policy.png?raw=true" width="250">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_email_policy.png?raw=true" width="250">
-  <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/user_denied_by_password_policy.png?raw=true" width="250">
+  <img src="/images/analyst_denied_by_delete_user_policy.png" width="250">
+  <img src="/images/user_denied_by_delete_user_policy.png" width="250">
+  <img src="/images/user_denied_by_update_email_policy.png" width="250">
+  <img src="/images/user_denied_by_update_password_policy.png" width="250">
+  <img src="/images/user_denied_by_email_policy.png" width="250">
+  <img src="/images/user_denied_by_update_password_policy.png" width="250">
 </p>
 
 ## How to Run Locally
