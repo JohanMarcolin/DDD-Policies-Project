@@ -8,12 +8,12 @@ The end result could serve as a practical example of how DDD-policies can be use
 ## Description
 The project is organized as a Melos monorepo. 
 It includes a Flutter client using BLoC for state management. 
-The server was built with Dart and Shelf with in-memory databases. 
+The server was built with Dart and Shelf and uses in-memory databases. 
 
 The project has a shared domain package implemented by both the client and server. 
 Other packages include utilities for API management, mapping and testing.
 
-Aside from the domain modeling, some advanced features were developed, such as server test fixtures for running isolated integration tests.
+Aside from the domain modeling, some advanced features were developed, such as server utilities for running isolated integration tests.
 
 By working on this project I've learned more about the challenges and potential benefits of using DDD policies. It's also been a good opportunity for learning about integration testing in Flutter.
 
