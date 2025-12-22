@@ -29,7 +29,9 @@ packages/
 	test_utils/     # Test fixtures, runners & mocks etc
 	mappers/        # Model mappers
 ```
-
+## Update User Email Example
+  <img src="/images/update_user_email_puml.png" width="750">
+  
 ## UI Examples
 <p align="center">
   <img src="https://github.com/JohanMarcolin/DDD-Policies-Project/blob/master/images/analyst_denied_by_delete_user_policy.png?raw=true" width="250">
