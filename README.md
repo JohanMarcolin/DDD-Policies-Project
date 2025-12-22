@@ -69,7 +69,7 @@ packages/
 	dart run apps/server/lib/application/main.dart
 	```
 6. **Select your Flutter Device**
-	- Using VSCode with Flutter installed, select your Android emulator as your *Flutter device*. Alternatively, generate a *"launch.json"* file and pass the emulator name as an argument.
+	- Using VSCode with Flutter installed, enable Android and set your emulator as the *Flutter device*. Alternatively, generate a *"launch.json"* file and pass the emulator name as an argument.
 
 7. **Start the client**
 	- Manually run the client's *main.dart*, or run your *"launch.json"* file.
