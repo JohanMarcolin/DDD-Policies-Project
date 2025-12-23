@@ -15,7 +15,7 @@ Other packages include utilities for API management, mapping and testing.
 
 Aside from the domain modeling, some advanced features were developed, such as server utilities for running isolated integration tests.
 
-By working on this project I've learned more about the challenges and potential benefits of using DDD policies. It's also been a good opportunity for learning about integration testing in Flutter.
+By working on this project I've learned more about the challenges and potential benefits of using DDD policies. It's also been a good template for learning about integration testing in Flutter.
 
 ## Project Structure
 ```
