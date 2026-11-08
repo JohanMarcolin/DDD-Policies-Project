@@ -128,7 +128,7 @@ class UserAdministrationService {
   /// Throws [PolicyViolationException]<[UpdateUserEmailUnauthorizedReason] or [EmailInvalidReason]>.
   Future<void> updateUserEmail({required User initiator, required User target, required Email newEmail}) async {
     return _updateUserEmailPolicy.enforce(initiator, target, onAuthorized: () {
-      _userEmailValidationPolicy.enforce(newEmail, onValid: () {
+      return _userEmailValidationPolicy.enforce(newEmail, onValid: () {
         return _userRepository.updateEmail(userId: target.userId, newEmail: newEmail);
       });
     });
@@ -186,7 +186,7 @@ class UserAdministrationService {
   Future<void> updateUserPassword(
       {required User initiator, required User target, required Password newPassword}) async {
     return _updateUserPasswordPolicy.enforce(initiator, target, onAuthorized: () {
-      _userPasswordValidationPolicy.enforce(newPassword, onValid: () {
+      return _userPasswordValidationPolicy.enforce(newPassword, onValid: () {
         return _userRepository.updatePassword(userId: target.userId, newPassword: newPassword);
       });
     });

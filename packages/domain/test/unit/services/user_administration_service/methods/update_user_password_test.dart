@@ -2,8 +2,11 @@ import 'package:domain/policies/action_authorization_policies/user_administratio
 import 'package:domain/policies/policy_violation_exception.dart';
 import 'package:domain/policies/value_validation_policies/user_credentials/user_credential_policy.dart';
 import 'package:domain/services/user_administration/user_administration_service.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:test_utils/domain/user_administration_service.dart';
 import 'package:test_utils/mocks/mock_user_credentials.dart';
+import 'package:test_utils/mocks/mock_user_repository.dart';
 import 'package:test_utils/mocks/mock_users.dart';
 import '../../../utils/services/user_administration_service.dart';
 
@@ -171,6 +174,21 @@ void main() {
             );
           });
         }
+      });
+
+      test('should pass a failed repository update on to the caller', () async {
+        final mockUserRepository = MockUserRepository();
+        final failure = Exception('update password failed');
+        when(() => mockUserRepository.updatePassword(userId: mockUser.userId, newPassword: mockValidPassword))
+            .thenAnswer((_) async => throw failure);
+        final service = createStubbedUserAdministrationService(mockUserRepository);
+
+        expect(
+          () async =>
+              await service.updateUserPassword(initiator: mockUser, target: mockUser, newPassword: mockValidPassword),
+          throwsA(same(failure)),
+          reason: 'A failed repository update should reach the caller',
+        );
       });
     });
   });
