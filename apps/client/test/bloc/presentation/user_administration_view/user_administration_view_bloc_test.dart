@@ -165,7 +165,7 @@ void main() {
                     targetUser: target,
                     stub: () => when(
                       () => _blocFixture.mockRepository.updateEmail(userId: target.userId, newEmail: mockValidEmail),
-                    ).thenThrow(Exception('update email error')),
+                    ).thenAnswer((_) async => throw Exception('update email error')),
                     event: UpdateUserEmailRequested(targetUser: target, newEmail: mockValidEmail),
                     expectPresentation: () => [isA<UpdateUserEmailFailure>()],
                     verify: (bloc) {},
@@ -245,7 +245,7 @@ void main() {
                         userId: target.userId,
                         newPassword: mockValidPassword,
                       ),
-                    ).thenThrow(Exception('update password error')),
+                    ).thenAnswer((_) async => throw Exception('update password error')),
                     event: UpdateUserPasswordRequested(targetUser: target, newPassword: mockValidPassword),
                     expectPresentation: () => [isA<UpdateUserPasswordFailure>()],
                     verify: (bloc) {},

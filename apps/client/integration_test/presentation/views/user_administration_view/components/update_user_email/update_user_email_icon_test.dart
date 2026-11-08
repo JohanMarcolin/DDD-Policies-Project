@@ -150,8 +150,8 @@ Future<void> main() async {
             final isUpdatingSelf = initiator.isSameAs(target);
             final takenEmail = isUpdatingSelf ? initiator.email : target.email;
 
-            when(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).thenThrow(
-              UserApiException(
+            when(() => _mockUserRepository.updateEmail(userId: target.userId, newEmail: takenEmail)).thenAnswer(
+              (_) async => throw UserApiException(
                 isUpdatingSelf ? UpdateUserEmailInUseBySelf().toString() : UpdateUserEmailInUseByOther().toString(),
               ),
             );
